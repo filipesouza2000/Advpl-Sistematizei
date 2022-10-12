@@ -1,6 +1,6 @@
 #INCLUDE 'TOTVS.ch'
 #INCLUDE 'protheus.ch'
-
+// até aula 12 
 User Function zTGet()
 Local oDlg
 local oSay1
