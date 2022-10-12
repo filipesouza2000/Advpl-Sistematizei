@@ -1,0 +1,13 @@
+#INCLUDE "Protheus.ch"
+#INCLUDE "TOTVS.ch"
+
+User Function  zCadDev()
+    Local oJanela   := TDialog():New(0,0,550,700,'Cadastro de Desenvolvedores protheus',,,,,CLR_BLACK,CLR_WHITE,,,.T.)
+    Local oSayCodigo := TSay():New(10,10 ,{||'Codigo'}  , oJanela,,,,,.T.,CLR_BLACK,CLR_WHITE,300,20)
+    Local oSayName   := TSay():New(10,50 ,{||'Nome'}    , oJanela,,,,,.T.,CLR_BLACK,CLR_WHITE,300,20)
+    Local oSayDtNasc := TSay():New(10,100,{||'Dt.Nasc.'}, oJanela,,,,,.T.,CLR_BLACK,CLR_WHITE,300,20)
+    
+    oJanela:ACTIVATE(,,,.T.,{||msgstop('Fechando'),.T.,,{||msgstop('Abrindo')} })
+
+
+Return
