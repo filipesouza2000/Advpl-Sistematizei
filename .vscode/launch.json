@@ -7,9 +7,18 @@
 			"name": "Depuração do idioma TOTVS",
 			"program": "${command:AskForProgramName}",
 			"cwb": "${workspaceFolder}",
-			"smartclientBin": "../totvs/bin/smartclient/smartclient.exe",
+			"smartclientBin": "C:/TOTVS12133/Protheus/Protheus/bin/smartclient/smartclient.exe",
 			"isMultiSession": true,
 			"enableTableSync": true
 		}
-	]
+	],
+	"lastPrograms": [
+		{
+			"label": "U_zTDialog"
+		},
+		{
+			"label": "sigamdi"
+		}
+	],
+	"lastProgramExecuted": "U_zTDialog"
 }

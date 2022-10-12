@@ -1,0 +1,41 @@
+#INCLUDE 'TOTVS.ch'
+#INCLUDE 'Protheus.ch'
+//+++++++++++++++++++++++++++++++++++++++++++
+// ----Data ---|---- Autor--- |---- Descricao
+// 21/11/2011  | Filipe Souza | Exemplo de elementos visuais com
+//                              TDialog, TSay e TButton chamando rotinas, Tela redimencionada, 
+//++++++++++++++++++++++++++++++++++++++++++++
+User Function zTDialog()
+Local oDlg
+Local oButton
+Local oBtCli
+Local oBtForn
+Local oBtProd
+Local oSay1
+Local oFontbt
+Local oFontSay
+Local aSize:= MsAdvsize()//função interna que retorna array com as coordenadas da tela
+/* aSize[n]
+1-Linha inicial da area de trabalho
+2-coluna inicial da area de trabalho 
+3-Linha final da area de trabalho
+4-coluna final da area de trabalho
+5-coluna final dialog(janela)
+6-linha final diallog(janela)
+7-linha inicial dialog(janela)
+*/            
+oFontbt := TFont():new("Arial"      ,,15,,.t.,,,,,.F.,.F.)
+oFontSay:= TFont():new("Arial Black",,18,,.F.,,,,,.T.,.F.)
+
+//oDlg := TDialog():New(0,0,300,300,'TDialog',,,,,CLR_BLACK, CLR_WHITE,,,.T.)
+oDlg := TDialog():New(aSize[7],aSize[1],aSize[6],aSize[5],'TDialog',,,,,CLR_BLACK, CLR_WHITE,,,.T.)
+
+oSay1   :=TSay():New(02,60,{||'Módulos:'}  ,oDlg,,oFontSay,,,,.T.,CLR_RED,CLR_WHITE,60,10)
+oBtCli  :=TButton():New(015,050,"Cliente"   ,oDlg,{|| Mata030()},50,10,,oFontbt,.F.,.T.,.F.,,.F.,,,.F.)
+oBtForn :=TButton():New(030,050,"Fornecedor",oDlg,{|| Mata020()},50,10,,oFontbt,.F.,.T.,.F.,,.F.,,,.F.)
+oBtprod :=TButton():New(045,050,"Produto"   ,oDlg,{|| Mata010()},50,10,,oFontbt,.F.,.T.,.F.,,.F.,,,.F.)
+oButton :=TButton():New(060,070, "Sair"     ,oDlg,{||oDlg:end()},20,10,,,.F.,.T.,.F.,,.F.,,,.F. )     
+
+
+oDlg:ACTIVATE(,,,.T.)
+Return 
