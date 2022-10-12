@@ -1,0 +1,19 @@
+#INCLUDE 'TOTVS.ch'
+#INCLUDE 'protheus.ch'
+
+User Function zTGet()
+Local oDlg
+local oSay1
+Local oButton1
+Local oGet1
+Local cGet1 := Space(20)
+local aSize := MsAdvsize()
+oDlg:= oDlg := TDialog():New(aSize[7],aSize[1],aSize[6],aSize[5],'TGet TDialog',,,,,CLR_BLACK, CLR_WHITE,,,.T.)
+oSay1   :=TSay():New(15,10,{||'Nome: '}  ,oDlg,,,,,,.T.,CLR_RED,CLR_WHITE,60,10)
+oGet1  := TGet():New(30,10,{|u| IIF(PCount()>0,cGet1:=u,cGet1)},oDlg,060,010,"@!",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,cGet1,,,, )
+
+oButton1  :=TButton():New(45,10,"Nome"   ,oDlg,{|| MsgInfo(cGet1,"Gigitado")},20,10,,,.F.,.T.,.F.,,.F.,,,.F.)
+
+oDlg:ACTIVATE(,,,.F.)
+
+Return
