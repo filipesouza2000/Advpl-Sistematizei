@@ -1,0 +1,53 @@
+#INCLUDE 'Protheus.ch'
+#INCLUDE 'TopConn.ch'
+ // Formao Desenvolvedor Protheus
+ // Mdulo 7- Aula 2- parte 2 - 
+ // Exportando um comando beginSQL para o Excel com pergunta
+
+User Function SB1A2Excel() //SB1A2Excel AULA_SIS
+//PREPARE ENVIRONMENT EMPRESA "99" FILIAL "01"
+RpcSetEnv("99","01",,,"COM")
+
+Local cHora := SUBSTR(TIME() , 1, 2) + SUBSTR(TIME() , 4, 2) + SUBSTR(TIME() , 7, 2) 
+Local cFile  := GetTempPath()+'produto-'+dtos(Date())+cHora+'.xml'
+Local oExcel := FWMsExcelEx():New()
+oExcel:addWorkSheet("planilhaP")
+oExcel:addTable("planilhaP","TabPro")
+oExcel:addColumn("planilhaP","TabPro","PRODUTO",2,1,.F.)
+oExcel:addColumn("planilhaP","TabPro","DESCRICAO",2,1,.F.)
+oExcel:addColumn("planilhaP","TabPro","TIPO",2,1,.F.)
+oExcel:addColumn("planilhaP","TabPro","FORNECEDOR",2,1,.F.)
+oExcel:addColumn("planilhaP","TabPro","LOJA",2,1,.F.)
+oExcel:addColumn("planilhaP","TabPro","NOME",2,1,.F.)
+oExcel:addColumn("planilhaP","TabPro","TIPO",2,1,.F.)
+oExcel:addColumn("planilhaP","TabPro","UF",2,1,.F.)
+oExcel:addColumn("planilhaP","TabPro","MUNICIPIO",2,1,.F.)
+
+Pergunte("RELPROD1",.T.)
+  
+cAlias := GetNextAlias()
+beginSQL Alias cAlias
+    SELECT B1_COD , B1_DESC ,B1_TIPO , A2_COD , A2_LOJA , A2_NREDUZ , A2_TIPO , A2_EST , A2_MUN 
+    FROM %table:SB1% SB1 INNER JOIN %table:SA5% SA5
+    ON SB1.B1_COD = SA5.A5_PRODUTO AND SB1.D_E_L_E_T_ = SA5.D_E_L_E_T_
+    INNER JOIN %table:SA2% SA2
+    ON SA5.A5_FORNECE = SA2.A2_COD AND SA2.D_E_L_E_T_ = SA5.D_E_L_E_T_
+    WHERE SA5.%notdel%
+ENDSQL
+
+while !(cAlias)->(EOF())
+    oExcel:addRow("planilhaP","TabPro",;
+    {B1_COD , B1_DESC ,B1_TIPO , A2_COD , A2_LOJA , A2_NREDUZ , A2_TIPO , A2_EST , A2_MUN })
+    (cAlias)->(DBSKIP())
+ENDDO
+  
+    oExcel:ACTIVATE()
+    oExcel:GetXMLFile(cFile)
+
+  //Abrindo o excel e abrindo o arquivo xml
+    oExcel:= MsExcel():New()       //Abre uma nova conexo com Excel
+    oExcel:WorkBooks:Open(cFile)    //Abre uma planilha
+    oExcel:SetVisible(.T.)          //Visualiza a planilha
+    oExcel:Destroy()                //Encerra o processo do gerenciador de tarefas
+(cAlias)->(DBCLOSEAREA())  
+Return
