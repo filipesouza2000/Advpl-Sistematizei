@@ -1,0 +1,294 @@
+#INCLUDE 'TOTVS.ch'
+#INCLUDE 'Protheus.ch'
+#INCLUDE 'parmtype.ch'
+#INCLUDE 'FWMVCDef.ch'
+#Include "tbiconn.ch"
+
+
+User Function INTERFACE1()
+    Local oButtonn
+
+    DEFINE MSDIALOG oDlg TITLE "Tela customizada" FROM 0,0 TO 400,600 PIXEL 
+    oButtonn :=  TButton():New(190, 250, "Botao Sair",oDlg,{|| oDlg:end()}, 40,10,,,.F.,.T.,.F.,,.F.,,,.F. )     
+    ACTIVATE MSDIALOG oDlg CENTER 
+Return
+
+
+User Function MsPanel()
+ DEFINE DIALOG oDlg TITLE "Tela customizada" FROM 0,0 TO 300,650 PIXEL
+  //oPanel:= tPanel():New(10,10,"Painel 1",oDlg,,.T.,,,CLR_GRAY,150,100)
+  //oPanel:= tPanel():New(10,162,"Painel 2",oDlg,,.T.,,,CLR_GRAY,150,100)
+
+  @ 10,10 MSPANEL oPanel1 COLORS CLR_BLACK,CLR_GRAY SIZE 150, 100 OF oDlg
+  @ 50,70 SAY "Painel 1" OF oPanel1 PIXEL
+
+  @ 10,162 MSPANEL oPanel1 COLORS CLR_BLACK,CLR_GRAY SIZE 150, 100 OF oDlg
+  @ 50,70 SAY "Painel 2" OF oPanel1 PIXEL    
+ ACTIVATE DIALOG oDlg CENTERED
+Return
+
+
+User Function Folder()
+    Local aFolder
+    Local oFolder
+
+    DEFINE MSDIALOG oDlg TITLE "Tela customizada" FROM 0,0 TO 250,700 PIXEL 
+    aFolder := {"Pasta1","Pasta2","Pasta3","Pasta4","Pasta5"}
+    oFolder := TFolder():New(0,0,aFolder,aFolder,oDlg,,,,.T.,,350,100)
+    oButtonn :=  TButton():New(105,310, "Botao Sair",oDlg,{|| oDlg:end()}, 40,10,,,.F.,.T.,.F.,,.F.,,,.F. )     
+
+    ACTIVATE MSDIALOG oDlg CENTER 
+return
+
+User Function Input()
+    DEFINE MSDIALOG oDlg TITLE "Tela customizada" FROM 0,0 TO 200,200 PIXEL 
+    cGet := "nome"
+    @ 02,02 SAY "Nome:" OF oDlg PIXEL
+    oTGet := TGet():New( 01,20,{||cGet},oDlg,050,000,"@!",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,cGet,,,, )
+    oButtonn :=  TButton():New(60,60, "Botao Sair",oDlg,{|| oDlg:end()}, 40,10,,,.F.,.T.,.F.,,.F.,,,.F. )     
+
+    ACTIVATE MSDIALOG oDlg CENTER 
+return
+
+User Function SearchDefault()
+    DEFINE MSDIALOG oDlg TITLE "Tela customizada" FROM 0,0 TO 200,200 PIXEL 
+    cGet := Space(50)
+    @ 02,02 SAY "Nome:" OF oDlg PIXEL
+    @ 02,20 MSGET oData VAR cGet F3 "SA1" PICTURE "@!" SIZE 50, 10 OF oDlg PIXEL HASBUTTON
+    //oTGet := TGet():New( 01,20,{||cGet},oDlg,050,000,"@!",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,cGet,,,, )
+    oButtonn :=  TButton():New(60,60, "Botao Sair",oDlg,{|| oDlg:end()}, 40,10,,,.F.,.T.,.F.,,.F.,,,.F. )     
+
+    ACTIVATE MSDIALOG oDlg CENTER 
+return
+
+User Function ComboBox()
+    Local aItens:= {'Item1','Item2','Item3'}
+    DEFINE MSDIALOG oDlg TITLE "Tela customizada" FROM 0,0 TO 200,200 PIXEL 
+    cCombo:= aItens[1]
+    @ 02,01 SAY "Item:" OF oDlg PIXEL
+    oCombo := TComboBox():New(02,15,,aItens,50,20,oDlg,,,,,,.T.,,,,,,,,,'cCombo')    
+    oButtonn :=  TButton():New(60,60, "Botao Sair",oDlg,{|| oDlg:end()}, 40,10,,,.F.,.T.,.F.,,.F.,,,.F. )     
+
+    ACTIVATE MSDIALOG oDlg CENTER 
+return
+
+User Function InputCalendar()
+    Local  dData := ctod("01/01/22")
+    DEFINE MSDIALOG oDlg TITLE "Tela customizada" FROM 0,0 TO 200,200 PIXEL 
+    dGet := Date()
+    @ 02,02 SAY "Data:" OF oDlg PIXEL
+    @ 0,15 MSGET oData VAR dData PICTURE "@D" SIZE 50, 10 OF oDlg PIXEL HASBUTTON
+     //oGet := TGet():New( 02,15,,oDlg,060, 010, "@D",, 0, ,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F. ,,"dGet",,,, .T.)
+     oButtonn :=  TButton():New(60,60, "Botao Sair",oDlg,{|| oDlg:end()}, 40,10,,,.F.,.T.,.F.,,.F.,,,.F. )     
+
+    ACTIVATE MSDIALOG oDlg CENTER 
+return
+
+User Function InputRows()
+    DEFINE MSDIALOG oDlg TITLE "Tela customizada" FROM 0,0 TO 400,400 PIXEL 
+    @ 02,02 SAY "Obs:" OF oDlg PIXEL
+    oTMultiget := tMultiget():new( 02, 15,,oDlg, 150, 50, , , , , , .T. )
+    oButtonn :=  TButton():New(60,60, "Botao Sair",oDlg,{|| oDlg:end()}, 40,10,,,.F.,.T.,.F.,,.F.,,,.F. )     
+
+    ACTIVATE MSDIALOG oDlg CENTER 
+return
+
+User Function Checkbox()
+    Local  lCheck := .T. 
+    DEFINE MSDIALOG oDlg TITLE "Tela customizada" FROM 0,0 TO 200,200 PIXEL        
+    oCheck := TCheckBox():New(01,01,'Option 1',{||lCheck},oDlg,100,210,,,,,,,,.T.,,,)
+    oCheck := TCheckBox():New(11,01,'Option 2',,oDlg,100,210,,,,,,,,.T.,,,)
+    oCheck := TCheckBox():New(21,01,'Option 3',,oDlg,100,210,,,,,,,,.T.,,,)
+    oCheck := TCheckBox():New(31,01,'Option 4',,oDlg,100,210,,,,,,,,.T.,,,)
+    oCheck := TCheckBox():New(41,01,'Option 5',,oDlg,100,210,,,,,,,,.T.,,,)
+    oButton := TButton():New(60,60, "Botao Sair",oDlg,{|| oDlg:end()}, 40,10,,,.F.,.T.,.F.,,.F.,,,.F. )     
+
+    ACTIVATE MSDIALOG oDlg CENTER 
+return
+
+User Function RadioButtonn()
+    Local nBt 
+    Local aOptions
+    DEFINE MSDIALOG oDlg TITLE "Tela customizada" FROM 0,0 TO 200,200 PIXEL        
+    nBt := 1
+    aOptions := {'Option 1','Option 2','Option 3','Option 4','Option 5'}
+    oRadio := TRadMenu():New (03,03,aOptions,,oDlg,,,,,,,,100,12,,,,.T.)
+    oRadio:bSetGet := {|u|Iif (PCount()==0,nBt,nBt:=u)}
+    oButton := TButton():New(60,60, "Botao Sair",oDlg,{|| oDlg:end()}, 40,10,,,.F.,.T.,.F.,,.F.,,,.F. )     
+
+    ACTIVATE MSDIALOG oDlg CENTER 
+return
+
+User Function MsBrGetDBase()
+    Local aArray := {}
+    Local oBrowse := NIL
+
+    aAdd( aArray, { "000001", "CLIENTE  01", "NOME  01"} )
+    aAdd( aArray, { "000002", "CLIENTE  02", "NOME  02"} )
+    aAdd( aArray, { "000003", "CLIENTE  03", "NOME  03"} )
+    aAdd( aArray, { "000004", "CLIENTE  04", "NOME  04"} )
+    aAdd( aArray, { "000005", "CLIENTE  05", "NOME  05"} )
+    
+    DEFINE MSDIALOG oDlg TITLE "Tela customizada" FROM 0,0 TO 200,400 PIXEL 
+
+    oBrowse := MsBrGetDBase():new( 5, 5, 500, 500,,,, oDlg,,,,,,,,,,,, .F., "", .T.,, .F.,,, )
+    oBrowse:setArray( aArray )
+    oBrowse:addColumn( TCColumn():new( "CODIGO", { || aArray[oBrowse:nAt, 1] },,,, "LEFT",, .F., .F.,,,, .F. ) )
+    oBrowse:addColumn( TCColumn():new( "FANTASIA",   { || aArray[oBrowse:nAt, 2] },,,, "LEFT",, .F., .F.,,,, .F. ) )
+    oBrowse:addColumn( TCColumn():new( "RAZAO SOCIAL",{ || aArray[oBrowse:nAt, 3] },,,, "LEFT",, .F., .F.,,,, .F. ) )
+    oBrowse:Refresh()
+    
+    oButton := TButton():New(75,150, "Botao Sair",oDlg,{|| oDlg:end()}, 40,10,,,.F.,.T.,.F.,,.F.,,,.F. )     
+
+    ACTIVATE MSDIALOG oDlg CENTER     
+return
+
+User Function TwBrowse()    
+  
+    DEFINE MSDIALOG oDlg TITLE "Tela customizada" FROM 0,0 TO 200,400 PIXEL  
+    aArray := { {"000001", "CLIENTE  01", "NOME  01"},;
+                {"000002", "CLIENTE  02", "NOME  02"},;
+                {"000003", "CLIENTE  03", "NOME  03"},;
+                {"000004", "CLIENTE  04", "NOME  04"} }
+
+    oBrowse := TCBrowse():New( 01 , 01, 260, 156,, {'CODIGO','FANTASIA','RAZAO SOCIAL'},{50,50,80}, oDlg,,,,,{||},,,,,,,.F.,,.T.,,.F.,,, )
+
+    oBrowse:SetArray(aArray)
+
+    oBrowse:bLine := {||{ aArray[oBrowse:nAt,01],;
+                          aArray[oBrowse:nAt,02],;
+                          aArray[oBrowse:nAt,03]} }
+
+    oButton := TButton():New(75,150, "Botao Sair",oDlg,{|| oDlg:end()}, 40,10,,,.F.,.T.,.F.,,.F.,,,.F. )     
+
+    ACTIVATE MSDIALOG oDlg CENTER     
+return
+
+User Function TwBrowseLeg()    
+    Private oMark
+    oMark:= FWMarkBrowse():New()
+    oMark:SetAlias('SB1')
+    oMark:SetDescription('Legenda de Produto')    
+    oMark:AddLegend('B1_TIPO == "PA"','GREEN','PA')
+    oMark:AddLegend('B1_TIPO == "MM"','YELLOW','MM')
+    oMark:AddLegend('B1_TIPO == "SV"','BLUE','SV')
+    oMark:AddLegend('B1_TIPO == "PV"','RED','PV')
+    oMark:Activate()    
+/*    Local oOK := LoadBitmap(GetResources(),'br_verde')
+    Local oNO := LoadBitmap(GetResources(),'br_vermelho')
+  
+    DEFINE MSDIALOG oDlg TITLE "Tela customizada" FROM 0,0 TO 200,400 PIXEL 
+  
+        aArray := { {.T.,"000001", "CLIENTE  01", "NOME  01"},;
+                    {.F.,"000002", "CLIENTE  02", "NOME  02"},;
+                    {.T.,"000003", "CLIENTE  03", "NOME  03"},;
+                    {.F.,"000004", "CLIENTE  04", "NOME  04"} }
+  
+        oBrowse := TCBrowse():New( 01 , 01, 260, 156,, {'','Codigo','Nome','Valor'},{20,50,50,50}, oDlg,,,,,{||},,,,,,,.F.,,.T.,,.F.,,, )
+        oBrowse:SetArray(aArray)  
+        oBrowse:bLine := {||{ If(aArray[oBrowse:nAt,01],oOK,oNO),;
+                                 aArray[oBrowse:nAt,02],;
+                                 aArray[oBrowse:nAt,03],;
+                                 aArray[oBrowse:nAt,04] } }
+
+    oButton := TButton():New(75,150, "Botao Sair",oDlg,{|| oDlg:end()}, 40,10,,,.F.,.T.,.F.,,.F.,,,.F. )     
+
+    ACTIVATE MSDIALOG oDlg CENTER
+*/     
+return
+
+User Function TwBrowseCheck()    
+    Private oMark
+    oMark:= FWMarkBrowse():New()
+    oMark:SetAlias('SB1')
+    oMark:SetDescription('Seleção de Produto')
+    oMark:SetFieldMark('B1_OK')    
+    oMark:Activate()
+
+/*    Local oOk       := LoadBitmap( GetResources(), "LBOK" )
+    Local oNo       := LoadBitmap( GetResources(), "LBNO" )
+    DEFINE MSDIALOG oDlg TITLE "Tela customizada" FROM 0,0 TO 200,400 PIXEL  
+  aArray := { {.T.,"000001", "CLIENTE 01", "NOME 01"},;
+              {.F.,"000002", "CLIENTE 02", "NOME 02"},;
+              {.T.,"000003", "CLIENTE 03", "NOME 03"},;
+              {.F.,"000004", "CLIENTE 04", "NOME 04"} }
+
+    oBrowse := TCBrowse():New( 01 , 01, 260, 156,, {'OK','CODIGO','FANTASIA','RAZAO SOCIAL'},{10,50,50,50}, oDlg,,,,,{||},,,,,,,.F.,,.T.,,.F.,,, )
+
+    oBrowse:SetArray(aArray)
+
+    oBrowse:bLine := {||{ If(aArray[oBrowse:nAt,01],oOk,oNo),;
+                          aArray[oBrowse:nAt,02],;
+                          aArray[oBrowse:nAt,03],;
+                          aArray[oBrowse:nAt,04]} }
+
+    oButton := TButton():New(75,150, "Botao Sair",oDlg,{|| oDlg:end()}, 40,10,,,.F.,.T.,.F.,,.F.,,,.F. )     
+
+    ACTIVATE MSDIALOG oDlg CENTER 
+*/        
+return
+
+User Function TwBrowseCL()    
+     Private oMark
+    oMark:= FWMarkBrowse():New()
+    oMark:SetAlias('SB1')
+    oMark:SetDescription('Seleção e Legenda de Produto')
+    oMark:SetFieldMark('B1_OK')
+    oMark:AddLegend('B1_TIPO == "PA"','GREEN','PA')
+    oMark:AddLegend('B1_TIPO == "MM"','YELLOW','MM')
+    oMark:AddLegend('B1_TIPO == "SV"','BLUE','SV')
+    oMark:AddLegend('B1_TIPO == "PV"','RED','PV')
+    oMark:Activate()
+/*    Local oOK := LoadBitmap(GetResources(),'br_verde')
+    Local oNO := LoadBitmap(GetResources(),'br_vermelho')
+    Local oOkck  := LoadBitmap( GetResources(), "LBOK" )
+    Local oNock  := LoadBitmap( GetResources(), "LBNO" )
+    DEFINE MSDIALOG oDlg TITLE "Tela customizada" FROM 0,0 TO 200,400 PIXEL 
+  
+        aArray := { {.T.,.T.,"000001", "CLIENTE  01", "NOME  01"},;
+                    {.F.,.F.,"000002", "CLIENTE  02", "NOME  02"},;
+                    {.T.,.T.,"000003", "CLIENTE  03", "NOME  03"},;
+                    {.F.,.F.,"000004", "CLIENTE  04", "NOME  04"} }
+  
+        oBrowse := TCBrowse():New( 01 , 01, 260, 156,, {'OK','LEG','CODIGO','FANTASIA','RAZAO SOCIAL'},{10,20,50,50,50}, oDlg,,,,,{||},,,,,,,.F.,,.T.,,.F.,,, )
+        oBrowse:SetArray(aArray)  
+        oBrowse:bLine := {||{ If(aArray[oBrowse:nAt,01],oOKck,oNOck),;
+                              If(aArray[oBrowse:nAt,02],oOK,oNO),;  
+                                 aArray[oBrowse:nAt,03],;
+                                 aArray[oBrowse:nAt,04],;
+                                 aArray[oBrowse:nAt,05] } }
+
+    oButton := TButton():New(75,150, "Botao Sair",oDlg,{|| oDlg:end()}, 40,10,,,.F.,.T.,.F.,,.F.,,,.F. )     
+    ACTIVATE MSDIALOG oDlg CENTER     
+*/    
+return
+
+user Function MvcMod1() //axcadastro("SA1","cadastro de cliente")   
+    Local oBrowse := FwMBrowse():New()
+
+    oBrowse:SetAlias("SA1")
+    oBrowse:SetDescription("FORMULÁRIO CLIENTE")
+    oBrowse:Activate()
+Return
+
+User Function Modelo2()
+    
+  DEFINE DIALOG oDlg TITLE "Tela customizada" FROM 0,0 TO 200,650 PIXEL
+  oButton := TButton():New(02,270, "Botao Sair",oDlg,{|| oDlg:end()}, 40,10,,,.F.,.T.,.F.,,.F.,,,.F. )     
+  @ 15,10 MSPANEL oPanel1 COLORS CLR_BLACK,CLR_GRAY SIZE 300, 20 OF oDlg
+  @ 5,150 SAY "Cabeçalho" OF oPanel1 PIXEL
+
+  @ 40,10 MSPANEL oPanel2 COLORS CLR_BLACK,CLR_GRAY SIZE 300, 20 OF oDlg
+  @ 5,150 SAY "Detalhe" OF oPanel2 PIXEL    
+
+  @ 65,10 MSPANEL oPanel3 COLORS CLR_BLACK,CLR_GRAY SIZE 300, 20 OF oDlg
+  @ 5,150 SAY "Rodape" OF oPanel3 PIXEL    
+ ACTIVATE DIALOG oDlg CENTERED
+Return
+
+User Function Modelo3()
+ 
+   
+Return
+
+return

@@ -1,0 +1,46 @@
+{
+	"version": "0.2.2",
+	"includes": [
+		""
+	],
+	"permissions": {
+		"authorizationtoken": ""
+	},
+	"connectedServer": {},
+	"configurations": [
+		{
+			"id": "l1s2sa1eyb8lachrla84zu7xqa6xo",
+			"type": "totvs_server_protheus",
+			"name": "Treinamento",
+			"port": 1235,
+			"address": "localhost",
+			"buildVersion": "7.00.210324P",
+			"secure": true,
+			"includes": [
+				"C:\\TOTVS12133\\Protheus\\Protheus\\include"
+			],
+			"environments": [
+				"Treinamento"
+			],
+			"username": "admin",
+			"environment": "Treinamento",
+			"token": "djM6bDFzMnNhMWV5YjhsYWNocmxhODR6dTd4cWE2eG86MTpsb2NhbGhvc3Q6MTIzNToxOjcuMDAuMjEwMzI0UDoz:djE6VHJlaW5hbWVudG86YWRtaW46c0JJS2lwSVZBWjNFYzNwTm9vVFFpWU5oazd1Ylp6ditSck4wblJUUlRDZz0=|djI6MTY2OTkzMDk0NzowOjE6MQ==.dH4ISVmLVaRC0HuwcwNwI3ersi16u6iOnNCmaWBpPvsjXgZ8JmWkWCReHCbZGzJAubWWkKbfnAsUn+hQRJJrXLS+d/GCViO5ylTwxSPLHVGPDWH1Yw9RK9XkXcCAYmEhCuuvqxvO3E4y9juiNchDUUp22lShxig2OnHyOuw8sMk4iDGqVE1dFB4m06bede4PMtKhxNit7OMJ+UsEKf8yQBWuwaYkiNRRuwtrPuPrl5HEIVFIn3shbEN6RCtyhUsoEEkQje3CFwManzTlpwFVSTmoM2cJTB3M74IFsk36SS5REG6lbBacu/tAMHakE/iJiXmJkyG9A49DV9h4iHPdOw==",
+			"informations": {
+				"permissions": [],
+				"errorMessage": "",
+				"environmentDetectedType": "totvs_server_protheus",
+				"serverDetectedType": "totvs_server_protheus"
+			}
+		}
+	],
+	"savedTokens": [
+		[
+			"l1s2sa1eyb8lachrla84zu7xqa6xo:Treinamento",
+			{
+				"id": "l1s2sa1eyb8lachrla84zu7xqa6xo",
+				"token": "djM6bDFzMnNhMWV5YjhsYWNocmxhODR6dTd4cWE2eG86MTpsb2NhbGhvc3Q6MTIzNToxOjcuMDAuMjEwMzI0UDoz:djE6VHJlaW5hbWVudG86YWRtaW46c0JJS2lwSVZBWjNFYzNwTm9vVFFpWU5oazd1Ylp6ditSck4wblJUUlRDZz0=|djI6MTY2OTkzMDk0NzowOjE6MQ==.dH4ISVmLVaRC0HuwcwNwI3ersi16u6iOnNCmaWBpPvsjXgZ8JmWkWCReHCbZGzJAubWWkKbfnAsUn+hQRJJrXLS+d/GCViO5ylTwxSPLHVGPDWH1Yw9RK9XkXcCAYmEhCuuvqxvO3E4y9juiNchDUUp22lShxig2OnHyOuw8sMk4iDGqVE1dFB4m06bede4PMtKhxNit7OMJ+UsEKf8yQBWuwaYkiNRRuwtrPuPrl5HEIVFIn3shbEN6RCtyhUsoEEkQje3CFwManzTlpwFVSTmoM2cJTB3M74IFsk36SS5REG6lbBacu/tAMHakE/iJiXmJkyG9A49DV9h4iHPdOw=="
+			}
+		]
+	],
+	"lastConnectedServer": "l1s2sa1eyb8lachrla84zu7xqa6xo"
+}

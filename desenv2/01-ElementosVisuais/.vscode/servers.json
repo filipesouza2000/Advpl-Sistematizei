@@ -1,0 +1,46 @@
+{
+	"version": "0.2.2",
+	"includes": [
+		""
+	],
+	"permissions": {
+		"authorizationtoken": ""
+	},
+	"connectedServer": {},
+	"configurations": [
+		{
+			"id": "58escp1dfy9la73149c3d2ot5gqi96",
+			"type": "totvs_server_protheus",
+			"name": "Treinamento33",
+			"port": 1235,
+			"address": "localhost",
+			"buildVersion": "7.00.210324P",
+			"secure": true,
+			"includes": [
+				"C:\\TOTVS12133\\Protheus\\Protheus\\include"
+			],
+			"environments": [
+				"treinamento"
+			],
+			"username": "admin",
+			"environment": "treinamento",
+			"token": "djM6NThlc2NwMWRmeTlsYTczMTQ5YzNkMm90NWdxaTk2OjE6bG9jYWxob3N0OjEyMzU6MTo3LjAwLjIxMDMyNFA6Mw==:djE6dHJlaW5hbWVudG86YWRtaW46YjRDdThKZVlGenAwL3JFUjFrZ1VJajAvTmxDZDJTVTNnaHFDc0FEMitUbz0=|djI6MTY2Nzg0MzY1NDowOjE6MQ==.h5s5gOyjccHoQbluzzsUd+elBu/QjnfpWSxW7BNHMeOidICuaIhNdegylRTjKIIG2sDrbbYb6WrbxC/6XyE10pJE9Hc9rGFbcieLLSWksjI8W/fLlB/lFThpQPkZKL+FBOGj492iPgM5sQ1nJH7bMkQNIDKbuZcVMwQCFamU0vLWX1DD0ALwE6OjQF+xtne8THl2+rYrlGF3Sz8JqzSb92nnYFrA7KXiWuiDHIZah68hlTYLqyKrYPtGLIh0AAvtGOLlmsJ9yHeAiXe9VsmRC+CM0Rg7Q5yNa/qZetu4uxnVFU3N2LodEgcOLPKdKo/31lVHxwsgZIBozL5n1lEkvQ==",
+			"informations": {
+				"permissions": [],
+				"errorMessage": "",
+				"environmentDetectedType": "totvs_server_protheus",
+				"serverDetectedType": "totvs_server_protheus"
+			}
+		}
+	],
+	"savedTokens": [
+		[
+			"58escp1dfy9la73149c3d2ot5gqi96:treinamento",
+			{
+				"id": "58escp1dfy9la73149c3d2ot5gqi96",
+				"token": "djM6NThlc2NwMWRmeTlsYTczMTQ5YzNkMm90NWdxaTk2OjE6bG9jYWxob3N0OjEyMzU6MTo3LjAwLjIxMDMyNFA6Mw==:djE6dHJlaW5hbWVudG86YWRtaW46YjRDdThKZVlGenAwL3JFUjFrZ1VJajAvTmxDZDJTVTNnaHFDc0FEMitUbz0=|djI6MTY2Nzg0MzY1NDowOjE6MQ==.h5s5gOyjccHoQbluzzsUd+elBu/QjnfpWSxW7BNHMeOidICuaIhNdegylRTjKIIG2sDrbbYb6WrbxC/6XyE10pJE9Hc9rGFbcieLLSWksjI8W/fLlB/lFThpQPkZKL+FBOGj492iPgM5sQ1nJH7bMkQNIDKbuZcVMwQCFamU0vLWX1DD0ALwE6OjQF+xtne8THl2+rYrlGF3Sz8JqzSb92nnYFrA7KXiWuiDHIZah68hlTYLqyKrYPtGLIh0AAvtGOLlmsJ9yHeAiXe9VsmRC+CM0Rg7Q5yNa/qZetu4uxnVFU3N2LodEgcOLPKdKo/31lVHxwsgZIBozL5n1lEkvQ=="
+			}
+		]
+	],
+	"lastConnectedServer": "58escp1dfy9la73149c3d2ot5gqi96"
+}

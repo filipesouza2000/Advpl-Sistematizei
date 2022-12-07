@@ -2,7 +2,7 @@
 #INCLUDE 'Protheus.ch'
 //+++++++++++++++++++++++++++++++++++++++++++
 // ----Data ---|---- Autor--- |---- Descricao
-// 21/11/2011  | Filipe Souza | Exemplo de elementos visuais com
+// 21/11/2021  | Filipe Souza | Exemplo de elementos visuais com
 //                              TDialog, TSay e TButton chamando rotinas, Tela redimencionada, 
 //++++++++++++++++++++++++++++++++++++++++++++
 User Function zTDialog()

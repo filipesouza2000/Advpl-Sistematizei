@@ -1,0 +1,63 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "totvs_language_debug",
+			"request": "launch",
+			"name": "Depuração do idioma TOTVS",
+			"program": "${command:AskForProgramName}",
+			"cwb": "${workspaceFolder}",
+			"smartclientBin": "C:/TOTVS12133/Protheus/Protheus/bin/smartclient/smartclient.exe",
+			"isMultiSession": true,
+			"enableTableSync": true
+		}
+	],
+	"lastPrograms": [
+		{
+			"label": "U_INTERFACE1"
+		},
+		{
+			"label": "U_MsPanel"
+		},
+		{
+			"label": "U_Folder"
+		},
+		{
+			"label": "U_Input"
+		},
+		{
+			"label": "U_SearchDefault"
+		},
+		{
+			"label": "U_ComboBox"
+		},
+		{
+			"label": "U_InputCalendar"
+		},
+		{
+			"label": "U_InputRows"
+		},
+		{
+			"label": "U_Checkbox"
+		},
+		{
+			"label": "U_RadioButtonn"
+		},
+		{
+			"label": "U_MsBrGetDBase"
+		},
+		{
+			"label": "U_TwBrowse"
+		},
+		{
+			"label": "U_TwBrowseLeg"
+		},
+		{
+			"label": "U_TwBrowseCheck"
+		},
+		{
+			"label": "U_TwBrowseCL"
+		}
+	],
+	"lastProgramExecuted": "U_TwBrowseLeg"
+}

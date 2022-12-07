@@ -1,0 +1,118 @@
+#INCLUDE "TOTVS.ch"
+#INCLUDE "Protheus.ch"
+
+/*/{Protheus.doc} User Function Projeto01
+    Primeiro projeto com tela de CRUD utilizando os recursos aprendisos de interface.
+    @type  Function
+    @author Filipe Souza
+    @since 01/11/2022
+/*/
+User Function Projeto01()
+
+Private oDlg1
+Private cTituloJanela := "PROJEO01 - Primeira tela em ADVPL Protheus"    
+
+//declarar variáveis do Folder
+Private oFolder
+Private aFolder
+
+//variáveis reverentes aos objetos do Folder1(Dados Pessoais)
+Private oSayNome
+Private oGetNome
+Private cGetNome
+Private oSayNReduz
+Private oGetNReduz
+Private cGetNReduz
+Private oSayDTNasc
+Private oGetDTNasc
+Private dGetDTNasc
+Private oSayDDD
+Private oGetDDD
+Private cGetDDD
+Private oSayTel
+Private oGetTel
+Private cGetTel
+Private oSayCpf
+Private oGetCpf
+Private cGetCpf
+Private oGroupSexo
+Private aSexo :={"Masculino","Feminino"}
+Private nSexo := 2
+Private oRadioSexo
+
+//variáveis reverentes aos objetos do Folder2(Endereço)
+Private oSayEnd
+Private oGetEnd
+Private cEnd
+Private oSayBairro
+Private oGetBairro
+Private cBairro
+Private oSayImovel
+Private aImovel := {"Casa","Apart.","Outro"}
+Private cImovel := aImovel[1]
+Private oComboImovel
+Private oSayCep
+Private oGetCep
+Private cCep
+Private oSayUf
+Private oGetUf
+Private cUF
+Private oSayCidade
+Private oGetCidade
+Private cCidade
+//variáveis reverentes aos objetos do Folder3(outros)
+
+//Inicio da construção da Tela
+oDlg1   := TDialog():New(0,0,720,1120,cTituloJanela,,,,,CLR_BLACK,CLR_WHITE,,,.T.)
+
+aFolder := {"Dados Pessoaos","Endereço","Outros"}
+oFolder := TFolder():New(0,0,aFolder,aFolder,oDlg1,,,,.T.,,600,200)
+//insere um TGet e uma TSay em cada aba da folder
+//elementos visuais que compoõem o Folder/Pasta1 Dados Pessoais
+oSayNome   := TSay():New(01,05,{||'Nome'},oFolder:aDialogs[1],,,,,,.T.,CLR_BLUE,CLR_WHITE,300,20)
+cGetNome   := Space(50)                                                 //exibe na aba 1
+oGetNome   :=TGet():New(10,05,{|u|IIF(Pcount()>0,cGetNome:=u,cGetNome)},oFolder:aDialogs[1],096,009,"",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,cGetNome,,,,)
+
+oSayNReduz   := TSay():New(01,110,{||'Nome Reduzido'},oFolder:aDialogs[1],,,,,,.T.,CLR_BLUE,CLR_WHITE,300,20)
+cGetNReduz   := Space(30)                                                 //exibe na aba 1
+oGetNReduz   :=TGet():New(10,110,{|u|IIF(Pcount()>0,cGetNReduz:=u,cGetNReduz)},oFolder:aDialogs[1],070,009,"",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,cGetNReduz,,,,)
+
+oSayDTNasc   := TSay():New(01,190,{||'Data de Nascimento'},oFolder:aDialogs[1],,,,,,.T.,CLR_BLUE,CLR_WHITE,300,20)
+dGetDTNasc   := DATE()                                                 //exibe na aba 1
+oGetDTNasc   := TGet():New(10,190,{|u|IIF(Pcount()>0,dGetDTNasc:=u,dGetDTNasc)},oFolder:aDialogs[1],050,009,"",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,/**/,,,,.T.)//ultumo .T. mostra icone de calendario
+
+oSayDDD   := TSay():New(01,250,{||'DDD'},oFolder:aDialogs[1],,,,,,.T.,CLR_BLUE,CLR_WHITE,300,20)
+cGetDDD   := Space(2)                                                 //exibe na aba 1
+oGetDDD   := TGet():New(10,250,{|u|IIF(Pcount()>0,cGetDDD:=u,cGetDDD)},oFolder:aDialogs[1],020,009,"@E 99",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,cGetDDD,,,,)
+
+oSayTel   := TSay():New(01,280,{||'Telefone'},oFolder:aDialogs[1],,,,,,.T.,CLR_BLUE,CLR_WHITE,300,20)
+cGetTel   := Space(2)                                                 //exibe na aba 1
+oGetTel   := TGet():New(10,280,{|u|IIF(Pcount()>0,cGetTel:=u,cGetTel)},oFolder:aDialogs[1],40,009,"@E 9-9999-9999",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,cGetTel,,,,)
+
+oGroupSexo:= tGroup():New(01,330,30,400,"Sexo",oFolder:aDialogs[1],,,.T.)
+oRadioSexo:= TRadMenu():New(10,340,aSexo,{|u|IIF(Pcount()>0,nSexo:=u,nSexo)},oFolder:aDialogs[1],,,,,,,,60,20,,,,.T.)
+
+oSayCpf   := TSay():New(30,05,{||'Cpf'},oFolder:aDialogs[1],,,,,,.T.,CLR_BLUE,CLR_WHITE,300,20)
+cGetCpf   := Space(11)                                                 //exibe na aba 1
+oGetCpf   := TGet():New(40,05,{|u|IIF(Pcount()>0,cGetCpf:=u,cGetCpf)},oFolder:aDialogs[1],050,009,"@E 999.999.999-99",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,cGetCpf,,,,)
+
+//elementos visuais que compoõem o Folder/Pasta2 Endereço
+oSayEnd   := TSay():New(01,05,{||'Endereço'},oFolder:aDialogs[2],,,,,,.T.,CLR_BLUE,CLR_WHITE,300,20)
+cGetEnd   := Space(80)                                                 //exibe na aba 2
+oGetEnd   :=TGet():New(10,05,{|u|IIF(Pcount()>0,cGetEnd:=u,cGetEnd)},oFolder:aDialogs[2],130,009,"",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,cGetEnd,,,,)
+
+oSayBairro   := TSay():New(01,140,{||'Bairro'},oFolder:aDialogs[2],,,,,,.T.,CLR_BLUE,CLR_WHITE,300,20)
+cGetBairro   := Space(60)                                                 //exibe na aba 2
+oGetBairro   :=TGet():New(10,140,{|u|IIF(Pcount()>0,cGetBairro:=u,cGetBairro)},oFolder:aDialogs[2],100,009,"",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,cGetBairro,,,,)
+
+oSayImovel   := TSay():New(01,250,{||'Tipo de Imóvel'},oFolder:aDialogs[2],,,,,,.T.,CLR_BLUE,CLR_WHITE,300,20)
+oComboImovel := TComboBox():New(10,250,{|u|IIF(Pcount()>0,cImovel:=u,cImovel)},aImovel,60,15,oFolder:aDialogs[2],,,,,,.T.,,,,,,,,,'cImovel')
+
+oSayCpf   := TSay():New(30,05,{||'Cpf'},oFolder:aDialogs[1],,,,,,.T.,CLR_BLUE,CLR_WHITE,300,20)
+cGetCpf   := Space(11)                                                 //exibe na aba 1
+oGetCpf   := TGet():New(40,05,{|u|IIF(Pcount()>0,cGetCpf:=u,cGetCpf)},oFolder:aDialogs[1],050,009,"@E 999.999.999-99",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,cGetCpf,,,,)
+
+
+oDlg1:ACTIVATE(,,,.T.)
+
+Return
