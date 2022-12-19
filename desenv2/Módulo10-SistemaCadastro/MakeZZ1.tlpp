@@ -1,0 +1,9 @@
+#INCLUDE "Protheus.ch"
+#INCLUDE "TOTVS.ch"
+#INCLUDE "TopConn.ch"
+
+User Function MakeZZ1()
+    DbSelectArea("ZZ1")
+    DbSetOrder(1)
+    DbCloseArea("ZZ1")
+Return
