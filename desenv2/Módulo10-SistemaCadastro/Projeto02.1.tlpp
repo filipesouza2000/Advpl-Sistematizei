@@ -1,0 +1,294 @@
+#INCLUDE "Protheus.ch"
+#INCLUDE "TOTVS.ch"
+#INCLUDE "TopConn.ch"
+
+/*/{Protheus.doc} User Function Projeto02
+    Segundo projeto para inclusão dos registros.
+    @type  Function
+    @author Filipe Souza
+    @since 01/12/2022
+/*/
+User Function Projeto02()
+
+Private oDlg1
+Private cTituloJanela := "PROJETO 02 - ADVPL Protheus"    
+
+//declarar variáveis do Folder
+Private oFolder
+Private aFolder
+
+//variáveis reverentes aos objetos do Folder1(Dados Pessoais)
+Private oSayCod, oGetCod, cGetCod, oSayNome, oGetNome, cGetNome, oSayNReduz,;
+        oGetNReduz, cGetNReduz, oSayDTNasc, oGetDTNasc, dGetDTNasc, oSayDDD, oGetDDD,;
+        cGetDDD, oSayTel, oGetTel, cGetTel, oSayCpf, oGetCpf, cGetCpf, oGroupSexo
+Private aSexo :={"Masculino","Feminino"}
+Private nSexo := 1
+Private oRadioSexo
+Private cSexo :=""
+
+//variáveis reverentes aos objetos do Folder2(Endereço)
+Private oSayCep, oGetCep, cCep, oSayEnd, oGetEnd, cEnd, oSayNum, oGetNum,;
+        cNum, oSayCompl, oGetCompl, cCompl, cGetCompl, oSayImovel, oComboImovel,;
+        oSayBairro, oGetBairro, cBairro, oSayCidade, oGetCidade, cCidade, oSayUf, oComboUf
+Private aImovel := {"Casa","Apart.","Outro"}
+Private cImovel := aImovel[1]
+Private aUf := {"RO","AC","AM","RR","PA","AP","TO","MA","PI","CE","RN","PB","PE","AL","SE",;
+                "BA","MG","ES","RJ","SP","PR","SC","RS","MS","MT","GO","DF"}
+Private cUf := aUf[1]
+
+//variáveis reverentes aos objetos do Folder3(outros)
+Private aEstCivil := {"Solteiro(a)","Namorando","Noivo(a)","Casado(a)","União Estável","Divorciado(a)","Viúvo(a)"}
+Private cEstCivil := aEstCivil[1]
+Private aPet :={"Não","Sim"}
+Private nPet := 1
+Private lCkAdvpl := .F.
+Private lCkSql   := .F.
+Private lCkJava  := .F.
+Private lCkJS    := .F.
+Private cUrl := "C:\TOTVS12133\Protheus\protheus_data\system\"
+Private cImgAdd := cUrl+"Add.png"
+Private cImgAlt := cUrl+"Alt.png"
+Private cImgPesq:= cUrl+"Pesq.png"
+Private cImgDel := cUrl+"Del.png"
+Private cDados := ""
+Private oSayEstCivil, oComboEstCivil, oGroupPet, oRadiopet, oGroupLing, oCkAdvpl,;
+        oCkSql, oCkJava, oCkJS, oSayObs, cObs , oTMultiget, oBtMarkAll,;
+        oBtUnMarkAll, oBtDados, oBtEnd, oBtoutros
+Private oBtSave,oBtIn,oBtCan,oBtDel
+//Inicio da construção da Tela
+oDlg1   := TDialog():New(0,0,720,1120,cTituloJanela,,,,,CLR_BLACK,CLR_WHITE,,,.T.)
+
+aFolder := {"Dados Pessoaos","Endereço","Outros"}
+oFolder := TFolder():New(0,0,aFolder,aFolder,oDlg1,,,,.T.,,600,200)
+//insere um TGet e uma TSay em cada aba da folder
+//elementos visuais que compoõem o Folder/Pasta1 Dados Pessoais
+oSayCod   := TSay():New(01,05,{||'Codigo'},oFolder:aDialogs[1],,,,,,.T.,CLR_BLUE,CLR_WHITE,300,20)
+cGetCod   := Space(6)                                                 //exibe na aba 1
+oGetCod   :=TGet():New(10,05,{|u|IIF(Pcount()>0,cGetCod:=u,cGetCod)},oFolder:aDialogs[1],040,009,"",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,cGetCod,,,,)
+
+oSayNome  := TSay():New(01,60,{||'Nome'},oFolder:aDialogs[1],,,,,,.T.,CLR_BLUE,CLR_WHITE,300,20)
+cGetNome  := Space(50)                                                 //exibe na aba 1
+oGetNome  :=TGet():New(10,60,{|u|IIF(Pcount()>0,cGetNome:=u,cGetNome)},oFolder:aDialogs[1],096,009,"",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,cGetNome,,,,)
+
+oSayNReduz:= TSay():New(01,170,{||'Nome Reduzido'},oFolder:aDialogs[1],,,,,,.T.,CLR_BLUE,CLR_WHITE,300,20)
+cGetNReduz:= Space(30)                                                 //exibe na aba 1
+oGetNReduz:=TGet():New(10,170,{|u|IIF(Pcount()>0,cGetNReduz:=u,cGetNReduz)},oFolder:aDialogs[1],070,009,"",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,cGetNReduz,,,,)
+
+oSayDTNasc:= TSay():New(01,250,{||'Data de Nascimento'},oFolder:aDialogs[1],,,,,,.T.,CLR_BLUE,CLR_WHITE,300,20)
+dGetDTNasc:= DATE()                                                 //exibe na aba 1
+oGetDTNasc:= TGet():New(10,250,{|u|IIF(Pcount()>0,dGetDTNasc:=u,dGetDTNasc)},oFolder:aDialogs[1],050,009,"",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,/**/,,,,.T.)//ultumo .T. mostra icone de calendario
+
+oSayCpf   := TSay():New(30,05,{||'Cpf'},oFolder:aDialogs[1],,,,,,.T.,CLR_BLUE,CLR_WHITE,300,20)
+cGetCpf   := Space(11)                                                 //exibe na aba 1
+oGetCpf   := TGet():New(40,05,{|u|IIF(Pcount()>0,cGetCpf:=u,cGetCpf)},oFolder:aDialogs[1],050,009,"@E 999.999.999-99",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,cGetCpf,,,,)
+
+oSayDDD   := TSay():New(30,70,{||'DDD'},oFolder:aDialogs[1],,,,,,.T.,CLR_BLUE,CLR_WHITE,300,20)
+cGetDDD   := Space(2)                                                 //exibe na aba 1
+oGetDDD   := TGet():New(40,70,{|u|IIF(Pcount()>0,cGetDDD:=u,cGetDDD)},oFolder:aDialogs[1],020,009,"@E 99",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,cGetDDD,,,,)
+
+oSayTel   := TSay():New(30,100,{||'Telefone'},oFolder:aDialogs[1],,,,,,.T.,CLR_BLUE,CLR_WHITE,300,20)
+cGetTel   := Space(11)                                                 //exibe na aba 1
+oGetTel   := TGet():New(40,100,{|u|IIF(Pcount()>0,cGetTel:=u,cGetTel)},oFolder:aDialogs[1],40,009,"@E 99999-9999",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,cGetTel,,,,)
+
+oGroupSexo:= tGroup():New(30,150,65,200,"Sexo",oFolder:aDialogs[1],,,.T.)
+oRadioSexo:= TRadMenu():New(40,155,aSexo,{|u|IIF(Pcount()>0,nSexo:=u,nSexo)},oFolder:aDialogs[1],,,,,,,,40,20,,,,.T.)
+
+// linha, coluna1 2 3 4, width, height, dialog
+U_xShowBitMap(120, 22,82,145,202, 75, 66,1)
+// linha, coluna1 2 3 4,dialog
+//U_xShowBt(150,20,80,140,200,1)
+//https://siga0984.wordpress.com/2014/12/03/classes-em-advpl-parte-03/
+@ 150,20 BUTTON oBtIn PROMPT 'Incluir' ;
+    ACTION ( oBtSave:Show(),oBtCan:Show() , oBtIn:Hide(),cGetCod:=GETSXENUM("ZZ1","ZZ1_COD") );
+    SIZE 40, 15 OF oFolder:aDialogs[1] PIXEL    
+oBtSave := APBUTTON():NEW(oFolder:aDialogs[1], "Salvar", 150, 20, 40, 15, {|| oBtIn:Show(),oBtSave:Hide(),oBtCan:Hide(),U_xSalvarZZ1() })
+oBtCan  := APBUTTON():NEW(oFolder:aDialogs[1], "Cancelar", 165, 20, 40, 10, {|| U_xCancel() })
+
+//oBtIn   := TButton():New(150,20,"Incluir" ,oFolder:aDialogs[1],{|| U_IncluirZZ1()},40,15,,,.F.,.T.,.F.,,.F.,,,.F.)
+oBtAlt  := TButton():New(150,80,"Alterar" ,oFolder:aDialogs[1],{|| MsgInfo("Alterar","Alterar") },40,15,,,.F.,.T.,.F.,,.F.,,,.F.)
+oBtCons := TButton():New(150,140,"Consultar" ,oFolder:aDialogs[1],{|| MsgInfo("Consultar","Consultar") },40,15,,,.F.,.T.,.F.,,.F.,,,.F.)
+oBtDel  := TButton():New(150,200,"Excluir" ,oFolder:aDialogs[1],{|| MsgInfo("Excluir","Excluir") },40,15,,,.F.,.T.,.F.,,.F.,,,.F.)
+
+//elementos visuais que compoõem o Folder/Pasta2 Endereço
+oSayCep   := TSay():New(01,05,{||'Cep'},oFolder:aDialogs[2],,,,,,.T.,CLR_BLUE,CLR_WHITE,30,20)
+cCep      := Space(9)                                                 //exibe na aba 2
+oGetCep   := TGet():New(10,05,{|u|IIF(Pcount()>0,cCep:=u,cCep)},oFolder:aDialogs[2],20,009,"@E 99999-999",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,cCep,,,,)
+
+oSayEnd   := TSay():New(01,50,{||'Endereço'},oFolder:aDialogs[2],,,,,,.T.,CLR_BLUE,CLR_WHITE,300,20)
+cGetEnd   := Space(80)                                                 //exibe na aba 2
+oGetEnd   := TGet():New(10,50,{|u|IIF(Pcount()>0,cGetEnd:=u,cGetEnd)},oFolder:aDialogs[2],130,009,"",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,cGetEnd,,,,)
+
+oSayNum   := TSay():New(01,190,{||'Número'},oFolder:aDialogs[2],,,,,,.T.,CLR_BLUE,CLR_WHITE,100,20)
+cGetNum   := Space(5)                                                 //exibe na aba 2
+oGetNum   := TGet():New(10,190,{|u|IIF(Pcount()>0,cGetNum:=u,cGetNum)},oFolder:aDialogs[2],30,009,"@E 99999",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,cGetNum,,,,)
+
+oSayImovel   := TSay():New(01,230,{||'Tipo de Imóvel'},oFolder:aDialogs[2],,,,,,.T.,CLR_BLUE,CLR_WHITE,300,20)
+oComboImovel := TComboBox():New(10,230,{|u|IIF(Pcount()>0,cImovel:=u,cImovel)},aImovel,60,15,oFolder:aDialogs[2],,,,,,.T.,,,,,,,,,'cImovel')
+
+oSayCompl   := TSay():New(01,300,{||'Complemento'},oFolder:aDialogs[2],,,,,,.T.,CLR_BLUE,CLR_WHITE,300,20)
+cGetCompl   := Space(20)                                                 //exibe na aba 2
+oGetCompl   := TGet():New(10,300,{|u|IIF(Pcount()>0,cGetCompl:=u,cGetCompl)},oFolder:aDialogs[2],130,009,"",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,cGetCompl,,,,)
+
+oSayUf       := TSay():New(30,05,{||'Estado'},oFolder:aDialogs[2],,,,,,.T.,CLR_BLUE,CLR_WHITE,30,15)
+oComboUf     := TComboBox():New(40,05,{|u|IIF(Pcount()>0,cUf:=u,cUf)},aUf,30,15,oFolder:aDialogs[2],,,,,,.T.,,,,,,,,,'cUf')
+
+oSayCidade   := TSay():New(30,50,{||'Cidade'},oFolder:aDialogs[2],,,,,,.T.,CLR_BLUE,CLR_WHITE,100,20)
+cCidade      := Space(30)                                                 //exibe na aba 2
+oGetCidade   := TGet():New(40,50,{|u|IIF(Pcount()>0,cCidade:=u,cCidade)},oFolder:aDialogs[2],100,009,"",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,cCidade,,,,)
+
+oSayBairro   := TSay():New(30,190,{||'Bairro'},oFolder:aDialogs[2],,,,,,.T.,CLR_BLUE,CLR_WHITE,300,20)
+cGetBairro   := Space(60)                                                 //exibe na aba 2
+oGetBairro   := TGet():New(40,190,{|u|IIF(Pcount()>0,cGetBairro:=u,cGetBairro)},oFolder:aDialogs[2],100,009,"",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,cGetBairro,,,,)
+
+
+U_xShowBitMap(120, 22,82,145,202, 75, 66,2)
+//U_xShowBt(150,20,80,140,200,2)
+/*
+oTBitAdd2 := TBitmap():New(120, 22, 75, 66,  NIL, cImgAdd,.T., oFolder:aDialogs[2],, NIL, .F., .F., NIL, NIL, .F., NIL, .T., NIL, .F.)
+oTBitAlt2 := TBitmap():New(120, 82, 75, 66,  NIL, cImgAlt,.T., oFolder:aDialogs[2],, NIL, .F., .F., NIL, NIL, .F., NIL, .T., NIL, .F.)
+oTBitCons2:= TBitmap():New(120, 145, 75, 66, NIL, cImgPesq,.T.,oFolder:aDialogs[2],, NIL, .F., .F., NIL, NIL, .F., NIL, .T., NIL, .F.)
+oTBitDel2 := TBitmap():New(120, 202, 75, 66, NIL, cImgDel,.T., oFolder:aDialogs[2],, NIL, .F., .F., NIL, NIL, .F., NIL, .T., NIL, .F.)
+
+oBtIn2   := TButton():New(150,20, "Incluir"  ,oFolder:aDialogs[2],{|| MsgInfo("Incluir","Incluir")},40,15,,,.F.,.T.,.F.,,.F.,,,.F.)
+oBtAlt2  := TButton():New(150,80, "Alterar"  ,oFolder:aDialogs[2],{|| MsgInfo("Alterar","Alterar") },40,15,,,.F.,.T.,.F.,,.F.,,,.F.)
+oBtCons2 := TButton():New(150,140,"Consultar",oFolder:aDialogs[2],{|| MsgInfo("Consultar","Consultar") },40,15,,,.F.,.T.,.F.,,.F.,,,.F.)
+oBtDel2  := TButton():New(150,200,"Excluir"  ,oFolder:aDialogs[2],{|| MsgInfo("Excluir","Excluir") },40,15,,,.F.,.T.,.F.,,.F.,,,.F.)
+*/               
+
+//elementos visuais que compoõem o Folder/Pasta3 outros
+oSayEstCivil  := TSay():New(01,05,{||'Estado Civil'},oFolder:aDialogs[3],,,,,,.T.,CLR_BLUE,CLR_WHITE,35,15)
+oComboEstCivil:= TComboBox():New(10,05,{|u|IIF(Pcount()>0,cEstCivil:=u,cEstCivil)},aEstCivil,50,15,oFolder:aDialogs[3],,,,,,.T.,,,,,,,,,'cEstCivil')
+
+oGroupPet     := tGroup():New(01,60,40,100,"Possui Pet?",oFolder:aDialogs[3],,,.T.)
+oRadiopet     := TRadMenu():New(10,65,aPet,{|u|IIF(Pcount()>0,nPet:=u,nPet)},oFolder:aDialogs[3],,,,,,,,30,20,,,,.T.)
+
+oGroupLing    := tGroup():New(01,110,50,200,"Linguagens que domina:",oFolder:aDialogs[3],,,.T.)
+                                                                                        // se clicar no check a variável recebe o valor inverso dela     
+oCkAdvpl      := TCheckBox():New(10,115,'Advpl',{||lCkAdvpl},oFolder:aDialogs[3],50,210,,{||lCkAdvpl:= !lCkAdvpl},,,,,,.T.,,,)
+oCkSql        := TCheckBox():New(20,115,'Sql',{||lCkSql},    oFolder:aDialogs[3],50,210,,{||lCkSql  := !lCkSql},,,,,,.T.,,,)
+oCkJava       := TCheckBox():New(30,115,'Java',{||lCkJava},  oFolder:aDialogs[3],50,210,,{||lCkJava := !lCkJava},,,,,,.T.,,,)
+oCkJS         := TCheckBox():New(40,115,'JScript',{||lCkJS}, oFolder:aDialogs[3],50,210,,{||lCkJS   := !lCkJS},,,,,,.T.,,,)
+oBtMarkAll    := TButton():New(15,150,"Todas", oFolder:aDialogs[3],;
+                {||lCkAdvpl:=.T., lCkSql:=.T., lCkJava:=.T.,lCkJS:=.T.},30,10,,,.F.,.T.,.F.,,.F.,,,.F.)
+oBtUnMarkAll  := TButton():New(30,150,"Nenhuma", oFolder:aDialogs[3],;
+                {||lCkAdvpl:=.F., lCkSql:=.F., lCkJava:=.F.,lCkJS:=.F.},30,10,,,.F.,.T.,.F.,,.F.,,,.F.)
+
+oSayObs       := TSay():New(50,05,{||'Observação'},oFolder:aDialogs[3],,,,,,.T.,CLR_BLUE,CLR_WHITE,50,15)
+oTMultiget    := tMultiget():new( 60, 05,{|u|IIF(Pcount()>0,cObs:=u,cObs)},oFolder:aDialogs[3], 150, 50, , , , , , .T. )
+
+U_xShowBitMap(120, 22,82,145,202, 75, 66,3)
+//U_xShowBt(150,20,80,140,200,3)
+/*
+oTBitAdd3 := TBitmap():New(120, 22, 75, 66,  NIL, cImgAdd,.T., oFolder:aDialogs[3],, NIL, .F., .F., NIL, NIL, .F., NIL, .T., NIL, .F.)
+oTBitAlt3 := TBitmap():New(120, 82, 75, 66,  NIL, cImgAlt,.T., oFolder:aDialogs[3],, NIL, .F., .F., NIL, NIL, .F., NIL, .T., NIL, .F.)
+oTBitCons3:= TBitmap():New(120, 145, 75, 66, NIL, cImgPesq,.T.,oFolder:aDialogs[3],, NIL, .F., .F., NIL, NIL, .F., NIL, .T., NIL, .F.)
+oTBitDel3 := TBitmap():New(120, 202, 75, 66, NIL, cImgDel,.T., oFolder:aDialogs[3],, NIL, .F., .F., NIL, NIL, .F., NIL, .T., NIL, .F.)
+
+oBtIn3   := TButton():New(150,20, "Incluir"  ,oFolder:aDialogs[3],{|| MsgInfo("Incluir","Incluir")},40,15,,,.F.,.T.,.F.,,.F.,,,.F.)
+oBtAlt3  := TButton():New(150,80, "Alterar"  ,oFolder:aDialogs[3],{|| MsgInfo("Alterar","Alterar") },40,15,,,.F.,.T.,.F.,,.F.,,,.F.)
+oBtCons3 := TButton():New(150,140,"Consultar",oFolder:aDialogs[3],{|| MsgInfo("Consultar","Consultar") },40,15,,,.F.,.T.,.F.,,.F.,,,.F.)
+oBtDel3  := TButton():New(150,200,"Excluir"  ,oFolder:aDialogs[3],{|| MsgInfo("Excluir","Excluir") },40,15,,,.F.,.T.,.F.,,.F.,,,.F.)
+*/
+
+//check box
+//oCheck := TCheckBox():New(01,01,'Option 1',{||lCheck},oFolder:aDialogs[3],100,210,,,,,,,,.T.,,,)
+
+oDlg1:ACTIVATE(,,,.T.)
+
+Return
+
+User Function xSalvarZZ1()
+    Local lRet  := .F.
+    DbSelectArea("ZZ1")
+    DbSetOrder(1)
+    if(RecLock("ZZ1", .T.))
+        ZZ1->ZZ1_COD    := cGetCod     //U_xNextCod() 
+        ZZ1->ZZ1_FILIAL := FwXFilial("ZZ1")
+        ZZ1->ZZ1_NOME   :=AllTrim(cGetNome) 
+        ZZ1->ZZ1_NOMERE :=AllTrim(cGetNReduz)
+        ZZ1->ZZ1_DTNASC :=dGetDTNasc
+        ZZ1->ZZ1_DDD    :=cGetDDD
+        ZZ1->ZZ1_TEL    :=AllTrim(cGetTel)  
+        ZZ1->ZZ1_SEXO   :=aSexo[nSexo]    
+        ZZ1->ZZ1_CPF    :=AllTrim(cGetCpf)  
+        /*ZZ1->ZZ1_CEP    :=AllTrim(cCep) 
+        ZZ1->ZZ1_END    :=AllTrim(cGetEnd) 
+        ZZ1->ZZ1_NUM    :=AllTrim(cGetNum) 
+        ZZ1->ZZ1_COMPL  :=AllTrim(cGetCompl) 
+        ZZ1->ZZ1_BAIRRO :=AllTrim(cGetBairro) 
+        ZZ1->ZZ1_CIDADE :=AllTrim(cCidade) 
+        ZZ1->ZZ1_UF     :=cUf
+        ZZ1->ZZ1_TPIMOV :=cImovel
+        ZZ1->ZZ1_CIVIL  :=AllTrim(cEstCivil) 
+        ZZ1->ZZ1_PET    :=IIF(nPet==1,1,0)     
+        ZZ1->ZZ1_ADVPL  :=IIF(lCkAdvpl,1,0)
+        ZZ1->ZZ1_SQL    :=IIF(lCkSql,1,0 )
+        ZZ1->ZZ1_JAVA   :=IIF(lCkJava,1,0)
+        ZZ1->ZZ1_JS     :=IIF(lCkJS,1,0)
+        ZZ1->ZZ1_OBS    :=AllTrim(cObs) */   
+        ConfirmSx8()
+        MsUnlock()
+        ZZ1->(DbCloseArea()) 
+        lRet   := .T.
+        oBtIn:Show()
+        oBtSave:Hide()
+        oBtCan:Hide()
+        U_xCancel()
+        FWAlertSuccess("Registrado com sucesso", "Registro")
+    else
+        rollbackSx8()
+        lRet   := .F.
+        FwAlertError("Registro com erro, verifique os dados!","Registro")
+    EndIf
+    
+Return lRet
+
+User Function xCancel()
+    cGetCod := ""    
+    cGetNome := ""    
+    cGetNReduz := ""    
+    dGetDTNasc := Date()
+    cGetCpf := ""    
+    cGetDDD := ""    
+    cGetTel := "" 
+    oBtIn:Show()
+    oBtSave:Hide()
+    oBtCan:Hide()
+Return
+
+User Function xShowBitMap(nL,nC1,nC2,nC3,nC4,nW,nH,nD)
+    oTBitAdd := TBitmap():New(nL, nC1, nW, nH,  NIL, cImgAdd,.T., oFolder:aDialogs[nD],, NIL, .F., .F., NIL, NIL, .F., NIL, .T., NIL, .F.)
+    oTBitAlt := TBitmap():New(nL, nC2, nW, nH,  NIL, cImgAlt,.T., oFolder:aDialogs[nD],, NIL, .F., .F., NIL, NIL, .F., NIL, .T., NIL, .F.)
+    oTBitCons:= TBitmap():New(nL, nC3, nW, nH, NIL,  cImgPesq,.T.,oFolder:aDialogs[nD],, NIL, .F., .F., NIL, NIL, .F., NIL, .T., NIL, .F.)
+    oTBitDel := TBitmap():New(nL, nC4, nW, nH, NIL,  cImgDel,.T., oFolder:aDialogs[nD],, NIL, .F., .F., NIL, NIL, .F., NIL, .T., NIL, .F.)
+Return
+
+User Function xShowBt(nL,nC1,nC2,nC3,nC4,nD) 
+    oBtIn   := TButton():New(nL,nC1,"Incluir" ,oFolder:aDialogs[nD],{|| U_IncluirZZ1()},40,15,,,.F.,.T.,.F.,,.F.,,,.F.)
+    oBtAlt  := TButton():New(nL,nC2,"Alterar" ,oFolder:aDialogs[nD],{|| MsgInfo("Alterar","Alterar") },40,15,,,.F.,.T.,.F.,,.F.,,,.F.)
+    oBtCons := TButton():New(nL,nC3,"Consultar" ,oFolder:aDialogs[nD],{|| MsgInfo("Consultar","Consultar") },40,15,,,.F.,.T.,.F.,,.F.,,,.F.)
+    oBtDel  := TButton():New(nL,nC4,"Excluir" ,oFolder:aDialogs[nD],{|| MsgInfo("Excluir","Excluir") },40,15,,,.F.,.T.,.F.,,.F.,,,.F.)
+Return
+
+// ------------------------------------------------------------
+CLASS APBUTTON FROM TBUTTON
+    PUBLIC  METHOD New() CONSTRUCTOR
+    PUBLIC  METHOD Hide()
+    PUBLIC  METHOD Show()
+ENDCLASS
+// Construtor da classe inicializa construtor do botão
+// e já seta todas as propriedades e comportamentos desejados
+// ( Troca fonte, seta cor e esconde o botão )
+METHOD New(oParent,cCaption,nTop,nLeft,nWidth,nHeight,bAction) CLASS APBUTTON
+      :New(nTop,nLeft,cCaption,oParent,bAction,nWidth,nHeight,NIL,NIL,NIL,.T.)
+_Super:Hide()
+Return self
+
+METHOD Hide() CLASS APBUTTON
+//MsgInfo("Escondendo o botão ["+::cCaption+"]")
+Return _Super:Hide()
+
+METHOD Show() CLASS APBUTTON
+//MsgInfo("Mostrando o botão ["+::cCaption+"]")
+Return _Super:Show()
+

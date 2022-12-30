@@ -1,0 +1,25 @@
+#INCLUDE "TOTVS.ch"
+#INCLUDE "Protheus.ch"
+#INCLUDE "TopConn.ch"
+
+User Function xNextCod()      
+    Local aArea  := GetArea()
+    Local nCod   := 0 
+  
+    BEGINSQL Alias "AliasCod"
+        Select MAX(ZZ1_COD) ZZ1_COD FROM %table:ZZ1% ZZ1
+    ENDSQL
+    //Local cQuery := "SELECT MAX("+cC+") "+cC+" FROM "+ RetSQLName(cTb)    
+        //TcQuery cQuery New Alias "AliasCod"        
+        //DbSelectArea("AliasCod")  
+        //DbSetOrder(1)      
+        nCod := Alltrim(AliasCod->ZZ1_COD)
+        If nCod != Nil .AND. nCod != ""            
+            nCod := VAL(nCod)+1
+            nCod := StrZero(nCod,6,0)                    
+        else
+            nCod := 000001
+        EndIf          
+        AliasCod->(dbCloseArea())
+    RestArea(aArea)
+Return nCod
