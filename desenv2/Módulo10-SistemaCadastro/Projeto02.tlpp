@@ -27,14 +27,14 @@ User Function Projeto02()
     Private cSexo :=""
 
     //variáveis reverentes aos objetos do Folder2(Endereço)
-    Private oSayCep, oGetCep, cCep, oSayEnd, oGetEnd, cEnd, oSayNum, oGetNum,;
+    Private oSayCep, oGetCep, cGetCep, oSayEnd, oGetEnd, cGetEnd, oSayNum, oGetNum,;
             cNum, oSayCompl, oGetCompl, cCompl, cGetCompl, oSayImovel, oComboImovel,;
             oSayBairro, oGetBairro, cBairro, oSayCidade, oGetCidade, cCidade, oSayUf, oComboUf
     Private aImovel := {"Casa","Apart.","Outro"}
     Private cImovel := aImovel[1]
     Private aUf := {"RO","AC","AM","RR","PA","AP","TO","MA","PI","CE","RN","PB","PE","AL","SE",;
                     "BA","MG","ES","RJ","SP","PR","SC","RS","MS","MT","GO","DF"}
-    Private cUf := aUf[1]
+    Private cGetUf := aUf[1]
 
     //variáveis reverentes aos objetos do Folder3(outros)
     Private aEstCivil := {"Solteiro(a)","Namorando","Noivo(a)","Casado(a)","União Estável","Divorciado(a)","Viúvo(a)"}
@@ -64,7 +64,8 @@ User Function Projeto02()
     //elementos visuais que compoõem o Folder/Pasta1 Dados Pessoais
     oSayCod   := TSay():New(05,05,{||'Codigo'},oFolder:aDialogs[1],,,,,,.T.,CLR_BLUE,CLR_WHITE,300,20)
     cGetCod   := Space(6)                                                 //exibe na aba 1
-    oGetCod   :=TGet():New(15,05,{|u|IIF(Pcount()>0,cGetCod:=u,cGetCod)},oFolder:aDialogs[1],040,009,"",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,cGetCod,,,,)
+    oGetCod   :=TGet():New(15,05,{|u|IIF(Pcount()>0,cGetCod:=u,cGetCod)},oFolder:aDialogs[1],040,009,"",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.T.,.F.,,cGetCod,,,,)
+    oGetCod:Disable()
 
     oSayNome  := TSay():New(05,60,{||'Nome'},oFolder:aDialogs[1],,,,,,.T.,CLR_BLUE,CLR_WHITE,300,20)
     cGetNome  := Space(50)                                                 //exibe na aba 1
@@ -98,9 +99,9 @@ User Function Projeto02()
 
     //elementos visuais que compoõem o Folder/Pasta2 Endereço
     oSayCep   := TSay():New(05,05,{||'Cep'},oFolder:aDialogs[2],,,,,,.T.,CLR_BLUE,CLR_WHITE,30,20)
-    cCep      := Space(9)                                                 //exibe na aba 2
-    oGetCep   := TGet():New(15,05,{|u|IIF(Pcount()>0,cCep:=u,cCep)},oFolder:aDialogs[2],20,009,"@E 99999-999",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,cCep,,,,)
-
+    cGetCep      := Space(9)                                                 //exibe na aba 2              //FWAlertSuccess('','')
+    oGetCep   := TGet():New(15,05,{|u|IIF(Pcount()>0,cGetCep:=u,cGetCep)},oFolder:aDialogs[2],20,009,"@E 99999-999",,0,,,.F.,,.T.,,.F.,/*17*/,.F.,.F.,,.F.,.F.,,cGetCep,,,,)
+    oGetCep:bValid    := {|| U_xCep(cGetCep)}
     oSayEnd   := TSay():New(05,50,{||'Endereço'},oFolder:aDialogs[2],,,,,,.T.,CLR_BLUE,CLR_WHITE,300,20)
     cGetEnd   := Space(80)                                                 //exibe na aba 2
     oGetEnd   := TGet():New(15,50,{|u|IIF(Pcount()>0,cGetEnd:=u,cGetEnd)},oFolder:aDialogs[2],130,009,"",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,cGetEnd,,,,)
@@ -117,7 +118,7 @@ User Function Projeto02()
     oGetCompl   := TGet():New(15,300,{|u|IIF(Pcount()>0,cGetCompl:=u,cGetCompl)},oFolder:aDialogs[2],130,009,"",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,cGetCompl,,,,)
 
     oSayUf       := TSay():New(35,05,{||'Estado'},oFolder:aDialogs[2],,,,,,.T.,CLR_BLUE,CLR_WHITE,30,15)
-    oComboUf     := TComboBox():New(45,05,{|u|IIF(Pcount()>0,cUf:=u,cUf)},aUf,30,15,oFolder:aDialogs[2],,,,,,.T.,,,,,,,,,'cUf')
+    oComboUf     := TComboBox():New(45,05,{|u|IIF(Pcount()>0,cGetUf:=u,cGetUf)},aUf,30,15,oFolder:aDialogs[2],,,,,,.T.,,,,,,,,,'cGetUf')
 
     oSayCidade   := TSay():New(35,50,{||'Cidade'},oFolder:aDialogs[2],,,,,,.T.,CLR_BLUE,CLR_WHITE,100,20)
     cCidade      := Space(30)                                                 //exibe na aba 2
@@ -153,11 +154,11 @@ User Function Projeto02()
     oTBitDel := TBitmap():New(120, 202, 75, 66, NIL, cImgDel,.T., oDlg1,, NIL, .F., .F., NIL, NIL, .F., NIL, .T., NIL, .F.)
 
     //https://siga0984.wordpress.com/2014/12/03/classes-em-advpl-parte-03/
-    @ 150,20 BUTTON oBtIn PROMPT 'Incluir' ;
+    @ 150,20 BUTTON oBtIn PROMPT 'Novo' ;
         ACTION ( oBtSave:Show(),oBtCan:Show() , oBtIn:Hide(),cGetCod:=GETSXENUM("ZZ1","ZZ1_COD") );
         SIZE 40, 15 OF oDlg1 PIXEL    
     oBtSave := APBUTTON():NEW(oDlg1, "Salvar", 150, 20, 40, 15, {|| oBtIn:Show(),oBtSave:Hide(),oBtCan:Hide(),U_xSalvarZZ1() })
-    oBtCan  := APBUTTON():NEW(oDlg1, "Cancelar", 165, 20, 40, 10, {|| U_xCancel() })
+    oBtCan  := APBUTTON():NEW(oDlg1, "Cancelar", 165, 20, 40, 10, {|| U_xCancel(),rollbackSx8() })
 
     //oBtIn   := TButton():New(150,20,"Incluir" ,oDlg1,{|| U_IncluirZZ1()},40,15,,,.F.,.T.,.F.,,.F.,,,.F.)
     oBtAlt  := TButton():New(150,80, "Alterar"  ,,{|| MsgInfo("Alterar","Alterar") },40,15,,,.F.,.T.,.F.,,.F.,,,.F.)
@@ -182,21 +183,21 @@ User Function xSalvarZZ1()
         ZZ1->ZZ1_TEL    :=AllTrim(cGetTel)  
         ZZ1->ZZ1_SEXO   :=aSexo[nSexo]    
         ZZ1->ZZ1_CPF    :=AllTrim(cGetCpf)  
-        /*ZZ1->ZZ1_CEP    :=AllTrim(cCep) 
+        ZZ1->ZZ1_CEP    :=AllTrim(cGetCep) 
         ZZ1->ZZ1_END    :=AllTrim(cGetEnd) 
         ZZ1->ZZ1_NUM    :=AllTrim(cGetNum) 
         ZZ1->ZZ1_COMPL  :=AllTrim(cGetCompl) 
         ZZ1->ZZ1_BAIRRO :=AllTrim(cGetBairro) 
         ZZ1->ZZ1_CIDADE :=AllTrim(cCidade) 
-        ZZ1->ZZ1_UF     :=cUf
+        ZZ1->ZZ1_UF     :=cGetUf
         ZZ1->ZZ1_TPIMOV :=cImovel
         ZZ1->ZZ1_CIVIL  :=AllTrim(cEstCivil) 
-        ZZ1->ZZ1_PET    :=IIF(nPet==1,1,0)     
-        ZZ1->ZZ1_ADVPL  :=IIF(lCkAdvpl,1,0)
-        ZZ1->ZZ1_SQL    :=IIF(lCkSql,1,0 )
-        ZZ1->ZZ1_JAVA   :=IIF(lCkJava,1,0)
-        ZZ1->ZZ1_JS     :=IIF(lCkJS,1,0)
-        ZZ1->ZZ1_OBS    :=AllTrim(cObs) */   
+        ZZ1->ZZ1_PET    :=IIF(nPet==1,'1','0')     
+        ZZ1->ZZ1_ADVPL  :=IIF(lCkAdvpl,'1','0')
+        ZZ1->ZZ1_SQL    :=IIF(lCkSql,'1','0')
+        ZZ1->ZZ1_JAVA   :=IIF(lCkJava,'1','0')
+        ZZ1->ZZ1_JS     :=IIF(lCkJS,'1','0')
+        ZZ1->ZZ1_OBS    :=AllTrim(cObs)  
         ConfirmSx8()
         MsUnlock()
         ZZ1->(DbCloseArea()) 
@@ -224,7 +225,7 @@ User Function xCancel()
     cGetTel := "" 
     oBtIn:Show()
     oBtSave:Hide()
-    oBtCan:Hide()
+    oBtCan:Hide()    
 Return
 
 User Function xShowBitMap(nL,nC1,nC2,nC3,nC4,nW,nH,nD)
@@ -240,6 +241,41 @@ User Function xShowBt(nL,nC1,nC2,nC3,nC4,nD)
     oBtCons := TButton():New(nL,nC3,"Consultar" ,oDlg1,{|| MsgInfo("Consultar","Consultar") },40,15,,,.F.,.T.,.F.,,.F.,,,.F.)
     oBtDel  := TButton():New(nL,nC4,"Excluir" ,oDlg1,{|| MsgInfo("Excluir","Excluir") },40,15,,,.F.,.T.,.F.,,.F.,,,.F.)
 Return
+
+User Function xCep(c)
+    Local lRet          := .T. 
+    Local aHeader       := {}  
+    Local cHeaderRet    := ''  
+    Local cResult       := ''  
+    Local oResult       := {}  
+    Begin Sequence
+        If Empty(AllTrim(c))
+            FwAlertError('Informe o CEP','Validação')
+            Break
+        Endif
+        cResult := HTTPQuote('https://brasilapi.com.br/api/cep/v2/'+AllTrim(c), "GET", "", , , aHeader, @cHeaderRet)
+            If !("200 OK" $ cHeaderRet )
+            FwAlertError('Erro na Consulta: ' + cResult,'Validação')
+            Break
+        Endif
+        If !FWJsonDeserialize( cResult, @oResult )
+            FwAlertError('Erro no jSon: ' + cResult,'Validação')
+            Break
+        Endif
+        cGetEnd    := DecodeUTF8(oResult:street)
+        if At(',',cGetEnd) >0            
+            cGetEnd    := SubStr(cGetEnd, 0, At(',',cGetEnd)-1)//retira sinal ,
+        EndIf
+        if At('-',cGetEnd) >0
+            cGetEnd    := SubStr(cGetEnd, 0, At('-',cGetEnd)-1)//retira sinal -            
+        EndIf
+        cGetUf     := DecodeUTF8(oResult:state)
+        cCidade    := DecodeUTF8(oResult:city)
+        cGetBairro := DecodeUTF8(oResult:neighborhood)
+        
+        RECOVER
+    End Sequence
+Return lRet
 
 // ------------------------------------------------------------
 CLASS APBUTTON FROM TBUTTON
@@ -262,4 +298,5 @@ Return _Super:Hide()
 METHOD Show() CLASS APBUTTON
 //MsgInfo("Mostrando o botão ["+::cCaption+"]")
 Return _Super:Show()
+
 
