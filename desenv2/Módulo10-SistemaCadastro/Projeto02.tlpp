@@ -29,7 +29,7 @@ User Function Projeto02()
     //variáveis reverentes aos objetos do Folder2(Endereço)
     Private oSayCep, oGetCep, cGetCep, oSayEnd, oGetEnd, cGetEnd, oSayNum, oGetNum,;
             cNum, oSayCompl, oGetCompl, cCompl, cGetCompl, oSayImovel, oComboImovel,;
-            oSayBairro, oGetBairro, cBairro, oSayCidade, oGetCidade, cCidade, oSayUf, oComboUf
+            oSayBairro, oGetBairro, cBairro, oSayCidade, oGetCidade, cGetCidade, oSayUf, oComboUf
     Private aImovel := {"Casa","Apart.","Outro"}
     Private cImovel := aImovel[1]
     Private aUf := {"RO","AC","AM","RR","PA","AP","TO","MA","PI","CE","RN","PB","PE","AL","SE",;
@@ -39,7 +39,7 @@ User Function Projeto02()
     //variáveis reverentes aos objetos do Folder3(outros)
     Private aEstCivil := {"Solteiro(a)","Namorando","Noivo(a)","Casado(a)","União Estável","Divorciado(a)","Viúvo(a)"}
     Private cEstCivil := aEstCivil[1]
-    Private aPet :={"Não","Sim"}
+    Private aPet :={"Sim","Não"}
     Private nPet := 1
     Private lCkAdvpl := .F.
     Private lCkSql   := .F.
@@ -52,7 +52,7 @@ User Function Projeto02()
     Private cImgDel := cUrl+"Del.png"
     Private cDados := ""
     Private oSayEstCivil, oComboEstCivil, oGroupPet, oRadiopet, oGroupLing, oCkAdvpl,;
-            oCkSql, oCkJava, oCkJS, oSayObs, cObs , oTMultiget, oBtMarkAll,;
+            oCkSql, oCkJava, oCkJS, oSayObs, cGetObs , oTMultiget, oBtMarkAll,;
             oBtUnMarkAll, oBtDados, oBtEnd, oBtoutros
     Private oBtSave,oBtIn,oBtCan,oBtDel
     //Inicio da construção da Tela
@@ -121,30 +121,30 @@ User Function Projeto02()
     oComboUf     := TComboBox():New(45,05,{|u|IIF(Pcount()>0,cGetUf:=u,cGetUf)},aUf,30,15,oFolder:aDialogs[2],,,,,,.T.,,,,,,,,,'cGetUf')
 
     oSayCidade   := TSay():New(35,50,{||'Cidade'},oFolder:aDialogs[2],,,,,,.T.,CLR_BLUE,CLR_WHITE,100,20)
-    cCidade      := Space(30)                                                 //exibe na aba 2
-    oGetCidade   := TGet():New(45,50,{|u|IIF(Pcount()>0,cCidade:=u,cCidade)},oFolder:aDialogs[2],100,009,"",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,cCidade,,,,)
+    cGetCidade      := Space(30)                                                 //exibe na aba 2
+    oGetCidade   := TGet():New(45,50,{|u|IIF(Pcount()>0,cGetCidade:=u,cGetCidade)},oFolder:aDialogs[2],100,009,"",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,cGetCidade,,,,)
 
     oSayBairro   := TSay():New(35,190,{||'Bairro'},oFolder:aDialogs[2],,,,,,.T.,CLR_BLUE,CLR_WHITE,300,20)
     cGetBairro   := Space(60)                                                 //exibe na aba 2
     oGetBairro   := TGet():New(45,190,{|u|IIF(Pcount()>0,cGetBairro:=u,cGetBairro)},oFolder:aDialogs[2],100,009,"",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,cGetBairro,,,,)
         
     //elementos visuais que compoõem o Folder/Pasta3 outros    
-    oGroupPet     := tGroup():New(05,60,40,100,"Possui Pet?",oFolder:aDialogs[3],,,.T.)
-    oRadiopet     := TRadMenu():New(15,65,aPet,{|u|IIF(Pcount()>0,nPet:=u,nPet)},oFolder:aDialogs[3],,,,,,,,30,20,,,,.T.)
+    oGroupPet     := tGroup():New(05,05,40,50,"Possui Pet?",oFolder:aDialogs[3],,,.T.)
+    oRadiopet     := TRadMenu():New(15,10,aPet,{|u|IIF(Pcount()>0,nPet:=u,nPet)},oFolder:aDialogs[3],,,,,,,,30,20,,,,.T.)
 
-    oGroupLing    := tGroup():New(05,110,60,200,"Linguagens que domina:",oFolder:aDialogs[3],,,.T.)
+    oGroupLing    := tGroup():New(05,55,60,140,"Linguagens que domina:",oFolder:aDialogs[3],,,.T.)
                                                                                             // se clicar no check a variável recebe o valor inverso dela     
-    oCkAdvpl      := TCheckBox():New(15,115,'Advpl',{||lCkAdvpl},oFolder:aDialogs[3],50,210,,{||lCkAdvpl:= !lCkAdvpl},,,,,,.T.,,,)
-    oCkSql        := TCheckBox():New(25,115,'Sql',{||lCkSql},    oFolder:aDialogs[3],50,210,,{||lCkSql  := !lCkSql},,,,,,.T.,,,)
-    oCkJava       := TCheckBox():New(35,115,'Java',{||lCkJava},  oFolder:aDialogs[3],50,210,,{||lCkJava := !lCkJava},,,,,,.T.,,,)
-    oCkJS         := TCheckBox():New(45,115,'JScript',{||lCkJS}, oFolder:aDialogs[3],50,210,,{||lCkJS   := !lCkJS},,,,,,.T.,,,)
-    oBtMarkAll    := TButton():New(20,150,"Todas", oFolder:aDialogs[3],;
+    oCkAdvpl      := TCheckBox():New(15,60,'Advpl',{||lCkAdvpl},oFolder:aDialogs[3],50,210,,{||lCkAdvpl:= !lCkAdvpl},,,,,,.T.,,,)
+    oCkSql        := TCheckBox():New(25,60,'Sql',{||lCkSql},    oFolder:aDialogs[3],50,210,,{||lCkSql  := !lCkSql},,,,,,.T.,,,)
+    oCkJava       := TCheckBox():New(35,60,'Java',{||lCkJava},  oFolder:aDialogs[3],50,210,,{||lCkJava := !lCkJava},,,,,,.T.,,,)
+    oCkJS         := TCheckBox():New(45,60,'JScript',{||lCkJS}, oFolder:aDialogs[3],50,210,,{||lCkJS   := !lCkJS},,,,,,.T.,,,)
+    oBtMarkAll    := TButton():New(20,90,"Todas", oFolder:aDialogs[3],;
                     {||lCkAdvpl:=.T., lCkSql:=.T., lCkJava:=.T.,lCkJS:=.T.},30,10,,,.F.,.T.,.F.,,.F.,,,.F.)
-    oBtUnMarkAll  := TButton():New(35,150,"Nenhuma", oFolder:aDialogs[3],;
+    oBtUnMarkAll  := TButton():New(35,90,"Nenhuma", oFolder:aDialogs[3],;
                     {||lCkAdvpl:=.F., lCkSql:=.F., lCkJava:=.F.,lCkJS:=.F.},30,10,,,.F.,.T.,.F.,,.F.,,,.F.)
 
-    oSayObs       := TSay():New(55,05,{||'Observação'},oFolder:aDialogs[3],,,,,,.T.,CLR_BLUE,CLR_WHITE,50,15)
-    oTMultiget    := tMultiget():new( 65, 05,{|u|IIF(Pcount()>0,cObs:=u,cObs)},oFolder:aDialogs[3], 150, 40, , , , , , .T. )
+    oSayObs       := TSay():New(05,150,{||'Observação'},oFolder:aDialogs[3],,,,,,.T.,CLR_BLUE,CLR_WHITE,50,15)
+    oTMultiget    := tMultiget():new( 15, 150,{|u|IIF(Pcount()>0,cGetObs:=u,cGetObs)},oFolder:aDialogs[3], 150, 50, , , , , , .T. )
 
     
     // linha, coluna1 2 3 4, width, height, dialog
@@ -188,7 +188,7 @@ User Function xSalvarZZ1()
         ZZ1->ZZ1_NUM    :=AllTrim(cGetNum) 
         ZZ1->ZZ1_COMPL  :=AllTrim(cGetCompl) 
         ZZ1->ZZ1_BAIRRO :=AllTrim(cGetBairro) 
-        ZZ1->ZZ1_CIDADE :=AllTrim(cCidade) 
+        ZZ1->ZZ1_CIDADE :=AllTrim(cGetCidade) 
         ZZ1->ZZ1_UF     :=cGetUf
         ZZ1->ZZ1_TPIMOV :=cImovel
         ZZ1->ZZ1_CIVIL  :=AllTrim(cEstCivil) 
@@ -197,7 +197,7 @@ User Function xSalvarZZ1()
         ZZ1->ZZ1_SQL    :=IIF(lCkSql,'1','0')
         ZZ1->ZZ1_JAVA   :=IIF(lCkJava,'1','0')
         ZZ1->ZZ1_JS     :=IIF(lCkJS,'1','0')
-        ZZ1->ZZ1_OBS    :=AllTrim(cObs)  
+        ZZ1->ZZ1_OBS    :=AllTrim(cGetObs)  
         ConfirmSx8()
         MsUnlock()
         ZZ1->(DbCloseArea()) 
@@ -223,9 +223,21 @@ User Function xCancel()
     cGetCpf := ""    
     cGetDDD := ""    
     cGetTel := "" 
+    cGetCep := "" 
+    cGetEnd := "" 
+    cGetNum := "" 
+    cGetCompl:= "" 
+    cGetCidade:= "" 
+    cGetBairro := "" 
+    lCkAdvpl:= .F. 
+    lCkSql  := .F.  
+    lCkJS   := .F.
+    lCkJava := .F.
+    cGetObs := "" 
     oBtIn:Show()
     oBtSave:Hide()
     oBtCan:Hide()    
+    oDlg1:Refresh()
 Return
 
 User Function xShowBitMap(nL,nC1,nC2,nC3,nC4,nW,nH,nD)
@@ -270,7 +282,7 @@ User Function xCep(c)
             cGetEnd    := SubStr(cGetEnd, 0, At('-',cGetEnd)-1)//retira sinal -            
         EndIf
         cGetUf     := DecodeUTF8(oResult:state)
-        cCidade    := DecodeUTF8(oResult:city)
+        cGetCidade    := DecodeUTF8(oResult:city)
         cGetBairro := DecodeUTF8(oResult:neighborhood)
         
         RECOVER
