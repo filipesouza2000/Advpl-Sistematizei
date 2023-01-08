@@ -182,7 +182,8 @@ User Function Projeto02()
     oBtAlt  := TButton():New(150,80, "Alterar"  ,,{|| MsgInfo("Alterar","Alterar") },40,15,,,.F.,.T.,.F.,,.F.,,,.F.)
     oBtCons := TButton():New(150,140,"Consultar",,{|| xConsultar() },40,15,,,.F.,.T.,.F.,,.F.,,,.F.)
     oBtDel  := TButton():New(150,200,"Excluir"  ,,{|| MsgInfo("Excluir","Excluir") },40,15,,,.F.,.T.,.F.,,.F.,,,.F.)
-
+    oBtAlt:Disable()
+    oBtDel:Disable()
     oDlg1:ACTIVATE(,,,.T.)
 
 Return
@@ -307,7 +308,8 @@ Static Function xConsultar()
         oBtSave:Show()
         oBtCan:Show() 
         oBtIn:Hide()   
-        
+        oBtAlt:Enable()
+        oBtDel:Enable()
     else
         FwAlertError('Erro na consulta','Consulta')   
 
@@ -354,7 +356,9 @@ User Function xCancel()
     
     oBtIn:Show()
     oBtSave:Hide()
-    oBtCan:Hide()    
+    oBtCan:Hide()   
+    oBtAlt:Disable()
+    oBtDel:Disable() 
     oDlg1:Refresh()
 Return
 
