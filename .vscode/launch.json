@@ -63,7 +63,10 @@
 				"1"
 			],
 			"label": "U_xViaCep"
+		},
+		{
+			"label": "sigacfg"
 		}
 	],
-	"lastProgramExecuted": "U_Projeto02"
+	"lastProgramExecuted": "sigamdi"
 }
