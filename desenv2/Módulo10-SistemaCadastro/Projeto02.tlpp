@@ -181,9 +181,9 @@ User Function Projeto02()
     oBtCan  := APBUTTON():NEW(oDlg1, "Cancelar", 165, 20, 40, 10, {|| U_xCancel(),rollbackSx8() })
 
     //oBtIn   := TButton():New(150,20,"Incluir" ,oDlg1,{|| U_IncluirZZ1()},40,15,,,.F.,.T.,.F.,,.F.,,,.F.)
-    oBtAlt  := TButton():New(150,80, "Alterar"  ,,{|| MsgInfo("Alterar","Alterar") },40,15,,,.F.,.T.,.F.,,.F.,,,.F.)
-    oBtCons := TButton():New(150,140,"Consultar",,{|| xConsultar() },40,15,,,.F.,.T.,.F.,,.F.,,,.F.)
-    oBtDel  := TButton():New(150,200,"Excluir"  ,,{|| MsgInfo("Excluir","Excluir") },40,15,,,.F.,.T.,.F.,,.F.,,,.F.)
+    oBtAlt  := TButton():New(150,80, "Alterar"  ,,{|| U_xUpdateZZ1()},40,15,,,.F.,.T.,.F.,,.F.,,,.F.)
+    oBtCons := TButton():New(150,140,"Consultar",,{|| U_xConsultar() },40,15,,,.F.,.T.,.F.,,.F.,,,.F.)
+    oBtDel  := TButton():New(150,200,"Excluir"  ,,{|| U_xDeleteZZ1() },40,15,,,.F.,.T.,.F.,,.F.,,,.F.)
     oBtAlt:Disable()
     oBtDel:Disable()
     oDlg1:ACTIVATE(,,,.T.)
@@ -225,28 +225,28 @@ User Function xSalvarZZ1()
         if(RecLock("ZZ1", .T.))
             ZZ1->ZZ1_COD    := cGetCod     //U_xNextCod() 
             ZZ1->ZZ1_FILIAL := FwXFilial("ZZ1")
-            ZZ1->ZZ1_NOME   :=AllTrim(cGetNome) 
-            ZZ1->ZZ1_NOMERE :=AllTrim(cGetNReduz)
+            ZZ1->ZZ1_NOME   :=cGetNome 
+            ZZ1->ZZ1_NOMERE :=cGetNReduz
             ZZ1->ZZ1_DTNASC :=dGetDTNasc
             ZZ1->ZZ1_DDD    :=cGetDDD
-            ZZ1->ZZ1_TEL    :=StrTran( AllTrim(cGetTel) ,'-','')  
+            ZZ1->ZZ1_TEL    :=StrTran( cGetTel ,'-','') 
             ZZ1->ZZ1_SEXO   :=CVALTOCHAR(nSexo)
             ZZ1->ZZ1_CPF    :=cGetCpf
-            ZZ1->ZZ1_CEP    :=StrTran(AllTrim(cGetCep),'-','') 
-            ZZ1->ZZ1_END    :=AllTrim(cGetEnd) 
-            ZZ1->ZZ1_NUM    :=AllTrim(cGetNum) 
-            ZZ1->ZZ1_COMPL  :=AllTrim(cGetCompl) 
-            ZZ1->ZZ1_BAIRRO :=AllTrim(cGetBairro) 
-            ZZ1->ZZ1_CIDADE :=AllTrim(cGetCidade) 
+            ZZ1->ZZ1_CEP    :=StrTran(cGetCep,'-','') 
+            ZZ1->ZZ1_END    :=cGetEnd 
+            ZZ1->ZZ1_NUM    :=cGetNum 
+            ZZ1->ZZ1_COMPL  :=cGetCompl 
+            ZZ1->ZZ1_BAIRRO :=cGetBairro 
+            ZZ1->ZZ1_CIDADE :=cGetCidade 
             ZZ1->ZZ1_UF     :=cGetUf
             ZZ1->ZZ1_TPIMOV :=cImovel
-            ZZ1->ZZ1_CIVIL  :=AllTrim(cEstCivil) 
+            ZZ1->ZZ1_CIVIL  :=cEstCivil 
             ZZ1->ZZ1_PET    :=CVALTOCHAR(nPet)     
             ZZ1->ZZ1_ADVPL  :=IIF(lCkAdvpl,'1','0')
             ZZ1->ZZ1_SQL    :=IIF(lCkSql,'1','0')
             ZZ1->ZZ1_JAVA   :=IIF(lCkJava,'1','0')
             ZZ1->ZZ1_JS     :=IIF(lCkJS,'1','0')
-            ZZ1->ZZ1_OBS    :=AllTrim(cGetObs)  
+            ZZ1->ZZ1_OBS    :=cGetObs 
             ConfirmSx8()
             MsUnlock()
             ZZ1->(DbCloseArea()) 
@@ -265,7 +265,64 @@ User Function xSalvarZZ1()
     
 Return lRet
 
-Static Function xConsultar()
+User Function xUpdateZZ1()
+    Local lRet  := .F.
+    DbSelectArea("ZZ1")
+    DbSetOrder(4)    
+    if DBSeek(FwXFilial("ZZ1")+cGetCpf)
+        RecLock("ZZ1", .F.)        
+        //ZZ1->ZZ1_COD    := cGetCod     //U_xNextCod() 
+        //ZZ1->ZZ1_FILIAL := FwXFilial("ZZ1")
+        ZZ1->ZZ1_NOME   :=cGetNome 
+        ZZ1->ZZ1_NOMERE :=cGetNReduz
+        ZZ1->ZZ1_DTNASC :=dGetDTNasc
+        ZZ1->ZZ1_DDD    :=cGetDDD
+        ZZ1->ZZ1_TEL    :=StrTran( cGetTel ,'-','')  
+        ZZ1->ZZ1_SEXO   :=CVALTOCHAR(nSexo)
+        //ZZ1->ZZ1_CPF    :=cGetCpf
+        ZZ1->ZZ1_CEP    :=StrTran(cGetCep,'-','') 
+        ZZ1->ZZ1_END    :=cGetEnd 
+        ZZ1->ZZ1_NUM    :=cGetNum
+        ZZ1->ZZ1_COMPL  :=cGetCompl
+        ZZ1->ZZ1_BAIRRO :=cGetBairro
+        ZZ1->ZZ1_CIDADE :=cGetCidade 
+        ZZ1->ZZ1_UF     :=cGetUf
+        ZZ1->ZZ1_TPIMOV :=cImovel
+        ZZ1->ZZ1_CIVIL  :=cEstCivil 
+        ZZ1->ZZ1_PET    :=CVALTOCHAR(nPet)     
+        ZZ1->ZZ1_ADVPL  :=IIF(lCkAdvpl,'1','0')
+        ZZ1->ZZ1_SQL    :=IIF(lCkSql,'1','0')
+        ZZ1->ZZ1_JAVA   :=IIF(lCkJava,'1','0')
+        ZZ1->ZZ1_JS     :=IIF(lCkJS,'1','0')
+        ZZ1->ZZ1_OBS    :=cGetObs 
+        MsUnlock()
+        ZZ1->(DbCloseArea()) 
+        lRet   := .T.
+        oBtIn:Show()
+        oBtSave:Hide()
+        oBtCan:Hide()
+        U_xCancel()
+        FWAlertSuccess("Atualizado com sucesso", "Atualização")       
+    Endif    
+    
+Return lRet
+
+User Function xDeleteZZ1()
+    DBSelectArea('ZZ1')
+    DbSetOrder(4)    
+        if DBSeek(FwXFilial("ZZ1")+cGetCpf)
+            IF MsgYesNo("Deletar registro com CPF: "+Alltrim(cGetCpf)+" ?", "Deletar registro")
+                RecLock('ZZ1',.F.)
+                DBDelete()
+                MsUnlock()
+                U_xCancel()
+            EndIf 
+        Endif
+
+    ZZ1->(DbCloseArea())
+Return
+// Ao consulta não consigo editar campos
+User Function xConsultar()
     Local xVar
     Local lChar
     DBSelectArea("ZZ1")
@@ -279,34 +336,33 @@ Static Function xConsultar()
         lChar:=.F.
     EndIf    
     If DBSeek(FwXFilial("ZZ1")+xVar)
-        cGetCod         :=Alltrim(ZZ1->ZZ1_COD)
+        cGetCod         :=ZZ1->ZZ1_COD
         //se for lChar preenche cpf,  senão preenche nome
-        IIF(lChar,cGetCpf:=Alltrim(ZZ1->ZZ1_CPF),;
-                  cGetNome:=(ZZ1->ZZ1_NOME))        
-        cGetNReduz      :=Alltrim(ZZ1->ZZ1_NOMERE) 
+        IIF(lChar,cGetCpf:=ZZ1->ZZ1_CPF,;
+                  cGetNome:=ZZ1->ZZ1_NOME)        
+        cGetNReduz      :=ZZ1->ZZ1_NOMERE
         dGetDTNasc      :=ZZ1->ZZ1_DTNASC 
-        cGetDDD         :=Alltrim(ZZ1->ZZ1_DDD)    
+        cGetDDD         :=ZZ1->ZZ1_DDD   
         cGetTel         :=SubStr(ZZ1->ZZ1_TEL,1,5)+'-'+SubStr(ZZ1->ZZ1_TEL,6,4)      
-        nSexo           :=Val(ZZ1->ZZ1_SEXO)   
-        
+        nSexo           :=Val(ZZ1->ZZ1_SEXO)
         cGetCep         :=SubStr(ZZ1->ZZ1_CEP ,1,5)+'-'+SubStr(ZZ1->ZZ1_CEP ,6,3)   
-        cGetEnd         :=Alltrim(ZZ1->ZZ1_END)
-        cGetNum         :=Alltrim(ZZ1->ZZ1_NUM)
-        cGetCompl       :=Alltrim(ZZ1->ZZ1_COMPL) 
-        cGetBairro      :=Alltrim(ZZ1->ZZ1_BAIRRO) 
-        cGetCidade      :=Alltrim(ZZ1->ZZ1_CIDADE) 
-        cGetUf          :=Alltrim(ZZ1->ZZ1_UF    )
-        cImovel         :=Alltrim(ZZ1->ZZ1_TPIMOV)
-        cEstCivil       :=Alltrim(ZZ1->ZZ1_CIVIL )
+        cGetEnd         :=ZZ1->ZZ1_END
+        cGetNum         :=ZZ1->ZZ1_NUM
+        cGetCompl       :=ZZ1->ZZ1_COMPL 
+        cGetBairro      :=ZZ1->ZZ1_BAIRRO
+        cGetCidade      :=ZZ1->ZZ1_CIDADE 
+        cGetUf          :=ZZ1->ZZ1_UF    
+        cImovel         :=ZZ1->ZZ1_TPIMOV
+        cEstCivil       :=ZZ1->ZZ1_CIVIL 
         nPet            :=Val(ZZ1->ZZ1_PET)
         lCkAdvpl        :=IIF(ZZ1->ZZ1_ADVPL=="1",.T.,.F.)
         lCkSql          :=IIF(ZZ1->ZZ1_SQL  =="1",.T.,.F.)
         lCkJava         :=IIF(ZZ1->ZZ1_JAVA =="1",.T.,.F.)
         lCkJS           :=IIF(ZZ1->ZZ1_JS   =="1",.T.,.F.)
-        cGetObs         :=Alltrim(ZZ1->ZZ1_OBS) 
+        cGetObs         :=ZZ1->ZZ1_OBS 
         oGetNReduz:Enable()
         oGetDTNasc:Enable()
-        oGetCpf:Enable()
+        oGetCpf:Disable()
         oGetDDD:Enable()
         oGetTel:Enable()
         oComboEstCivil:Enable()
