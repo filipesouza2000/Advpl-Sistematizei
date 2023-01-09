@@ -311,11 +311,12 @@ User Function xDeleteZZ1()
     DBSelectArea('ZZ1')
     DbSetOrder(4)    
         if DBSeek(FwXFilial("ZZ1")+cGetCpf)
-            IF MsgYesNo("Deletar registro com CPF: "+Alltrim(cGetCpf)+" ?", "Deletar registro")
+            IF MsgYesNo("Excluir registro com CPF: "+Alltrim(cGetCpf)+" ?", "Excluir registro")
                 RecLock('ZZ1',.F.)
                 DBDelete()
                 MsUnlock()
                 U_xCancel()
+                FWAlertSuccess('Registro excluído!','Excluir registro')
             EndIf 
         Endif
 
