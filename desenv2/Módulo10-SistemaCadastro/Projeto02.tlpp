@@ -55,6 +55,7 @@ User Function Projeto02()
             oCkSql, oCkJava, oCkJS, oSayObs, cGetObs , oTMultiget, oBtMarkAll,;
             oBtUnMarkAll, oBtDados, oBtEnd, oBtoutros
     Private oBtSave,oBtIn,oBtCan,oBtDel
+    
     //Inicio da construção da Tela
     oDlg1   := TDialog():New(0,0,720,1120,cTituloJanela,,,,,CLR_BLACK,CLR_WHITE,,,.T.)
 
@@ -81,9 +82,10 @@ User Function Projeto02()
     oGetDTNasc:= TGet():New(15,250,{|u|IIF(Pcount()>0,dGetDTNasc:=u,dGetDTNasc)},oFolder:aDialogs[1],050,009,"",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,/**/,,,,.T.)//ultumo .T. mostra icone de calendario
     
     oSayCpf   := TSay():New(35,05,{||'Cpf'},oFolder:aDialogs[1],,,,,,.T.,CLR_BLUE,CLR_WHITE,300,20)
-    cGetCpf   := Space(14)                                                 //exibe na aba 1
-    oGetCpf   := TGet():New(45,05,{|u|IIF(Pcount()>0,cGetCpf:=u,cGetCpf)},oFolder:aDialogs[1],050,009,"@E 999.999.999-99",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,cGetCpf,,,,)
-    
+    cGetCpf   := Space(11)                                                 //exibe na aba 1
+    oGetCpf   := TGet():New(45,05,{|u|IIF(Pcount()>0,cGetCpf:=u,cGetCpf)},oFolder:aDialogs[1],050,009,"@E 99999999999",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,cGetCpf,,,,)
+    oGetCpf:cf3:='ZZ1CPF'
+
     oSayDDD   := TSay():New(35,70,{||'DDD'},oFolder:aDialogs[1],,,,,,.T.,CLR_BLUE,CLR_WHITE,300,20)
     cGetDDD   := Space(2)                                                 //exibe na aba 1
     oGetDDD   := TGet():New(45,70,{|u|IIF(Pcount()>0,cGetDDD:=u,cGetDDD)},oFolder:aDialogs[1],020,009,"@E 99",,0,,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F.,,cGetDDD,,,,)
@@ -152,7 +154,7 @@ User Function Projeto02()
     //oGetNome:Disable()
     oGetNReduz:Disable()
     oGetDTNasc:Disable()
-    oGetCpf:Disable()
+    //oGetCpf:Disable()
     oGetDDD:Disable()
     oGetTel:Disable()
     oComboEstCivil:Disable()
@@ -215,7 +217,7 @@ User Function xSalvarZZ1()
     Local lRet  := .F.
     DbSelectArea("ZZ1")
     DbSetOrder(4)
-    If DBSeek(FwXFilial("ZZ1")+StrTran(StrTran(cGetCpf,'-',''),'.',''  ))
+    If DBSeek(FwXFilial("ZZ1")+cGetCpf)
         FwAlertError('Cliente com CPF:'+ cGetCpf +' já cadastrado, verifique o documento.')
         ZZ1->(DbCloseArea())
     else
@@ -229,7 +231,7 @@ User Function xSalvarZZ1()
             ZZ1->ZZ1_DDD    :=cGetDDD
             ZZ1->ZZ1_TEL    :=StrTran( AllTrim(cGetTel) ,'-','')  
             ZZ1->ZZ1_SEXO   :=CVALTOCHAR(nSexo)
-            ZZ1->ZZ1_CPF    :=StrTran(StrTran(cGetCpf,'-',''),'.',''  )
+            ZZ1->ZZ1_CPF    :=cGetCpf
             ZZ1->ZZ1_CEP    :=StrTran(AllTrim(cGetCep),'-','') 
             ZZ1->ZZ1_END    :=AllTrim(cGetEnd) 
             ZZ1->ZZ1_NUM    :=AllTrim(cGetNum) 
@@ -264,17 +266,29 @@ User Function xSalvarZZ1()
 Return lRet
 
 Static Function xConsultar()
+    Local xVar
+    Local lChar
     DBSelectArea("ZZ1")
-    DBSetOrder(2)
-    If DBSeek(FwXFilial("ZZ1")+cGetNome)
+    IF Alltrim(cGetNome)<>""
+        DBSetOrder(2)
+        xVar := Alltrim(cGetNome)
+        lChar:=.T.
+    elseIF Alltrim(cGetCpf)<>""
+        DBSetOrder(4)
+        xVar :=Alltrim(cGetCpf)
+        lChar:=.F.
+    EndIf    
+    If DBSeek(FwXFilial("ZZ1")+xVar)
         cGetCod         :=Alltrim(ZZ1->ZZ1_COD)
-        //cGetNome        :=ZZ1->ZZ1_NOME    
+        //se for lChar preenche cpf,  senão preenche nome
+        IIF(lChar,cGetCpf:=Alltrim(ZZ1->ZZ1_CPF),;
+                  cGetNome:=(ZZ1->ZZ1_NOME))        
         cGetNReduz      :=Alltrim(ZZ1->ZZ1_NOMERE) 
         dGetDTNasc      :=ZZ1->ZZ1_DTNASC 
         cGetDDD         :=Alltrim(ZZ1->ZZ1_DDD)    
         cGetTel         :=SubStr(ZZ1->ZZ1_TEL,1,5)+'-'+SubStr(ZZ1->ZZ1_TEL,6,4)      
         nSexo           :=Val(ZZ1->ZZ1_SEXO)   
-        cGetCpf         :=SubStr(ZZ1->ZZ1_CPF,1,3)+'.'+SubStr(ZZ1->ZZ1_CPF,4,3)+'.'+SubStr(ZZ1->ZZ1_CPF,7,3)+'-'+SubStr(ZZ1->ZZ1_CPF,10,2)     
+        
         cGetCep         :=SubStr(ZZ1->ZZ1_CEP ,1,5)+'-'+SubStr(ZZ1->ZZ1_CEP ,6,3)   
         cGetEnd         :=Alltrim(ZZ1->ZZ1_END)
         cGetNum         :=Alltrim(ZZ1->ZZ1_NUM)
@@ -323,7 +337,7 @@ User Function xCancel()
     cGetNome    := Space(50)  
     cGetNReduz  :=  Space(30)    
     dGetDTNasc  := Date()
-    cGetCpf     := Space(14)    
+    cGetCpf     := Space(11)    
     cGetDDD     := Space(2)      
     cGetTel     := Space(10) 
     cGetCep     := Space(10) 
@@ -340,7 +354,7 @@ User Function xCancel()
     //oGetNome:Disable()
     oGetNReduz:Disable()
     oGetDTNasc:Disable()
-    oGetCpf:Disable()
+    //oGetCpf:Disable()
     oGetDDD:Disable()
     oGetTel:Disable()
     oComboEstCivil:Disable()
