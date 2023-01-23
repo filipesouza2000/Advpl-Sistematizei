@@ -35,7 +35,7 @@ User Function Projeto02()
     Private aUf := {"RO","AC","AM","RR","PA","AP","TO","MA","PI","CE","RN","PB","PE","AL","SE",;
                     "BA","MG","ES","RJ","SP","PR","SC","RS","MS","MT","GO","DF"}
     Private cGetUf := aUf[1]
-
+    
     //variáveis reverentes aos objetos do Folder3(outros)
     Private aEstCivil := {"Solteiro(a)","Namorando","Noivo(a)","Casado(a)","União Estável","Divorciado(a)","Viúvo(a)"}
     Private cEstCivil := aEstCivil[1]
@@ -51,10 +51,13 @@ User Function Projeto02()
     Private cImgPesq:= cUrl+"Pesq.png"
     Private cImgDel := cUrl+"Del.png"
     Private cDados := ""
-    Private oSayEstCivil, oComboEstCivil, oGroupPet, oRadiopet, oGroupLing, oCkAdvpl,;
+    Private aStatus := {"Sim","Não"}
+    Private nSt := 1
+    Private oSayEstCivil, oComboEstCivil, oGroupPet, oRadiopet,oGroupSt,  oRadioSt, oGroupLing, oCkAdvpl,;
             oCkSql, oCkJava, oCkJS, oSayObs, cGetObs , oTMultiget, oBtMarkAll,;
             oBtUnMarkAll, oBtDados, oBtEnd, oBtoutros
     Private oBtSave,oBtIn,oBtCan,oBtDel
+    
     
     //Inicio da construção da Tela
     oDlg1   := TDialog():New(0,0,720,1120,cTituloJanela,,,,,CLR_BLACK,CLR_WHITE,,,.T.)
@@ -147,9 +150,13 @@ User Function Projeto02()
                     {||lCkAdvpl:=.T., lCkSql:=.T., lCkJava:=.T.,lCkJS:=.T.},30,10,,,.F.,.T.,.F.,,.F.,,,.F.)
     oBtUnMarkAll  := TButton():New(35,90,"Nenhuma", oFolder:aDialogs[3],;
                     {||lCkAdvpl:=.F., lCkSql:=.F., lCkJava:=.F.,lCkJS:=.F.},30,10,,,.F.,.T.,.F.,,.F.,,,.F.)
-
-    oSayObs       := TSay():New(05,150,{||'Observação'},oFolder:aDialogs[3],,,,,,.T.,CLR_BLUE,CLR_WHITE,50,15)
+    
+    oSayObs       := TSay():New(05,150,{||'Observação'},oFolder:aDialogs[3],,,,,,.T.,CLR_BLACK,CLR_WHITE,50,15)
     oTMultiget    := tMultiget():new( 15, 150,{|u|IIF(Pcount()>0,cGetObs:=u,cGetObs)},oFolder:aDialogs[3], 150, 50, , , , , , .T. )
+    
+    oGroupSt     := tGroup():New(05,305,40,350,"Ativo(a)?",oFolder:aDialogs[3],,,.T.)
+    oRadioSt     := TRadMenu():New(15,310,aStatus,{|u|IIF(Pcount()>0,nSt:=u,nSt)},oFolder:aDialogs[3],,,,,,,,30,20,,,,.T.)
+
     //iniciar campos desabilitados, para criar novo ou pesquisar
     //oGetNome:Disable()
     oGetNReduz:Disable()
@@ -242,6 +249,7 @@ User Function xSalvarZZ1()
             ZZ1->ZZ1_TPIMOV :=cImovel
             ZZ1->ZZ1_CIVIL  :=cEstCivil 
             ZZ1->ZZ1_PET    :=CVALTOCHAR(nPet)     
+            ZZ1->ZZ1_STATUS :=CVALTOCHAR(nSt)  
             ZZ1->ZZ1_ADVPL  :=IIF(lCkAdvpl,'1','0')
             ZZ1->ZZ1_SQL    :=IIF(lCkSql,'1','0')
             ZZ1->ZZ1_JAVA   :=IIF(lCkJava,'1','0')
@@ -290,6 +298,7 @@ User Function xUpdateZZ1()
         ZZ1->ZZ1_TPIMOV :=cImovel
         ZZ1->ZZ1_CIVIL  :=cEstCivil 
         ZZ1->ZZ1_PET    :=CVALTOCHAR(nPet)     
+        ZZ1->ZZ1_STATUS :=CVALTOCHAR(nSt) 
         ZZ1->ZZ1_ADVPL  :=IIF(lCkAdvpl,'1','0')
         ZZ1->ZZ1_SQL    :=IIF(lCkSql,'1','0')
         ZZ1->ZZ1_JAVA   :=IIF(lCkJava,'1','0')
@@ -356,6 +365,7 @@ User Function xConsultar()
         cImovel         :=ZZ1->ZZ1_TPIMOV
         cEstCivil       :=ZZ1->ZZ1_CIVIL 
         nPet            :=Val(ZZ1->ZZ1_PET)
+        nSt             :=Val(ZZ1->ZZ1_STATUS)
         lCkAdvpl        :=IIF(ZZ1->ZZ1_ADVPL=="1",.T.,.F.)
         lCkSql          :=IIF(ZZ1->ZZ1_SQL  =="1",.T.,.F.)
         lCkJava         :=IIF(ZZ1->ZZ1_JAVA =="1",.T.,.F.)
