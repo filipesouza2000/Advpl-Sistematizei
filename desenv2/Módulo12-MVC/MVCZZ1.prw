@@ -23,8 +23,8 @@ oBrowseZZ1:AddLegend("ZZ1->ZZ1_STATUS=='1'","GREEN","Ativo(a)")
 //Filtrando os dados
 //oBrowseZZ1:SetFilterDefault("ZZ1->ZZ1_STATUS == '1'")
 
-//Exibir determinados campos na tabela, SetOnlyFields
-oBrowseZZ1:SetOnlyFields({"ZZ1_COD","ZZ1_NOME","ZZ1_NOMERE","ZZ1_CPF","ZZ1_BAIRRO","ZZ1_CIDADE"})
+//Exibir determinados campos na tabela, SetOnlyFields, ou RemoveField()  no View
+//oBrowseZZ1:SetOnlyFields({"ZZ1_COD","ZZ1_NOME","ZZ1_NOMERE","ZZ1_CPF","ZZ1_BAIRRO","ZZ1_CIDADE"})
 oBrowseZZ1:ACTIVATE()
 RestArea(aArea)
 Return
@@ -70,10 +70,12 @@ Static Function ViewDef()
     Local oModel:= FWLoadModel("MVCZZ1")
     //traz a estrutura da ZZ1- (1 model - 2 View)
     Local oStructZZ1 := FWFormStruct(2,"ZZ1")
+     //Remover específico campo no View , Remove um campo da estrutura. No lugar de SetOnlyFields    
+    oStructZZ1:RemoveField("ZZ1_STATUS")    
     //Criando a view que será o retorno da função e setando o modelo da rotina
     oView:=FWFormView():New()    
     oView:SetModel(oModel)
-
+   
     //no view add field (singular)
     oView:AddField("ViewZZ1",oStructZZ1,"FormZZ1")
     //Criando um container com nome tela com 100%
