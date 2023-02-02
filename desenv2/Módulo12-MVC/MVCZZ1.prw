@@ -88,3 +88,29 @@ Static Function ViewDef()
     oView:SetOwnerView("ViewZZ1","Formulário-ZZ1")
 
 Return oView
+
+//API UF
+User Function xApiUf()
+    Local nX
+    Local cRet          := ''        
+    Local aHeader       := {}  
+    Local cHeaderRet    := ''  
+    Local cResult       := ''  
+    Local oResult       := {}  
+    Begin Sequence        
+        cResult := HTTPQuote('https://servicodados.ibge.gov.br/api/v1/localidades/estados/', "GET", "", , , aHeader, @cHeaderRet)
+            If !("200 OK" $ cHeaderRet )
+            FwAlertError('Erro na Consulta: ' + cResult,'Validação')
+            Break
+        Endif
+        If !FWJsonDeserialize( cResult, @oResult )
+            FwAlertError('Erro no jSon: ' + cResult,'Validação')
+            Break
+        Endif 
+        For nX:= 1 to Len(oResult)
+            cRet +=oResult[nX]:sigla +';'
+        Next                
+        
+        RECOVER
+    End Sequence
+Return cRet
