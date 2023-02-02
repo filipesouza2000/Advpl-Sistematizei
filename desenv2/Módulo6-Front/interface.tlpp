@@ -263,32 +263,3 @@ User Function TwBrowseCL()
 */    
 return
 
-user Function MvcMod1() //axcadastro("SA1","cadastro de cliente")   
-    Local oBrowse := FwMBrowse():New()
-
-    oBrowse:SetAlias("SA1")
-    oBrowse:SetDescription("FORMULÁRIO CLIENTE")
-    oBrowse:Activate()
-Return
-
-User Function Modelo2()
-    
-  DEFINE DIALOG oDlg TITLE "Tela customizada" FROM 0,0 TO 200,650 PIXEL
-  oButton := TButton():New(02,270, "Botao Sair",oDlg,{|| oDlg:end()}, 40,10,,,.F.,.T.,.F.,,.F.,,,.F. )     
-  @ 15,10 MSPANEL oPanel1 COLORS CLR_BLACK,CLR_GRAY SIZE 300, 20 OF oDlg
-  @ 5,150 SAY "Cabeçalho" OF oPanel1 PIXEL
-
-  @ 40,10 MSPANEL oPanel2 COLORS CLR_BLACK,CLR_GRAY SIZE 300, 20 OF oDlg
-  @ 5,150 SAY "Detalhe" OF oPanel2 PIXEL    
-
-  @ 65,10 MSPANEL oPanel3 COLORS CLR_BLACK,CLR_GRAY SIZE 300, 20 OF oDlg
-  @ 5,150 SAY "Rodape" OF oPanel3 PIXEL    
- ACTIVATE DIALOG oDlg CENTERED
-Return
-
-User Function Modelo3()
- 
-   
-Return
-
-return
