@@ -142,7 +142,7 @@ Static Function ModelDef()
     oModel:SetPrimarikey({})                           
     //para o item não se repetir        
     oModel:GetModel("SZ7DETAIL"):SetUniqueline("Z7_ITEM")  
-     
+
     oModel:GetModel("SZ7MASTER"):SetDescription("Cabeçalho da Solicitação de Compras")
     oModel:Getmodel("SZ7DETAIL"):SetDescription("Itens da Solicitação de Compras")
 
@@ -153,12 +153,152 @@ Static Function ModelDef()
 Return oModel
 
 /*§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§*/
-Static Function MenuDef()
-
-return
-
-/*§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§*/
 Static Function ViewDef()
+    Local oView     := Nil
+    Local oModel    :=FwLoadModel("MVCSZ7")//carregar o modelo que foi montado na user function MVCSZ7
+    Local oStHead   :=FwFormViewStruct():New()
+    Local oStItens  :=FwFormStruct(2,"SZ7")// 1 para model, 2 para View
+
+    //addFiled em ViewStruct
+    //tratando a visualização dos campos
+    oStHead:AddField(;//Pedido
+        "Z7_NUM",;  //1 nome do campo
+        "01",;      //2 ordem
+        "Pedido",;  //3 titulo do campo
+        X3Descric('Z7_NUM'),;//4 desciçãod o campo
+        Nil,;       //5 array help
+        "C",;       //6 tipo de campo
+        X3Picture("Z7_NUM"),;//7 Picture, máscara
+        NIL,;       //8 bloco de picture Var
+        NIL,;       //9 consulta F3
+        IIF(INCLUI, .T., .F.),;//10 indica se o campo é editável na operação de INCLUI
+        NIL,;       //11 pasta do campo
+        NIL,;       //12 agrupamento do campo
+        NIL,;       //13 lista de valores permitidos no campo
+        NIL,;       //14 tamanho máximodo campo
+        NIL,;       //15 inicializador do Browse
+        NIL,;       //16 insica de o campo é virtual
+        NIL,;       //17 picture variável
+        NIL)        //18
+
+    oStHead:AddField(;//Emissao
+        "Z7_EMISSAO",;  //1 nome do campo
+        "02",;      //2 ordem
+        "Emissao",;  //3 titulo do campo
+        X3Descric('Z7_EMISSAO'),;//4 desciçãod o campo
+        Nil,;       //5 array help
+        "D",;       //6 tipo de campo
+        X3Picture("Z7_EMISSAO"),;//7 Picture, máscara
+        NIL,;       //8 bloco de picture Var
+        NIL,;       //9 consulta F3
+        IIF(INCLUI, .T., .F.),;//10 indica se o campo é editável na operação de INCLUI
+        NIL,;       //11 pasta do campo
+        NIL,;       //12 agrupamento do campo
+        NIL,;       //13 lista de valores permitidos no campo
+        NIL,;       //14 tamanho máximodo campo
+        NIL,;       //15 inicializador do Browse
+        NIL,;       //16 insica de o campo é virtual
+        NIL,;       //17 picture variável
+        NIL)        //18  
+
+    oStHead:AddField(;//Fornecedor
+        "Z7_FORNECE",;  //1 nome do campo
+        "03",;      //2 ordem
+        "Fornecedor",;  //3 titulo do campo
+        X3Descric('Z7_FORNECE'),;//4 desciçãod o campo
+        Nil,;       //5 array help
+        "C",;       //6 tipo de campo
+        X3Picture("Z7_FORNECE"),;//7 Picture, máscara
+        NIL,;       //8 bloco de picture Var
+        "SA2",;     //9 consulta F3
+        IIF(INCLUI, .T., .F.),;//10 indica se o campo é editável na operação de INCLUI
+        NIL,;       //11 pasta do campo
+        NIL,;       //12 agrupamento do campo
+        NIL,;       //13 lista de valores permitidos no campo
+        NIL,;       //14 tamanho máximodo campo
+        NIL,;       //15 inicializador do Browse
+        NIL,;       //16 insica de o campo é virtual
+        NIL,;       //17 picture variável
+        NIL)        //18
+
+    oStHead:AddField(;//Z7_LOJA
+        "Z7_LOJA",;  //1 nome do campo
+        "04",;      //2 ordem
+        "Loja",;  //3 titulo do campo
+        X3Descric('Z7_LOJA'),;//4 desciçãod o campo
+        Nil,;       //5 array help
+        "C",;       //6 tipo de campo
+        X3Picture("Z7_LOJA"),;//7 Picture, máscara
+        NIL,;       //8 bloco de picture Var
+        NIL,;       //9 consulta F3
+        IIF(INCLUI, .T., .F.),;//10 indica se o campo é editável na operação de INCLUI
+        NIL,;       //11 pasta do campo
+        NIL,;       //12 agrupamento do campo
+        NIL,;       //13 lista de valores permitidos no campo
+        NIL,;       //14 tamanho máximodo campo
+        NIL,;       //15 inicializador do Browse
+        NIL,;       //16 insica de o campo é virtual
+        NIL,;       //17 picture variável
+        NIL)        //18
+
+    
+
+    oStHead:AddField(;
+        "Z7_USER",;  //1 nome do campo
+        "05",;      //2 ordem
+        "Usuario",;  //3 titulo do campo
+        X3Descric('Z7_USER'),;//4 desciçãod o campo
+        Nil,;       //5 array help
+        "C",;       //6 tipo de campo
+        X3Picture("Z7_USER"),;//7 Picture, máscara
+        NIL,;       //8 bloco de picture Var
+        NIL,;       //9 consulta F3
+        .F.,;       //10 indica se o campo é editável na operação de INCLUI
+        NIL,;       //11 pasta do campo
+        NIL,;       //12 agrupamento do campo
+        NIL,;       //13 lista de valores permitidos no campo
+        NIL,;       //14 tamanho máximodo campo
+        NIL,;       //15 inicializador do Browse
+        NIL,;       //16 insica de o campo é virtual
+        NIL,;       //17 picture variável
+        NIL)        //18      
+      
+    //remover a exibição dos itens na grid, pois estão no cabeçalho
+    oStItens:RemoveFiled("Z7_NUM")
+    oStItens:RemoveFiled("Z7_EMISSAO")
+    oStItens:RemoveFiled("Z7_FORNECE")
+    oStItens:RemoveFiled("Z7_LOJA")
+    oStItens:RemoveFiled("Z7_USER")
+
+    oView:FwFormView():New()
+    //atribui na view o modelo criado
+    oView:SetModel(oModel)
+    //estrutura de vizualização do master e detail
+    oView:AddField("VIEW_SZ7M",oStHead,"SZ7MASTER")
+    oView:AddGrid("VIEW_SZ7D".oStItens,"SZ7DETAIL")
+
+    oView:CreateHorizontalBox("HEAD",40)
+    oView:CreateHorizontalBox("GRID",60)
+
+    //informa para onde vai cada view criada
+    //associo o view a cada box criado, ID form e ID box
+    oView:SetOwnerView("VIEW_SZ7","HEAD")
+    oView:SetOwnerView("VIEW_SZ7","GRID")
+
+    //ativar titulo de cada view box
+    oView:EnableTitleView("VIEW_SZ7M","Cabeçalho de Solicitação de Compra")
+    oView:EnableTitleView("VIEW_SZ7D","Itens de Solicitação de Compra")
+    
+    //fecha a janela ao clicar em OK
+    oView:SetCloseOnOK({|| .T.})
+
 
 return oView
+
+/*§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§*/
+Static Function MenuDef()
+    
+return
+
+
 
