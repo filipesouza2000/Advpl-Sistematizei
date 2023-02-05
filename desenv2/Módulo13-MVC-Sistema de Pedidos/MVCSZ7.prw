@@ -32,7 +32,7 @@ Static Function ModelDef()
     Local oStItens  := FWFormStruct(1,'SZ7')
     
     //objeto principal do MVC model2, com caracteristicas do dicionario de dados
-    Local oModel    := MDFormModel('MVCSZ7m',/*bPre*/,/*bPos*/,/*bComit*/,/*bCancel*/)
+    Local oModel    := MPFormModel():New('MVCSZ7m',/*bPre*/,/*bPos*/,/*bComit*/,/*bCancel*/)
     
     //criação da tabela temporária Head
     oStHead:AddTable('SZ7',{'Z7_FILIAL','Z7_NUM','Z7_ITEM'},'HeadSZ7')
@@ -55,6 +55,23 @@ Static Function ModelDef()
         .F.,;                    //[13] Indica se o campo não pode receber valor em uma operação de update
         .F.)                     //[14] Indica se o campo é virtual
 
+    oStHead:AddField(;//Num pedido
+        'Pedido',;               //[01] Titulo do campo
+        'Pedido',;               //[02] Tooltip do campo
+        'Z7_NUM',;            //[03] Id do Field
+        'C',;                    //[04] Tipo do campo
+        TamSX3('Z7_NUM')[1],; //[05] Tamanho do campo
+        0,;                      //[06] Decimal do campo
+        NIL,;                    //[07] Bloco de código de validação do campo
+        NIL,;                    //[08] Bloco de código de validação when do campo
+        {},;                     //[09] Lista de valores permitido do campo
+        .F.,;                    //[10] Indica se o campo tem preenchimento obrigatório
+        FWBuildFeature(STRUCT_FEATURE_INIPAD,;//[11]Bloco de código de inicialização do campo
+            "IIF(!INCLUI,SZ7->Z7_NUM,'')"),;
+        .T.,;                    //[12] Indica se trata-se de um campo chave
+        .F.,;                    //[13] Indica se o campo não pode receber valor em uma operação de update
+        .F.)                     //[14] Indica se o campo é virtual    
+
     oStHead:AddField(;//Emissao
         'Emissao',;               
         'Emissao',;               
@@ -67,7 +84,7 @@ Static Function ModelDef()
         {},;                     
         .T.,;                    
         FWBuildFeature(STRUCT_FEATURE_INIPAD,;
-            'IIF(!INCLUI,SZ7->Z7_EMISAO,dDataBase'),;
+            'IIF(!INCLUI,SZ7->Z7_EMISSAO,dDataBase)'),;
         .F.,;                   
         .F.,;                   
         .F.)                    
@@ -126,22 +143,22 @@ Static Function ModelDef()
 
     //Gerar a estrutura dos itens, visualizados na Grid
     //modificar inicializador padrao
-    oStItens:SetProperty("Z7_NUM",    MODEL_FILED_INIT, FWBuildFeature(STRUCT_FEATURE_INIPAD,'"*"'))   
-    oStItens:SetProperty("Z7_EMISSAO",MODEL_FILED_INIT, FWBuildFeature(STRUCT_FEATURE_INIPAD,'dDataBase'))   
-    oStItens:SetProperty("Z7_FORNECE",MODEL_FILED_INIT, FWBuildFeature(STRUCT_FEATURE_INIPAD,'"*"'))   
-    oStItens:SetProperty("Z7_LOJA",   MODEL_FILED_INIT, FWBuildFeature(STRUCT_FEATURE_INIPAD,'"*"'))   
-    oStItens:SetProperty("Z7_USER",   MODEL_FILED_INIT, FWBuildFeature(STRUCT_FEATURE_INIPAD,'__cUserId'))  
+    oStItens:SetProperty("Z7_NUM",    MODEL_FIELD_INIT, FWBuildFeature(STRUCT_FEATURE_INIPAD,'"*"'))   
+    oStItens:SetProperty("Z7_EMISSAO",MODEL_FIELD_INIT, FWBuildFeature(STRUCT_FEATURE_INIPAD,'dDataBase'))   
+    oStItens:SetProperty("Z7_FORNECE",MODEL_FIELD_INIT, FWBuildFeature(STRUCT_FEATURE_INIPAD,'"*"'))   
+    oStItens:SetProperty("Z7_LOJA",   MODEL_FIELD_INIT, FWBuildFeature(STRUCT_FEATURE_INIPAD,'"*"'))   
+    oStItens:SetProperty("Z7_USER",   MODEL_FIELD_INIT, FWBuildFeature(STRUCT_FEATURE_INIPAD,'__cUserId'))  
 
     //União das estruturas, cabeçalho aos itens
-    oModel:AddFields("SZ7MASTER",,oStHead)
+    oModel:AddFields("SZ7MASTER",,oStHead,,,)
     oModel:AddGrid("SZ7DETAIL","SZ7MASTER",oStItens,,,,,)
     //relacionamento através de FILIAL + NUM, que é do indice 1
     oModel:SetRelation("SZ7DETAIL",{{"Z7_FILIAL","'IIF(!INCLUI,SZ7->Z7_FILIAL,FWxFilial('SZ7'))'"},;
                                    {"Z7_NUM","SZ7->Z7_NUM"}},;
                                    SZ7->(INDEXKEY( 1 )))
-    oModel:SetPrimarikey({})                           
+    oModel:SetPrimarykey({})                           
     //para o item não se repetir        
-    oModel:GetModel("SZ7DETAIL"):SetUniqueline("Z7_ITEM")  
+    oModel:GetModel("SZ7DETAIL"):SetUniqueline({"Z7_ITEM"})  
 
     oModel:GetModel("SZ7MASTER"):SetDescription("Cabeçalho da Solicitação de Compras")
     oModel:Getmodel("SZ7DETAIL"):SetDescription("Itens da Solicitação de Compras")
@@ -154,7 +171,7 @@ Return oModel
 
 /*§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§*/
 Static Function ViewDef()
-    Local oView     := Nil
+    Local oView 
     Local oModel    :=FwLoadModel("MVCSZ7")//carregar o modelo que foi montado na user function MVCSZ7
     Local oStHead   :=FwFormViewStruct():New()
     Local oStItens  :=FwFormStruct(2,"SZ7")// 1 para model, 2 para View
@@ -221,7 +238,7 @@ Static Function ViewDef()
         NIL,;       //17 picture variável
         NIL)        //18
 
-    oStHead:AddField(;//Z7_LOJA
+    oStHead:AddField(;//Loja
         "Z7_LOJA",;  //1 nome do campo
         "04",;      //2 ordem
         "Loja",;  //3 titulo do campo
@@ -243,7 +260,7 @@ Static Function ViewDef()
 
     
 
-    oStHead:AddField(;
+    oStHead:AddField(;//Usuario
         "Z7_USER",;  //1 nome do campo
         "05",;      //2 ordem
         "Usuario",;  //3 titulo do campo
@@ -264,26 +281,26 @@ Static Function ViewDef()
         NIL)        //18      
       
     //remover a exibição dos itens na grid, pois estão no cabeçalho
-    oStItens:RemoveFiled("Z7_NUM")
-    oStItens:RemoveFiled("Z7_EMISSAO")
-    oStItens:RemoveFiled("Z7_FORNECE")
-    oStItens:RemoveFiled("Z7_LOJA")
-    oStItens:RemoveFiled("Z7_USER")
+    oStItens:RemoveField("Z7_NUM")
+    oStItens:RemoveField("Z7_EMISSAO")
+    oStItens:RemoveField("Z7_FORNECE")
+    oStItens:RemoveField("Z7_LOJA")
+    oStItens:RemoveField("Z7_USER")
 
-    oView:FwFormView():New()
+    oView:=FwFormView():New()
     //atribui na view o modelo criado
     oView:SetModel(oModel)
     //estrutura de vizualização do master e detail
     oView:AddField("VIEW_SZ7M",oStHead,"SZ7MASTER")
-    oView:AddGrid("VIEW_SZ7D".oStItens,"SZ7DETAIL")
+    oView:AddGrid("VIEW_SZ7D",oStItens,"SZ7DETAIL")
 
     oView:CreateHorizontalBox("HEAD",40)
     oView:CreateHorizontalBox("GRID",60)
 
     //informa para onde vai cada view criada
     //associo o view a cada box criado, ID form e ID box
-    oView:SetOwnerView("VIEW_SZ7","HEAD")
-    oView:SetOwnerView("VIEW_SZ7","GRID")
+    oView:SetOwnerView("VIEW_SZ7M","HEAD")
+    oView:SetOwnerView("VIEW_SZ7D","GRID")
 
     //ativar titulo de cada view box
     oView:EnableTitleView("VIEW_SZ7M","Cabeçalho de Solicitação de Compra")
@@ -297,8 +314,24 @@ return oView
 
 /*§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§*/
 Static Function MenuDef()
-    
-return
+    //1ª opção
+    Local aRotina   := FwMvcmenu("MVCSZ7")
+
+/*    //2ª opção
+    Local aRotina:={}
+    ADD OPTION aRotina TITLE 'Visualizar'   ACTION 'ViewDef.MVCSZ7' OPERATION 2 ACCESS 0
+    ADD OPTION aRotina TITLE 'Incluir'      ACTION 'ViewDef.MVCSZ7' OPERATION 3 ACCESS 0
+    ADD OPTION aRotina TITLE 'Alterar'      ACTION 'ViewDef.MVCSZ7' OPERATION 4 ACCESS 0
+    ADD OPTION aRotina TITLE 'Excluir'      ACTION 'ViewDef.MVCSZ7' OPERATION 5 ACCESS 0
+
+    //3ª Opção
+    Local aRotina:={}
+    ADD OPTION aRotina TITLE 'Visualizar'   ACTION 'ViewDef.MVCSZ7' OPERATION MODEL_OPERATION_VIEW ACCESS 0
+    ADD OPTION aRotina TITLE 'Incluir'      ACTION 'ViewDef.MVCSZ7' OPERATION MODEL_OPERATION_INSERT ACCESS 0
+    ADD OPTION aRotina TITLE 'Alterar'      ACTION 'ViewDef.MVCSZ7' OPERATION MODEL_OPERATION_UPDATE ACCESS 0
+    ADD OPTION aRotina TITLE 'Excluir'      ACTION 'ViewDef.MVCSZ7' OPERATION MODEL_OPERATION_DELETE ACCESS 0
+*/
+return aRotina
 
 
 
