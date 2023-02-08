@@ -443,6 +443,15 @@ User Function GrvSZ7()
                 EndIf 
             EndIf  
         Next nLinAtu 
+    
+    ELSEIF cOption == MODEL_OPERATION_DELETE
+        SZ7->(DbSetOrder(1))
+        While !SZ7->(EOF()) .AND. SZ7->Z7_NUM = cNum .AND. SZ7->Z7_FILIAL = cFilSZ7
+            RecLock("SZ7",.F.)
+            DBDelete()
+            SZ7->(MSUNLOCK())
+            SZ7->(DBSKIP())//pula ao próximo registro
+        ENDDO        
     ENDIF
     SZ7->(DBCloseArea())
     RestArea(aArea)
