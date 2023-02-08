@@ -30,9 +30,13 @@ Static Function ModelDef()
     
     //formará estrutura dos itens, chamando a tabela e dicionario de dados
     Local oStItens  := FWFormStruct(1,'SZ7')
+
+    //b bloco de codigo, função COMIT que validará INCLUSÃO/ALTERAÇÃO/EXCLUSÃO
+    Local bVldCom   := {|| u_GrvSZ7()}
     
     //objeto principal do MVC model2, com caracteristicas do dicionario de dados
-    Local oModel    := MPFormModel():New('MVCSZ7m',/*bPre*/,/*bPos*/,/*bComit*/,/*bCancel*/)
+                                                  //*bPre*/,/*bPos*/,/*bComit*/,/*bCancel*/
+    Local oModel    := MPFormModel():New('MVCSZ7m',/*bPre*/,/*bPos*/,bVldCom,/*bCancel*/)
     
     //criação da tabela temporária Head
     oStHead:AddTable('SZ7',{'Z7_FILIAL','Z7_NUM','Z7_ITEM'},'HeadSZ7')
@@ -153,7 +157,7 @@ Static Function ModelDef()
     oModel:AddFields("SZ7MASTER",,oStHead,,,)
     oModel:AddGrid("SZ7DETAIL","SZ7MASTER",oStItens,,,,,)
     //relacionamento através de FILIAL + NUM, que é do indice 1
-    oModel:SetRelation("SZ7DETAIL",{{"Z7_FILIAL","'IIF(!INCLUI,SZ7->Z7_FILIAL,FWxFilial('SZ7'))'"},;
+    oModel:SetRelation("SZ7DETAIL",{{"Z7_FILIAL","IIF(!INCLUI,SZ7->Z7_FILIAL,FWxFilial('SZ7'))"},;
                                    {"Z7_NUM","SZ7->Z7_NUM"}},;
                                    SZ7->(INDEXKEY( 1 )))
     oModel:SetPrimarykey({})                           
@@ -308,7 +312,7 @@ Static Function ViewDef()
     
     //fecha a janela ao clicar em OK
     oView:SetCloseOnOK({|| .T.})
-
+    
 
 return oView
 
@@ -332,6 +336,121 @@ Static Function MenuDef()
     ADD OPTION aRotina TITLE 'Excluir'      ACTION 'ViewDef.MVCSZ7' OPERATION MODEL_OPERATION_DELETE ACCESS 0
 */
 return aRotina
+
+//função COMIT que validará INCLUSÃO/ALTERAÇÃO/EXCLUSÃO
+User Function GrvSZ7()
+    Local aArea     := GetArea()
+                    //retorna a referência do ultimo MODEL utilizado, o ativo
+    Local oModel    := FwModelActive()
+    //criar modelo de dados MASTER/HEAD com dados do model geral que foi capturado acima
+    //carrega o demolo do Head
+    Local oModelHead  := oModel:GetModel("SZ7MASTER")    
+    //carrega o modelo do DETAIL(detalhes-itens)
+    Local oModelDetail:= oModel:GetModel("SZ7DETAIL")    
+
+    //capturo os valores que estão no cabeçalho, métido GETVALUE
+    Local cFilSZ7   := oModelHead:Getvalue("Z7_FILIAL")
+    Local cNum      := oModelHead:Getvalue("Z7_NUM")
+    Local dEmissao  := oModelHead:Getvalue("Z7_EMISSAO")
+    Local cForn     := oModelHead:Getvalue("Z7_FORNECE")
+    Local cLoja     := oModelHead:Getvalue("Z7_LOJA")
+    Local cUser     := oModelHead:Getvalue("Z7_USER")
+
+    //variáveis que farão a captura dos dados com base no head e detail
+    Local aHeadAux  :=oModelDetail:aHeader  //captura head do grid
+    Local aColsAux  :=oModelDetail:aCols    //captura aCols do grid
+
+    //pegar posição de cada campo dentro do grid
+    Local nPosItem  := aScan(aHeadAux,{|x| AllTrim(Upper(x[2])) == AllTrim("Z7_ITEM")})
+    Local nPosProd  := aScan(aHeadAux,{|x| AllTrim(Upper(x[2])) == AllTrim("Z7_PRODUTO")})
+    Local nPosQtd   := aScan(aHeadAux,{|x| AllTrim(Upper(x[2])) == AllTrim("Z7_QUANT")})
+    Local nPosPrec  := aScan(aHeadAux,{|x| AllTrim(Upper(x[2])) == AllTrim("Z7_PRECO")})
+    Local nPosTotal := aScan(aHeadAux,{|x| AllTrim(Upper(x[2])) == AllTrim("Z7_TOTAL")})
+
+    //pegar a linha atual que o usuario estpa posicionado
+    Local nLinAtu   :=0
+
+    //Identificar quel operação está sendo feita(INCLUSÃO/ALTERAÇÃO/EXCLUSÃO)
+    Local cOption   := oModelHead:GetOperation()
+    Local lRet := .T.
+    //selecionar area SZ7
+    DBSelectArea("SZ7")
+    SZ7->(DbSetOrder(1))
+    IF cOption == MODEL_OPERATION_INSERT
+        //primeiro verificar se a linha está deletada
+        For nLinAtu:= 1 to Len(aColsAux)
+            If !aColsAux[nLinAtu][len(aHeadAux)+1] // expressão que verifica se a linha NÃO está deletada no aColsAux
+                RECLOCK( "SZ7", .T.)
+                    //header
+                    Z7_FILIAL   := cFilSZ7
+                    Z7_NUM      := cNum
+                    Z7_EMISSAO  := dEmissao
+                    Z7_FORNECE  := cForn
+                    Z7_LOJA     := cLoja
+                    Z7_USER     := cUser
+                    //grid
+                    Z7_ITEM     := aColsAux[nLinAtu][nPosItem]
+                    Z7_PRODUTO  := aColsAux[nLinAtu][nPosProd]
+                    Z7_QUANT    := aColsAux[nLinAtu][nPosQtd]
+                    Z7_PRECO    := aColsAux[nLinAtu][nPosPrec]
+                    Z7_TOTAL    := aColsAux[nLinAtu][nPosTotal]                
+                MSUNLOCK()                
+            EndIf  
+        Next nLinAtu 
+    ELSEIF cOption == MODEL_OPERATION_UPDATE
+        For nLinAtu:= 1 to Len(aColsAux)
+            If aColsAux[nLinAtu][len(aHeadAux)+1] // expressão que verifica se a linha está deletada no aColsAux
+                //se a linha está deletada
+                SZ7->(DbSetOrder(3))// FILIAL+NUM+ITEM
+                If SZ7->(DBSeek(cFilSZ7 + cNum + aColsAux[nLinAtu,nPosItem]))//deletar do banco
+                    RecLock("SZ7",.F.)
+                        DBDelete()
+                    SZ7->(MSUNLOCK())
+                EndIf
+            ELSE //A linha não está excluída, fazer atualização
+                //é possível ter novos itens no pedido
+                //validar se existem no BD, senão faz inclusão  
+                SZ7->(DbSetOrder(3))// FILIAL+NUM+ITEM
+                If SZ7->(DBSeek(cFilSZ7 + cNum + aColsAux[nLinAtu,nPosItem]))//se existe faz atualização
+                    RecLock("SZ7",.F.)                
+                    Z7_FILIAL   := cFilSZ7
+                    Z7_NUM      := cNum
+                    Z7_EMISSAO  := dEmissao
+                    Z7_FORNECE  := cForn
+                    Z7_LOJA     := cLoja
+                    Z7_USER     := cUser
+                    Z7_ITEM     := aColsAux[nLinAtu][nPosItem]
+                    Z7_PRODUTO  := aColsAux[nLinAtu][nPosProd]
+                    Z7_QUANT    := aColsAux[nLinAtu][nPosQtd]
+                    Z7_PRECO    := aColsAux[nLinAtu][nPosPrec]
+                    Z7_TOTAL    := aColsAux[nLinAtu][nPosTotal]
+                    SZ7->(MSUNLOCK())
+                else// se não achar, o item existe na base, ocorrerá a inclusão
+                    RECLOCK( "SZ7", .T.)//
+                    Z7_FILIAL   := cFilSZ7
+                    Z7_NUM      := cNum
+                    Z7_EMISSAO  := dEmissao
+                    Z7_FORNECE  := cForn
+                    Z7_LOJA     := cLoja
+                    Z7_USER     := cUser
+                    Z7_ITEM     := aColsAux[nLinAtu][nPosItem]
+                    Z7_PRODUTO  := aColsAux[nLinAtu][nPosProd]
+                    Z7_QUANT    := aColsAux[nLinAtu][nPosQtd]
+                    Z7_PRECO    := aColsAux[nLinAtu][nPosPrec]
+                    Z7_TOTAL    := aColsAux[nLinAtu][nPosTotal]                
+                    SZ7->(MSUNLOCK())  
+                   
+                EndIf 
+            EndIf  
+        Next nLinAtu 
+    ENDIF
+    SZ7->(DBCloseArea())
+    RestArea(aArea)
+
+return lRet
+
+
+
 
 
 
