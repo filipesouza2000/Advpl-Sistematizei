@@ -31,12 +31,15 @@ Static Function ModelDef()
     //formará estrutura dos itens, chamando a tabela e dicionario de dados
     Local oStItens  := FWFormStruct(1,'SZ7')
 
+    //b bloco de codigo, função que validará antes de INSERT dos itens
+    Local bVldPos   := {|| u_VldSZ7()}
+
     //b bloco de codigo, função COMIT que validará INCLUSÃO/ALTERAÇÃO/EXCLUSÃO
     Local bVldCom   := {|| u_GrvSZ7()}
     
     //objeto principal do MVC model2, com caracteristicas do dicionario de dados
                                                   //*bPre*/,/*bPos*/,/*bComit*/,/*bCancel*/
-    Local oModel    := MPFormModel():New('MVCSZ7m',/*bPre*/,/*bPos*/,bVldCom,/*bCancel*/)
+    Local oModel    := MPFormModel():New('MVCSZ7m',/*bPre*/,bVldPos,bVldCom,/*bCancel*/)
     
     //criação da tabela temporária Head
     oStHead:AddTable('SZ7',{'Z7_FILIAL','Z7_NUM','Z7_ITEM'},'HeadSZ7')
@@ -457,6 +460,41 @@ User Function GrvSZ7()
     RestArea(aArea)
 
 return lRet
+
+/*£££££££££££££££££££££££££££££££££££££££££££££££££££££££*/
+User Function VldSZ7()
+    Local lRet        := .T.
+    Local aArea       := GetArea()
+    //¢¢¢¢¢¢¢¢ estrutura igual ao GrvSZ7()
+    //instancio os models para pegar os valores digitados
+    Local oModel      := FwModelActive()
+    Local oModelHead  := oModel:GetModel("SZ7MASTER")    
+    Local cFilSZ7     := oModelHead:GetValue("Z7_FILIAL")
+    Local cNum        := oModelHead:GetValue("Z7_NUM")
+    Local cOption     := oModelHead:GetOperation()
+    //¢¢¢¢¢¢¢
+    If cOption == MODEL_OPERATION_INSERT
+        DbSelectArea("SZ7")
+        SZ7->(DbSetOrder(1))
+        //se encontrar o numero do Pedido no banco
+        if SZ7->(DBSeek(cFilSZ7+cNum))
+            lRet :=.F.
+            //Use Help,aparece mensagem de erro, pois Alert e MsInfo não.
+            Help(NIL, NIL, "Escolha outro numero de pedido.", NIL, "Este numero já existe.", 1, 0, NIL, NIL, NIL, NIL, NIL, {"Atenção! verifique nos registros."})            
+        endif
+        SZ7->(DBCloseArea())
+    EndIf
+    RestArea(aArea)
+Return lRet
+/*
+Melhorias a serem feitas, scopo:
+1- Não deixar incluir pedido com mesmo número
+2- Número do pedido auto incremental
+3- Item do grid auto incremental
+4- gatilhos nos campos calculados, total dos itens.
+5-Travar campos de Item e Total para não serem editados.
+6-Gerar rodapé com totalizadores do grid.
+*/
 
 
 
