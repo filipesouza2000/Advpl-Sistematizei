@@ -74,7 +74,7 @@ Static Function ModelDef()
         {},;                     //[09] Lista de valores permitido do campo
         .F.,;                    //[10] Indica se o campo tem preenchimento obrigatório
         FWBuildFeature(STRUCT_FEATURE_INIPAD,;//[11]Bloco de código de inicialização do campo
-            "IIF(!INCLUI,SZ7->Z7_NUM,'')"),;
+            "IIF(!INCLUI,SZ7->Z7_NUM,GetSXEnum('SZ7','Z7_NUM'))"),;
         .T.,;                    //[12] Indica se trata-se de um campo chave
         .F.,;                    //[13] Indica se o campo não pode receber valor em uma operação de update
         .F.)                     //[14] Indica se o campo é virtual    
@@ -150,7 +150,7 @@ Static Function ModelDef()
 
     //Gerar a estrutura dos itens, visualizados na Grid
     //modificar inicializador padrao
-    oStItens:SetProperty("Z7_NUM",    MODEL_FIELD_INIT, FWBuildFeature(STRUCT_FEATURE_INIPAD,'"*"'))   
+    oStItens:SetProperty("Z7_NUM",    MODEL_FIELD_INIT, FWBuildFeature(STRUCT_FEATURE_INIPAD,'"*"'))   //"GetSXEnum('SZ7','Z7_NUM')"  não colocar nos items pois perde a sequencia
     oStItens:SetProperty("Z7_EMISSAO",MODEL_FIELD_INIT, FWBuildFeature(STRUCT_FEATURE_INIPAD,'dDataBase'))   
     oStItens:SetProperty("Z7_FORNECE",MODEL_FIELD_INIT, FWBuildFeature(STRUCT_FEATURE_INIPAD,'"*"'))   
     oStItens:SetProperty("Z7_LOJA",   MODEL_FIELD_INIT, FWBuildFeature(STRUCT_FEATURE_INIPAD,'"*"'))   
@@ -195,7 +195,7 @@ Static Function ViewDef()
         X3Picture("Z7_NUM"),;//7 Picture, máscara
         NIL,;       //8 bloco de picture Var
         NIL,;       //9 consulta F3
-        IIF(INCLUI, .T., .F.),;//10 indica se o campo é editável na operação de INCLUI
+        .F.,;       //10 indica se o campo é editável na operação de INCLUI
         NIL,;       //11 pasta do campo
         NIL,;       //12 agrupamento do campo
         NIL,;       //13 lista de valores permitidos no campo
