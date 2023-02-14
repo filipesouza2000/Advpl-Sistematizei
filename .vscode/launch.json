@@ -66,6 +66,19 @@
 		},
 		{
 			"label": "sigacfg"
+		},
+		{
+			"label": "U_BRWZZ1"
+		},
+		{
+			"label": "U_MVCZZ1"
+		},
+		{
+			"label": "U_MvcMod1"
+		},
+		{
+			"args": [],
+			"label": "U_Modelo2"
 		}
 	],
 	"lastProgramExecuted": "sigamdi"
