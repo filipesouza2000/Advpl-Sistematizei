@@ -41,6 +41,10 @@ Static Function ModelDef()
                                                   //*bPre*/,/*bPos*/,/*bComit*/,/*bCancel*/
     Local oModel    := MPFormModel():New('MVCSZ7m',/*bPre*/,bVldPos,bVldCom,/*bCancel*/)
     
+    //variáveis que armazenarão a estrutura da trigger dos campos, para gerar TOTAL automático.
+    Local aTrigQuant:={}
+    Local aTrigPreco:={}
+
     //criação da tabela temporária Head
     oStHead:AddTable('SZ7',{'Z7_FILIAL','Z7_NUM','Z7_ITEM'},'HeadSZ7')
 
@@ -156,6 +160,33 @@ Static Function ModelDef()
     oStItens:SetProperty("Z7_LOJA",   MODEL_FIELD_INIT, FWBuildFeature(STRUCT_FEATURE_INIPAD,'"*"'))   
     oStItens:SetProperty("Z7_USER",   MODEL_FIELD_INIT, FWBuildFeature(STRUCT_FEATURE_INIPAD,'__cUserId'))  
 
+    //Trigger
+    aTrigQuant  := FwStruTrigger(;
+    "Z7_QUANT",;    //campo que irá disparar o gatilho/trigger
+    "Z7_TOTAL",;    //campo que receberá o resultado da trigger
+    "M->Z7_QUANT * M->Z7_PRECO",;//resultado da trigger
+    .F.)            //não posiciona
+
+    //Trigger
+    aTrigPreco  := FwStruTrigger(;
+    "Z7_PRECO",;    //campo que irá disparar o gatilho/trigger
+    "Z7_TOTAL",;    //campo que receberá o resultado da trigger
+    "M->Z7_QUANT * M->Z7_PRECO",;//resultado da trigger
+    .F.)            //não posiciona
+
+    //adiciono a trigger na estrutura de Itens
+    oStItens:AddTrigger(;
+    aTrigQuant[1],;
+    aTrigQuant[2],;
+    aTrigQuant[3],;
+    aTrigQuant[4])
+    oStItens:AddTrigger(;
+    aTrigPreco[1],;
+    aTrigPreco[2],;
+    aTrigPreco[3],;
+    aTrigPreco[4])
+    
+    
     //União das estruturas, cabeçalho aos itens
     oModel:AddFields("SZ7MASTER",,oStHead,,,)
     oModel:AddGrid("SZ7DETAIL","SZ7MASTER",oStItens,,,,,)
@@ -300,6 +331,9 @@ Static Function ViewDef()
     //estrutura de vizualização do master e detail
     oView:AddField("VIEW_SZ7M",oStHead,"SZ7MASTER")
     oView:AddGrid("VIEW_SZ7D",oStItens,"SZ7DETAIL")
+
+    //Deixar o campo ITEM auto increment
+    oView:AddIncrementalField("SZ7DETAIL","Z7_ITEM")
 
     oView:CreateHorizontalBox("HEAD",40)
     oView:CreateHorizontalBox("GRID",60)
