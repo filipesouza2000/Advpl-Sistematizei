@@ -325,6 +325,10 @@ Static Function ViewDef()
     oStItens:RemoveField("Z7_LOJA")
     oStItens:RemoveField("Z7_USER")
 
+    //bloqueando a edição dos campos, pois são automáticos.
+    oStItens:SetProperty("Z7_ITEM" ,MVC_VIEW_CANCHANGE,.F.)
+    oStItens:SetProperty("Z7_TOTAL",MVC_VIEW_CANCHANGE,.F.)
+
     oView:=FwFormView():New()
     //atribui na view o modelo criado
     oView:SetModel(oModel)
