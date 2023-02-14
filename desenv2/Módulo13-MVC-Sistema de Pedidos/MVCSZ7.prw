@@ -190,6 +190,19 @@ Static Function ModelDef()
     //União das estruturas, cabeçalho aos itens
     oModel:AddFields("SZ7MASTER",,oStHead,,,)
     oModel:AddGrid("SZ7DETAIL","SZ7MASTER",oStItens,,,,,)
+
+    //Modelo de Totalizadores
+    oModel:AddCalc( "SZ7TOTAIS",;    //Id do Modelo    
+                    "SZ7MASTER",;   //master
+                    "SZ7DETAIL",;   //detail
+                    "Z7_PRODUTO",;  //campo calculado
+                    "QtdItens",;    //nome personalizado
+                    "COUNT",,,;     //Operação ,,,
+                    "ITENS")     //Nome totalizador
+    oModel:AddCalc( "SZ7TOTAIS", "SZ7MASTER", "SZ7DETAIL", "Z7_QUANT", "Qtd",  "SUM",,,"QUANTIDADE")  
+    oModel:AddCalc( "SZ7TOTAIS", "SZ7MASTER", "SZ7DETAIL", "Z7_TOTAL", "Total","SUM",,,"VALOR TOTAL") 
+
+
     //relacionamento através de FILIAL + NUM, que é do indice 1
     oModel:SetRelation("SZ7DETAIL",{{"Z7_FILIAL","IIF(!INCLUI,SZ7->Z7_FILIAL,FWxFilial('SZ7'))"},;
                                    {"Z7_NUM","SZ7->Z7_NUM"}},;
@@ -213,6 +226,7 @@ Static Function ViewDef()
     Local oModel    :=FwLoadModel("MVCSZ7")//carregar o modelo que foi montado na user function MVCSZ7
     Local oStHead   :=FwFormViewStruct():New()
     Local oStItens  :=FwFormStruct(2,"SZ7")// 1 para model, 2 para View
+    Local oStTotais :=FWCalcStruct(oModel:GetModel("SZ7TOTAIS"))
 
     //addFiled em ViewStruct
     //tratando a visualização dos campos
@@ -332,24 +346,28 @@ Static Function ViewDef()
     oView:=FwFormView():New()
     //atribui na view o modelo criado
     oView:SetModel(oModel)
-    //estrutura de vizualização do master e detail
+    //estrutura de vizualização do master , detail e totalizadores
     oView:AddField("VIEW_SZ7M",oStHead,"SZ7MASTER")
     oView:AddGrid("VIEW_SZ7D",oStItens,"SZ7DETAIL")
-
+    oView:AddField("VIEW_TOTAL",oStTotais,"SZ7TOTAIS")
+//£££££££££££££££££££££££££££££££££££££££££££££££££
     //Deixar o campo ITEM auto increment
     oView:AddIncrementalField("SZ7DETAIL","Z7_ITEM")
 
-    oView:CreateHorizontalBox("HEAD",40)
-    oView:CreateHorizontalBox("GRID",60)
+    oView:CreateHorizontalBox("HEAD",20)
+    oView:CreateHorizontalBox("GRID",50)
+    oView:CreateHorizontalBox("TOTAL",30)
 
     //informa para onde vai cada view criada
     //associo o view a cada box criado, ID form e ID box
     oView:SetOwnerView("VIEW_SZ7M","HEAD")
     oView:SetOwnerView("VIEW_SZ7D","GRID")
+    oView:SetOwnerView("VIEW_TOTAL","TOTAL")
 
     //ativar titulo de cada view box
     oView:EnableTitleView("VIEW_SZ7M","Cabeçalho de Solicitação de Compra")
     oView:EnableTitleView("VIEW_SZ7D","Itens de Solicitação de Compra")
+    oView:EnableTitleView("VIEW_TOTAL","Totalizador")
     
     //fecha a janela ao clicar em OK
     oView:SetCloseOnOK({|| .T.})
