@@ -50,16 +50,16 @@ Static Function ModelDef()
 
     //estruturas das SZ2 e SZ3
     Local oStZ2 := FWFormStruct(1,'SZ2')
-    Local oStZ3 := FWFormStruct(2,'SZ3')
+    Local oStZ3 := FWFormStruct(1,'SZ3')
 
     //após declarar estrutura de dados, posso modificar com Setproperty
     //na lista de comentarios, o campos chamado será auto preenchido com o campo Z2_COD
-    oStZ3:SetProperty("Z3_CHAMADO",MODEL_FIELD_INIT,FWBuildFeature(STRUCT_FEATURE_INIPAD,"SZ2->Z2_COD"))
+    //oStZ3:SetProperty("Z3_CHAMADO",MODEL_FIELD_INIT,FWBuildFeature(STRUCT_FEATURE_INIPAD,"SZ2->Z2_COD"))
 
     oModel:AddFields("SZ2MASTER",,oStZ2)
     oModel:AddGrid("SZ3DETAIL","SZ2MASTER",oStZ3,,,,,)
     //relaciona o detail com o master pela FILIAL e pelo numero do chamado, com a ordenação indice 1
-    oModel:SetRelation("SZ3DETAIL",{{"Z3_FILIAL","xFilial('SZ2)"},{"Z3_CHAMADO","Z2_COD"}},SZ3->(Indexkey(1)))
+    oModel:SetRelation("SZ3DETAIL",{{"Z3_FILIAL","xFilial('SZ2')"},{"Z3_CHAMADO","Z2_COD"}},SZ3->(Indexkey(1)))
     //define a chave primária, se nãoter X2_UNICO
     oModel:SetPrimaryKey({"Z3_FILIAL","Z3_CHAMADO","Z3_CODIGO"})
     //cominação de campos que não podem se repetir
@@ -74,17 +74,21 @@ Static Function ModelDef()
 
 return oModel
 
-Static ViewDef()
+Static Function ViewDef()
     Local oView     := Nil
     Local oModel    := FwLoadModel("MVCZ2Z3")// importa o model da função
     Local oStZ2     := FwFormStruct(2,"SZ2")    
     Local oStZ3     := FwFormStruct(2,"SZ3")
     
     //remove o campo pois ele é auto preenchido com o codigo no cabeçalho
-    oStZ3:RemoveField("Z3_CHAMADO")
+    //oStZ3:RemoveField("Z3_CHAMADO")
 
     //bloquear a edição do codigo pois é auto incrementado
-    oStZ3:SetProperty("Z3_CODIGO",MVC_VIEW_CANCHANGE,.F.)
+    oStZ2:SetProperty("Z2_COD",     MVC_VIEW_CANCHANGE,.F.)
+    oStZ2:SetProperty("Z2_USUARIO", MVC_VIEW_CANCHANGE,.F.)
+    oStZ2:SetProperty("Z2_USERNAM", MVC_VIEW_CANCHANGE,.F.)
+    oStZ2:SetProperty("Z2_MODULO",  MVC_VIEW_CANCHANGE,.F.)
+    oStZ3:SetProperty("Z3_CODIGO",  MVC_VIEW_CANCHANGE,.F.)
     
     oView   := FwFormView():New()
     //carego o model importado
@@ -124,15 +128,18 @@ Static Function MenuDef()
     Local aMenu     :={}
     //trago o menu padrão para o menuAut
     Local aMenuAut  := FwMvcMenu("MVCZ2Z3")
+    Local n
     
     //Adiciono dentro de aMenu o titulo legenda, ação chamando a função de Legenda, operações de codigo 6
     ADD OPTION aMenu TITLE "Legenda" ACTION 'U_SZ2LEG' OPERATION 6 ACCESS 0
 
     //para adicionar item ao menu padrão, utilizo um laço para incrementar ao aMenu
     // cada item do amenuAut que é padrão
-    For nX:= 1 to Len(amenuAut)
-        Add(aMenu,amenuAut[n])        
+    For n:= 1 to Len(amenuAut)
+        AAdd(aMenu,amenuAut[n])        
     Next n
     
 return aMenu
 
+//testes
+// verificar o campo Z3_CHAMADO não recebe auto increment do Z2_COD
