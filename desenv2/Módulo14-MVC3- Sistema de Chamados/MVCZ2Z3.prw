@@ -1,10 +1,12 @@
 #INCLUDE 'protheus.ch'
 #INCLUDE 'FwMvcDef.ch'
+#INCLUDE 'restful.ch'
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 +++DATA++++|++++AUTOR+++++|++++++++++++++++DESCRIÇÂO++++++++++++++++++++++++++++++
 10/02/2023 | Filipe Souza | sistema de chamados, modelo3 com as tabelas SZ2 SZ3
 11/02/2023 | Filipe Souza | Implementação VIEWDEF , Legenda
+24/02/2023 | Filipe Souza | automatização dos campos, auto numeração e sequencia
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 @see https://centraldeatendimento.totvs.com/hc/pt-br/articles/360016740431-MP-ADVPL-ESTRUTURA-MVC-PAI-FILHO-NETO
 
@@ -79,9 +81,8 @@ Static Function ViewDef()
     Local oModel    := FwLoadModel("MVCZ2Z3")// importa o model da função
     Local oStZ2     := FwFormStruct(2,"SZ2")    
     Local oStZ3     := FwFormStruct(2,"SZ3")
-    
     //remove o campo pois ele é auto preenchido com o codigo no cabeçalho
-    //oStZ3:RemoveField("Z3_CHAMADO")
+    oStZ3:RemoveField("Z3_CHAMADO")
 
     //bloquear a edição do codigo pois é auto incrementado
     oStZ2:SetProperty("Z2_COD",     MVC_VIEW_CANCHANGE,.F.)
@@ -111,7 +112,7 @@ Static Function ViewDef()
     //titulos personalizados ao cabeçalho e comentarios
     oView:EnableTitleView("VIEWSZ2","Titulo do Chamado")
     oView:EnableTitleView("VIEWSZ3","Comentários do Chamado")
-
+    
 return oView
 
 User Function SZ2LEG()
@@ -141,5 +142,28 @@ Static Function MenuDef()
     
 return aMenu
 
-//testes
-// verificar o campo Z3_CHAMADO não recebe auto increment do Z2_COD
+//Falta implementar a funcionalidade de API em MVC
+/*User Function ApiMods()
+    Local lRet          := .T. 
+    Local aHeader       := {}  
+    Local cHeaderRet    := ''  
+    Local cResult       := ''  
+    Local oResult       := {}  
+    Begin Sequence        
+        cResult := HTTPQuote('http://127.0.0.1:8089/rest/api/framework/v1/systemModules', "GET", "", , , aHeader, @cHeaderRet)
+        If !("200 OK" $ cHeaderRet )
+            FwAlertError('Erro na Consulta: ' + cResult,'Validação')
+            lRet    :=.F.
+            Break
+        Endif
+        If !FWJsonDeserialize( cResult, @oResult )
+            FwAlertError('Erro no jSon: ' + cResult,'Validação')
+            lRet    :=.F.
+            Break
+        Endif
+        //cGetEnd    := DecodeUTF8(oResult:street)        
+        
+        RECOVER
+    End Sequence
+Return lRet
+*/
