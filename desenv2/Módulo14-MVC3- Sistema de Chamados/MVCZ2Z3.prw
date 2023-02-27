@@ -118,9 +118,9 @@ return oView
 User Function SZ2LEG()
     Local aLegenda
 
-    Add(aLegenda,{"BR_VERDE","Aberto"})
-    Add(aLegenda,{"BR_VERMELHO","Finalizado"})
-    Add(aLegenda,{"BR_AMARELO","Em Andamento"})
+    AAdd(aLegenda,{"BR_VERDE","Aberto"})
+    AAdd(aLegenda,{"BR_VERMELHO","Finalizado"})
+    AAdd(aLegenda,{"BR_AMARELO","Em Andamento"})
     BrwLegenda("Status dos chamados",,aLegenda)
 
 return aLegenda
