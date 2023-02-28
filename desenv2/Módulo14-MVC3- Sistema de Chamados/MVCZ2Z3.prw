@@ -101,10 +101,24 @@ Static Function ViewDef()
     oStZ2:SetProperty("Z2_USERNAM", MVC_VIEW_CANCHANGE,.F.)
     oStZ2:SetProperty("Z2_MODULO",  MVC_VIEW_CANCHANGE,.F.)
     oStZ3:SetProperty("Z3_CODIGO",  MVC_VIEW_CANCHANGE,.F.)
+    //grupo de campos
+    oStZ2:AddGroup('G1','Detalhes do Chamado','',2)
+    oStZ2:AddGroup('G2','        ','',2)
+    oStZ2:SetProperty("Z2_COD",     MVC_VIEW_GROUP_NUMBER,"G1")
+    oStZ2:SetProperty("Z2_DATA",    MVC_VIEW_GROUP_NUMBER,"G1")
+    oStZ2:SetProperty("Z2_USUARIO", MVC_VIEW_GROUP_NUMBER,"G1")
+    oStZ2:SetProperty("Z2_USERNAM", MVC_VIEW_GROUP_NUMBER,"G1")
+    oStZ2:SetProperty("Z2_CODMODU", MVC_VIEW_GROUP_NUMBER,"G1")
+    oStZ2:SetProperty("Z2_MODULO",  MVC_VIEW_GROUP_NUMBER,"G1")
+
+    oStZ2:SetProperty("Z2_STATUS",  MVC_VIEW_GROUP_NUMBER,"G2")
+    oStZ2:SetProperty("Z2_TITCHAM", MVC_VIEW_GROUP_NUMBER,"G2")    
+    oStZ2:SetProperty("Z2_DESCCHA", MVC_VIEW_GROUP_NUMBER,"G2")
     
+
     oView   := FwFormView():New()
     //carego o model importado
-    oView:SetModel(oModel)
+    oView:SetModel(oModel)    
     
     oView:AddField("VIEWSZ2",oStZ2,"SZ2MASTER")
     oView:AddGrid("VIEWSZ3",oStZ3,"SZ3DETAIL")
@@ -121,7 +135,7 @@ Static Function ViewDef()
     oView:SetOwnerView("VIEWSZ3","Grid")
 
     //titulos personalizados ao cabeçalho e comentarios
-    oView:EnableTitleView("VIEWSZ2","Titulo do Chamado")
+    //oView:EnableTitleView("VIEWSZ2","Titulo do Chamado")
     oView:EnableTitleView("VIEWSZ3","Comentários do Chamado")
     
 return oView
@@ -150,6 +164,8 @@ Static Function MenuDef()
     For n:= 1 to Len(amenuAut)
         AAdd(aMenu,amenuAut[n])        
     Next n
+    //££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
+    // não incluir o item 'alterar' quando chamado fechado
     
 return aMenu
 
