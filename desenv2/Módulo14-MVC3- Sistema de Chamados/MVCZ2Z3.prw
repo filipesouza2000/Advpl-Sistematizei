@@ -7,9 +7,15 @@
 10/02/2023 | Filipe Souza | sistema de chamados, modelo3 com as tabelas SZ2 SZ3
 11/02/2023 | Filipe Souza | Implementação VIEWDEF , Legenda
 24/02/2023 | Filipe Souza | automatização dos campos, auto numeração e sequencia
+25/02/2012 | Filipe Souza | SZ0 Módulos, pesquisa padrão  retornando cod e desc.
+27/02/2023 | Filipe Souza | gatilho para modulo,desativação de campos,
+                            gatilho auto do comentario,revisão base de dados, revisão da legenda
+28/02/2023 | Filipe Souza | bloquear operação ALTERAR o registro com status 2-Fechado, 
+                            layout da View com grupo de campo, 
+                            SetFilterDefault - filtra o browse para chamado só do logado e abertos
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 @see https://centraldeatendimento.totvs.com/hc/pt-br/articles/360016740431-MP-ADVPL-ESTRUTURA-MVC-PAI-FILHO-NETO
-
+                                                                                                          
 */
 
 User Function MVCZ2Z3()
@@ -141,7 +147,7 @@ Static Function ViewDef()
 return oView
 
 User Function SZ2LEG()
-    Local aLegenda
+    Local aLegenda :={}
 
     AAdd(aLegenda,{"BR_VERDE","Aberto"})
     AAdd(aLegenda,{"BR_VERMELHO","Finalizado"})
@@ -157,7 +163,7 @@ Static Function MenuDef()
     Local n
     
     //Adiciono dentro de aMenu o titulo legenda, ação chamando a função de Legenda, operações de codigo 6
-    ADD OPTION aMenu TITLE "Legenda" ACTION 'U_SZ2LEG' OPERATION 6 ACCESS 0
+    ADD OPTION aMenu TITLE "Legenda" ACTION 'U_SZ2LEG()' OPERATION 6 ACCESS 0
 
     //para adicionar item ao menu padrão, utilizo um laço para incrementar ao aMenu
     // cada item do amenuAut que é padrão
@@ -169,28 +175,23 @@ Static Function MenuDef()
     
 return aMenu
 
-//Falta implementar a funcionalidade de API em MVC
-/*User Function ApiMods()
-    Local lRet          := .T. 
-    Local aHeader       := {}  
-    Local cHeaderRet    := ''  
-    Local cResult       := ''  
-    Local oResult       := {}  
-    Begin Sequence        
-        cResult := HTTPQuote('http://127.0.0.1:8089/rest/api/framework/v1/systemModules', "GET", "", , , aHeader, @cHeaderRet)
-        If !("200 OK" $ cHeaderRet )
-            FwAlertError('Erro na Consulta: ' + cResult,'Validação')
-            lRet    :=.F.
-            Break
-        Endif
-        If !FWJsonDeserialize( cResult, @oResult )
-            FwAlertError('Erro no jSon: ' + cResult,'Validação')
-            lRet    :=.F.
-            Break
-        Endif
-        //cGetEnd    := DecodeUTF8(oResult:street)        
-        
-        RECOVER
-    End Sequence
-Return lRet
-*/
+// Ponto de Entrada, em MVC é único que é chamado em diversos cenários e eventos,
+//sendo USER FUNCTION com nome do ID do Modelo a trabalhar.
+// bloquear operação ALTERAR o registro com status 2-Fechado
+User Function MVCSZ23m()
+    Local aParam    := PARAMIXB
+    Local xRet      := .T.
+    Local oObj      := aParam[1]
+    Local nOP       := oObj:GetOperation()        
+
+    IF(nOp == 4 )//operação ALTERAR 
+        if SZ2->Z2_STATUS == "2"
+            Help(NIL, NIL, "Edição indisponível!", NIL, ;
+            "Chamado "+SZ2->Z2_COD+" Finalizado.", 1, 0, NIL, NIL, NIL, NIL, NIL,;
+            {"Atenção!"+CHR(13)+CHR(10)+;
+            "Verifique Status do chamado na linha."+CHR(13)+CHR(10)+;
+            "Abra novo Chamado para o caso."})
+            xRet := .F.    
+        endif       
+    Endif    
+Return xRet
