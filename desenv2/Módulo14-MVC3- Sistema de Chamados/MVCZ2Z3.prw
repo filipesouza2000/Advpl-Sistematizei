@@ -41,6 +41,14 @@ Static Function BrowseDef()
 
     //definir de onde virá o Menufef
     oBrowse:Setmenudef("MVCZ2Z3")
+    
+    //filtro na exibição do Browse,
+    // se o usuario logado não estiver no paramentro dos que atendem chamados
+    // mostra somente os ainda abertos e os seus próprios chamado que abriu
+    if !__CUSERID $ SuperGetMV('MV_USRCALL')
+        oBrowse:SetFilterDefault("SZ2->Z2_STATUS ==1" .OR.  "__CUSERID ==SZ2->Z2_USUARIO")
+    endif
+    
 
     
     RestArea(aArea)
@@ -69,6 +77,9 @@ Static Function ModelDef()
     oModel:SetDescription("Modelo3-Sistema de Chamados")
     oModel:GetModel("SZ2MASTER"):SetDescription("Cabeçalho do Chamado")
     oModel:GetModel("SZ3DETAIL"):SetDescription("Comentários do Chamado")
+
+    //Define que um submodelo é opcional. Quando um modelo é opcional ele tem seu preenchimento não obrigatório, podendo realizar a gravação dos dados sem preenche-lo
+    oModel:GetModel("SZ3DETAIL"):SetOptional(.T.)
 
     //não utilizaremos GetOldGrid pois nao precisaremos manipular aCols e aHeader com bloco de codigo
 
