@@ -74,6 +74,10 @@ Static Function ModelDef()
 
     oModel:AddFields("SZ2MASTER",,oStZ2)
     oModel:AddGrid("SZ3DETAIL","SZ2MASTER",oStZ3,,,,,)
+    
+    //chamar função de validação na ativação(abertura) do modelo
+    oModel:setVldActivate({|oModel| MActivVld(oModel)})
+    
     //relaciona o detail com o master pela FILIAL e pelo numero do chamado, com a ordenação indice 1
     oModel:SetRelation("SZ3DETAIL",{{"Z3_FILIAL","xFilial('SZ2')"},{"Z3_CHAMADO","Z2_COD"}},SZ3->(Indexkey(1)))
     //define a chave primária, se nãoter X2_UNICO
@@ -195,3 +199,20 @@ User Function MVCSZ23m()
         endif       
     Endif    
 Return xRet
+
+//££££££££££££££££££££££££££££££££££££££££££££££££
+// Validador para bloquear usuários não permitidos ao módulo, só visualizar o Browse
+// esta função deve ser incluída no ModelDef com setVldActivate()
+Static Function MActivVld(oModel)
+    Local lRet      := .T.
+    Local cUsers    := SuperGetMV("MV_USRCALL")//contém os codigos dos usuarios permitidos
+    Local cCodUser  := RETCODUSR()//retorna codigo do usuario logado
+
+    if !(cCodUser$cUsers)
+        lRet    :=.F.
+        //Help(NIL, NIL, "TITULO HELP", NIL, "PROBLEMA", 1, 0, NIL, NIL, NIL, NIL, NIL, {"SOLUÇÃO"})
+        Help(NIL, NIL, "Validação de Acesso", NIL,;
+        "Usuário não autorizado", 1, 0, NIL, NIL, NIL, NIL, NIL, ;
+        {"Este usuário não está autorizado à realizar esta operação. Vide o parâmetro MV_USRCALL"})
+    endif
+Return lRet
