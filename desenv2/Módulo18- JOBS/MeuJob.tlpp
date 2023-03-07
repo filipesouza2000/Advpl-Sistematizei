@@ -1,0 +1,7 @@
+#INCLUDE "protheus.ch"
+#INCLUDE "TOTVS.ch"
+
+User Function MeuJob()
+    ConOut( "JOB IS RUNNING-VSCODE$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+
+return

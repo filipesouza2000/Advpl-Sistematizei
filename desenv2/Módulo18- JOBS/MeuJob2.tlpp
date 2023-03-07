@@ -1,0 +1,9 @@
+#INCLUDE "protheus.ch"
+#INCLUDE "TOTVS.ch"
+
+User Function MeuJob2(cPar1,cPar2)
+
+    ConOut(cPar1)
+    ConOut(cPar2)
+
+return

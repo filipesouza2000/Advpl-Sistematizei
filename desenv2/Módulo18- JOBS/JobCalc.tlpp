@@ -1,0 +1,15 @@
+
+#INCLUDE "protheus.ch"
+#INCLUDE "TOTVS.ch"
+
+User Function JobCalc(nPar1,nPar2)
+
+    nPar1:=Val(nPar1)
+    nPar2:=Val(nPar2)
+    ConOut("Soma------>"+cValToChar(nPar1+nPar2))
+    ConOut("Subtr----->"+cValToChar(nPar1-nPar2))
+    ConOut("Multi----->"+cValToChar(nPar1*nPar2))
+    ConOut("Divis----->"+cValToChar(nPar1/nPar2))
+    
+return
+
