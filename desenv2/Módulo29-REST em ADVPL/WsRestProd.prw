@@ -14,19 +14,25 @@ WSMETHOD GET buscaProduto;
     WSSYNTAX '/buscaproduto';
     PATH 'buscaproduto';
     PRODUCES APPLICATION_JSON
-ENDWSRESTFUL    
+   
+WSMETHOD POST inserirProduto;
+    DESCRIPTION 'Inserir dados do Produto';
+    WSSYNTAX '/inserirproduto';
+    PATH 'inserirproduto';
+    PRODUCES APPLICATION_JSON
+ENDWSRESTFUL  
 
 
 WSMETHOD GET buscaProduto WSRECEIVE CODPRODUTO WSREST WSRESTPROD
-    // recuperar o prodoto informado nia url
+    // recuperar o produto informado via url
     Local cCodProd  := Self:CODPRODUTO
     Local aArea     := GetArea()
     Local oJsonProd := JsonObject():New()
+    Local oReturn   := JsonObject():new()
     Local cStatus   :=""
     Local cGrupo    :=""
     Local aProd     :={}
     Local cJson     :=""
-    Local oReturn
     Local cReturn 
     Local lRet      :=.T.
     RpcSetEnv("99","01",,,"COM")
@@ -38,15 +44,14 @@ WSMETHOD GET buscaProduto WSRECEIVE CODPRODUTO WSREST WSRESTPROD
         cStatus := IIF(SB1->B1_MSBLQL=='1','Sim','Não')
         cGrupo  := AllTrim(Posicione('SBM',1,xFilial('SBM')+SB1->B1_GRUPO,'BM_DESC'))
         aadd(aProd,JsonObject():New())
-        aProd[1]['prodcod'] :=AllTrim(SB1->B1_COD)
-        aProd[1]['proddesc']:=AllTrim(EncodeUtf8(SB1->B1_DESC))
-        aProd[1]['produm']  :=AllTrim(SB1->B1_UM)
-        aProd[1]['prodncm'] :=AllTrim(SB1->B1_POSIPI)
-        aProd[1]['prodgrup']:=cGrupo
-        aProd[1]['prodbloq']:=cStatus
+        aProd[1]['prodcod']   :=AllTrim(SB1->B1_COD)
+        aProd[1]['proddesc']  :=AllTrim(EncodeUtf8(SB1->B1_DESC))
+        aProd[1]['produm']    :=AllTrim(SB1->B1_UM)
+        aProd[1]['prodncm']   :=AllTrim(SB1->B1_POSIPI)
+        aProd[1]['prodgrup']  :=cGrupo
+        aProd[1]['prodstatus']:=cStatus
 
         cReturn := FWJSONSerialize(oReturn)//rerializa o retorno
-        oReturn:= JsonObject():new()
         oReturn['cRet']:= '20-Sucesso'
         oReturn['cmessage']:='Produto entontrado com sucesso'
 
@@ -66,6 +71,94 @@ WSMETHOD GET buscaProduto WSRECEIVE CODPRODUTO WSREST WSRESTPROD
         //oReturn['cmessage']:='codigo do produto não encontrado'
     endif
     SB1->(DBCloseArea()) 
+    RestArea(aArea)
+    FreeObj(oJsonProd)//liberar os objetos
+    FreeObj(oReturn)
+return lRet
+
+WSMETHOD POST inserirProduto WSRECEIVE WSREST WSRESTPROD   
+    Local aArea     := GetArea()
+    Local oJsonProd := JsonObject():New()
+    Local oReturn   := JsonObject():new()
+    Local lRet      :=.T.
+    Local cCod,cDesc,cUm,cTipo,cGrupo  := ""
+    //FROMJSON Carrega os dados vindos do conteúdo da requisição em json
+    oJsonProd:FromJson(Self:GetContent())//getContent traz o conteúdo
+    //busca o codigo do produto no objeto Json na estrutura criada.
+    cCod  := AllTrim(oJsonProd['produtos']:GetJsonObject('prodcod'))
+    cDesc := AllTrim(oJsonProd['produtos']:GetJsonObject('proddesc'))
+    cUm   := AllTrim(oJsonProd['produtos']:GetJsonObject('produm'))
+    cTipo := AllTrim(oJsonProd['produtos']:GetJsonObject('prodtipo'))
+    cGrupo:= AllTrim(oJsonProd['produtos']:GetJsonObject('prodgrup'))
+
+
+
+    RpcSetEnv("99","01",,,"COM")    
+    DBSelectArea("SB1")//Abro o ambiente
+    SB1->(DBSetOrder(1))
+    //verificar se o código já existe
+    if SB1->(DBSeek(xFilial("SB1")+cCod))
+        SetRestFault(400,'Codigo do produto ja existe na base.')
+        lRet := .F.
+        return lRet
+        //verificar campo em branco    
+        elseif Empty(cCod)
+            SetRestFault(401,'Codigo do produto esta em branco.')
+            lRet := .F.
+            return lRet
+        elseif Empty(cDesc)
+            SetRestFault(402,'Descricao produto esta em branco.')
+            lRet := .F.
+            return lRet
+        elseif Empty(cUm)
+            SetRestFault(403,'Unidade de Medida do produto esta em branco.')
+            lRet := .F.
+            return lRet
+        elseif Empty(cTipo)
+            SetRestFault(404,'Tipo do produto esta em branco.')
+            lRet := .F.
+            return lRet             
+        elseif Empty(cGrupo)
+            SetRestFault(405,'Grupo do produto esta em branco.')
+            lRet := .F.
+            return lRet  
+            //verificar se algum campo de consulta padrão existe
+            elseif !SBM->(DbSeek(xFilial("SBM")+cGrupo))               
+                SetRestFault(406,'Grupo do produto não existe na base. Verifique ou informe para cadastrar.')
+                lRet := .F.
+                return lRet 
+            elseif !SX5->(DbSeek(xFilial("SX5")+"02"+cTipo))               
+                SetRestFault(407,'Tipo de produto não existe na base. Verifique ou informe para cadastrar.')
+                lRet := .F.
+                return lRet 
+            elseif !SAH->(DbSeek(xFilial("SAH")+cUm))               
+                SetRestFault(408,'Unidade de Medida do produto não existe na base. Verifique ou informe para cadastrar.')
+                lRet := .F.
+                return lRet          
+        
+    //incluir
+    else   
+        RECLOCK( "SB1", .T.)
+            SB1->B1_COD     := cCod
+            SB1->B1_DESC    := cDesc
+            SB1->B1_TIPO    := cTipo
+            SB1->B1_UM      := cUm
+            SB1->B1_GRUPO   := cGrupo
+            SB1->B1_MSBLQL  :='2'//ja inicia com status Ativo, nao bloqueado
+        SB1->(MSUNLOCK())
+        //exibir retorno do processo        
+        oReturn['prodcod']  := cCod
+        oReturn['proddesc'] := cDesc
+        oReturn['cRet']     := '201-Sucesso'
+        oReturn['cMsg']     := 'Registro efetuado com sucesso, complete o registro no Protheus.'
+        
+        Self:SetStatus(201)
+        //tipo de conteúdo retornado
+        Self:SetContentType(APPLICATION_JSON)
+        //serializa o Json para exibição ao usuário
+        Self:SetResponse(FWJSONSerialize(oReturn))
+    endif
+    
     RestArea(aArea)
     FreeObj(oJsonProd)//liberar os objetos
     FreeObj(oReturn)
