@@ -26,7 +26,13 @@ WSMETHOD PUT alterarProduto;
     DESCRIPTION 'Alterar dados do Produto';
     WSSYNTAX '/alterarproduto';
     PATH 'alterarproduto';
-    PRODUCES APPLICATION_JSON    
+    PRODUCES APPLICATION_JSON   
+
+WSMETHOD DELETE deletarProduto;
+    DESCRIPTION 'Deletar registro do Produto';
+    WSSYNTAX '/deletarproduto';
+    PATH 'deletarproduto';
+    PRODUCES APPLICATION_JSON       
 ENDWSRESTFUL  
 
 WSMETHOD GET buscaProduto WSRECEIVE CODPRODUTO WSREST WSRESTPROD
@@ -251,6 +257,41 @@ WSMETHOD PUT alterarProduto WSRECEIVE WSREST WSRESTPROD
         Self:SetResponse(FWJSONSerialize(oReturn))
     endif
     
+    RestArea(aArea)
+    FreeObj(oJsonProd)//liberar os objetos
+    FreeObj(oReturn)
+return lRet
+
+WSMETHOD DELETE deletarProduto WSRECEIVE CODPRODUTO WSREST WSRESTPROD
+    // recuperar o produto informado via url
+    Local cCodProd  := Self:CODPRODUTO
+    Local aArea     := GetArea()
+    Local oJsonProd := JsonObject():New() 
+    Local oReturn   := JsonObject():New()
+    Local lRet      :=.T.   
+    Local cDesc
+    
+    DBSelectArea("SB1")//Abro o ambiente
+    SB1->(DBSetOrder(1))
+    if SB1->(DBSeek(xFilial("SB1")+cCodProd))
+        cDesc   := AllTrim(SB1->B1_DESC)
+        RECLOCK( "SB1", .F. )
+            DBDelete()
+        SB1->(MSUNLOCK())
+        
+        oReturn['prodcod']  := cCodProd
+        oReturn['proddesc'] := cDesc
+        oReturn['cRet']     := '201-Sucesso'
+        oReturn['cMsg']     := 'Registro exckído com sucesso.'
+        Self:SetStatus(201)
+        Self:SetContentType(APPLICATION_JSON)
+        Self:SetResponse(FWJSONSerialize(oReturn))
+    else
+        SetRestFault(401,'Codigo do produto não contrado.')//setando o erro
+        lRet := .F.
+        return lRet        
+    endif
+    SB1->(DBCloseArea()) 
     RestArea(aArea)
     FreeObj(oJsonProd)//liberar os objetos
     FreeObj(oReturn)
