@@ -1,0 +1,2 @@
+SELECT * 
+FROM SA1990
