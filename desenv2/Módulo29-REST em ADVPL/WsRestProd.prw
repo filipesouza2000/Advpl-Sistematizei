@@ -170,7 +170,7 @@ WSMETHOD POST inserirProduto WSRECEIVE WSREST WSRESTPROD
         //serializa o Json para exibição ao usuário
         Self:SetResponse(FWJSONSerialize(oReturn))
     endif
-    
+    SB1->(DBCloseArea())
     RestArea(aArea)
     FreeObj(oJsonProd)//liberar os objetos
     FreeObj(oReturn)
@@ -256,7 +256,7 @@ WSMETHOD PUT alterarProduto WSRECEIVE WSREST WSRESTPROD
         //serializa o Json para exibição ao usuário
         Self:SetResponse(FWJSONSerialize(oReturn))
     endif
-    
+    SB1->(DBCloseArea())
     RestArea(aArea)
     FreeObj(oJsonProd)//liberar os objetos
     FreeObj(oReturn)
