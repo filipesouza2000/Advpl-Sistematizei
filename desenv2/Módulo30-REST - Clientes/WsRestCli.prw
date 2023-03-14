@@ -1,4 +1,4 @@
-#INCLUDE 'PROTHEUS.CH'
+#INCLUDE 'Protheus.ch'
 #INCLUDE 'RESTFUL.CH
 #INCLUDE "tbiconn.ch"
 
@@ -32,7 +32,7 @@ WSMETHOD DELETE delCli;
     PATH 'delCli';
     PRODUCES APPLICATION_JSON       
 ENDWSRESTFUL  
-
+ 
 WSMETHOD GET GetCli WSRECEIVE CODCLIDE,CODCLIATE WSREST WSRESTCLI
     Local lRet      := .T.
     Local nCount    :=1
@@ -195,6 +195,149 @@ WSMETHOD POST PostCli WSRECEIVE WSREST WSRESTCLI
     FreeObj(oReturn)
 return lRet
 
+WSMETHOD PUT putCli WSRECEIVE WSREST WSRESTCLI   
+    Local aArea     := GetArea()
+    Local oJsonCli := JsonObject():New()
+    Local oReturn   := JsonObject():new()
+    Local lRet      :=.T.
+    Local cCod,cLoja,cNome,cNRed,cEnd,cCid, cUf,cBai,cCgc  := ""
+    //FROMJSON Carrega os dados vindos do conteúdo da requisição em json
+    oJsonCli:FromJson(Self:GetContent())//getContent traz o conteúdo
+    //busca o codigo do cliente no objeto Json na estrutura criada.
+    cCod  := AllTrim(oJsonCli['clientes']:GetJsonObject('clicod'))
+    cLoja := AllTrim(oJsonCli['clientes']:GetJsonObject('cliloja'))
+    cNome := AllTrim(oJsonCli['clientes']:GetJsonObject('clinome'))
+    cNRed := AllTrim(oJsonCli['clientes']:GetJsonObject('clinred'))
+    cEnd  := AllTrim(oJsonCli['clientes']:GetJsonObject('cliend'))
+    cCid  := AllTrim(oJsonCli['clientes']:GetJsonObject('clicid'))
+    cUf   := AllTrim(oJsonCli['clientes']:GetJsonObject('cliuf'))
+    cBai  := AllTrim(oJsonCli['clientes']:GetJsonObject('clibai'))
+    cCgc  := AllTrim(oJsonCli['clientes']:GetJsonObject('clicgc'))
+
+    //RpcSetEnv("99","01",,,"COM")    
+    DBSelectArea("SA1")//Abro o ambiente
+    SA1->(DBSetOrder(1))
+    //verificar se o código já existe, senão existir não pode ser atualziado
+    if !SA1->(DBSeek(xFilial("SA1")+cCod+cLoja))
+        SetRestFault(400,'Codigo do Cliente não existe na base.')
+        lRet := .F.
+        return lRet
+        //verificar campo em branco    
+        elseif Empty(cCod)
+            SetRestFault(401,'Codigo do cliente esta em branco.')
+            lRet := .F.
+            return lRet        
+        elseif Empty(cNome)
+            SetRestFault(402,'Nome do cliente esta em branco.')
+            lRet := .F.
+            return lRet
+        elseif Empty(cLoja)
+            SetRestFault(403,'Loja do cliente esta em branco.')
+            lRet := .F.
+            return lRet
+        elseif Empty(cNRed)
+            SetRestFault(404,'Nome reduzido do cliente esta em branco.')
+            lRet := .F.
+            return lRet             
+        elseif Empty(cEnd)
+            SetRestFault(405,'Endereço do cliente esta em branco.')
+            lRet := .F.
+            return lRet  
+        elseif Empty(cCid)
+            SetRestFault(406,'Cidade do cliente esta em branco.')
+            lRet := .F.
+            return lRet 
+        elseif Empty(cBai)
+            SetRestFault(407,'bairro do cliente esta em branco.')
+            lRet := .F.
+            return lRet             
+        elseif Empty(cUf)
+            SetRestFault(408,'Estado Federativo do cliente esta em branco.')
+            lRet := .F.
+            return lRet   
+        elseif Empty(cCgc)
+            SetRestFault(409,'Documento CGC do cliente esta em branco.')
+            lRet := .F.
+            return lRet 
+        elseif !CGC(cCgc)
+            SetRestFault(410,'Verifique numero do CGC, inválido.')
+            lRet := .F.
+            return lRet     
+    //update
+    else   
+        RECLOCK( "SA1", .F.)
+            SA1->A1_LOJA    := cLoja
+            SA1->A1_NOME    := cNome
+            SA1->A1_NREDUZ  := cNRed
+            SA1->A1_END     := cEnd
+            SA1->A1_BAIRRO  := cBai
+            SA1->A1_MUN     := cCid
+            SA1->A1_EST     := cUf
+            SA1->A1_CGC     := cCgc          
+        SA1->(MSUNLOCK())
+        //exibir retorno do processo 
+        oReturn['CliNome'] := cNome
+        oReturn['cRet']     := '201-Sucesso'
+        oReturn['cMsg']     := 'Registro atualizado com sucesso, complete a atualizacao no Protheus.'
+        
+        Self:SetStatus(201)
+        //tipo de conteúdo retornado
+        Self:SetContentType(APPLICATION_JSON)
+        //serializa o Json para exibição ao usuário
+        Self:SetResponse(FWJSONSerialize(oReturn))
+    endif
+    SA1->(DBCloseArea())
+    RestArea(aArea)
+    FreeObj(oJsonCli)//liberar os objetos
+    FreeObj(oReturn)
+return lRet
+
+WSMETHOD DELETE delCli WSRECEIVE CODCLIDE,CODCLIATE WSREST WSRESTCLI
+    // recuperar o cliente informado via url
+    Local cCodDe   := cValToChar(Self:CODCLIDE)
+    Local cCodAte  := cValToChar(Self:CODCLIATE)   
+    Local aArea    := GetArea()
+    Local oReturn  := JsonObject():New()
+    Local lRet     :=.T.  
+    Local nCount   :=0
+    Local nCod     :=0
+
+    IF Self:CODCLIDE > Self:CODCLIATE
+        cCodDe  := cValToChar(Self:CODCLIATE)
+        cCodAte := cValToChar(Self:CODCLIDE)
+    ENDIF
+    
+    DBSelectArea("SA1")//Abro o ambiente
+    SA1->(DBSetOrder(1))   
+    
+    nCod:=Val(cCodDe)    
+    While (nCod <= VAL(cCodAte))//-----  xxxxx1 convertido perde 0 a esquerda, resolvido com PADL
+                //se encontrar o cliente na lista, irá deletar.
+        cA1COD := PADL( cValToChar(nCod), 6, '0')
+        if SA1->(DBSeek(xFilial("SA1")+cA1COD))            
+            RECLOCK( "SA1", .F. )
+            DBDelete()
+            SA1->(MSUNLOCK())
+            nCount++                
+        endif       
+        nCod++             
+    ENDDO//while
+    if nCount > 0
+        oReturn['cRet']     := '201-Sucesso'
+        oReturn['cMsg']     :=EncodeUtf8(cValToChar(nCount) +' registro(s) excluído(s) com sucesso.')
+        Self:SetStatus(201)
+        Self:SetContentType(APPLICATION_JSON)
+        Self:SetResponse(FWJSONSerialize(oReturn))
+    else 
+        SetRestFault(400,EncodeUtf8("Não foram encontrados registros com os códigos passados."))
+        lRet :=.F.
+        Return lRet
+    endif
+
+    SA1->(DBCloseArea()) 
+    RestArea(aArea)
+    FreeObj(oReturn)
+return lRet
 /* Modelo Json
 {
     "clientes": [
