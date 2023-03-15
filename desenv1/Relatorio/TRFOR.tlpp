@@ -15,7 +15,7 @@ User Function TRFOR() //TRFOR  AULA_SIS
     Private  oSecCab := Nil
     Private  cPerg   :="TRFOR"
 // função que cria perguntas na SX1 se não existir
-//    ValidPerg()
+    ValidPerg()
 //função para exibir pergunta e rececer parâmetros para o relatório
     pergunte(cPerg)
 //funções que construirão relatorio    
@@ -32,7 +32,7 @@ Return
     @version 1.0    
 /*/
 Static Function ReportDef()
-    oReport := TReport():new("TRFOR","Relatorio - Titulos por Fornecedor",cPerg,{|oReport| PrintReport })
+    oReport := TReport():new("TRFOR","Relatorio - Titulos por Fornecedor",cPerg,{|oReport| PrintReport(oReport) })
     oReport:SetLandScape(.T.)// define relatirio no formato em paisagem
 
     //controle da seção do relatorio
@@ -66,14 +66,39 @@ Static Function PrintReport(oReport)
     // inicio da query
     BeginSql Alias cAlias
         SELECT E2_PREFIXO, E2_NUM, A2_COD, A2_NOME, E2_VALOR FROm %table:SE2% SE2
-        INNER JOIN %table:SA2% SA2 ON SE2.E2_FORNECE = SA2.A2_COD AND E2_LOJA = A2_LOJA
+        INNER JOIN %table:SA2% SA2 
+        ON SE2.E2_FORNECE = SA2.A2_COD AND E2_LOJA = A2_LOJA
         WHERE E2_FORNECE BETWEEN %exp:(MV_PAR01)% AND %exp:(MV_PAR02)%
         AND SE2.D_E_L_E_T_ = '' AND SA2.D_E_L_E_T_ = ''
-EndSql        
+    EndSql        
 
-oSecCab:EndQuery()// fim da query
-oSecCab:Print() // impressão do relatorio
+    oSecCab:EndQuery()// fim da query
+    oSecCab:Print() // impressão do relatorio
 
-(cAlias)->(DBCLOSEAREA())
-    
+    (cAlias)->(DBCLOSEAREA())
+        
 Return
+
+Static Function ValidPerg()
+	Local aArea  := SX1->(GetArea())
+	Local aRegs := {}
+	Local i,j
+
+	aadd( aRegs, { cPerg,"01","Fornecedor de ?","Fornecedor de ?","Fornecedor de ?","mv_ch1","C", 6,0,0,"G","","mv_par01","","","mv_par01"," ","",""," ","","","","","","","","","","","","","","","","","","SA2"          } )
+	aadd( aRegs, { cPerg,"02","Fornecedor ate ?","Fornecedor ate ?","Fornecedor ate ?","mv_ch2","C", 6,0,0,"G","","mv_par02","","","mv_par02"," ","",""," ","","","","","","","","","","","","","","","","","","SA2"       } )
+
+	DbselectArea('SX1')
+	SX1->(DBSETORDER(1))
+	For i:= 1 To Len(aRegs)
+		If ! SX1->(DBSEEK( AvKey(cPerg,"X1_GRUPO") +aRegs[i,2]) )
+			Reclock('SX1', .T.)
+			FOR j:= 1 to SX1->( FCOUNT() )
+				IF j <= Len(aRegs[i])
+					FieldPut(j,aRegs[i,j])
+				ENDIF
+			Next j
+			SX1->(MsUnlock())
+		Endif
+	Next i 
+	RestArea(aArea) 
+Return(cPerg)
