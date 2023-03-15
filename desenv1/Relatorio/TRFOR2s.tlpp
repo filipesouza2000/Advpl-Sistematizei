@@ -1,0 +1,95 @@
+#INCLUDE 'Protheus.ch'
+#INCLUDE 'TOPCONN.ch'
+ /* Formação Desenvolvedor Protheus
+    Módulo 7- Aula 6- TReport
+    Relatório no modelo TReport 2 seções
+*/
+User Function TRFOR2s() 
+    Private  oReport := Nil
+    Private  oSection1 := Nil
+    Private  oSection2:= Nil
+    Private  cPerg   :="TRFOR"
+// função que cria perguntas na SX1 se não existir
+    ValidPerg()
+//função para exibir pergunta e rececer parâmetros para o relatório
+    pergunte(cPerg)
+//funções que construirão relatorio    
+ReportDef()
+oReport:PrintDialog()
+
+Return 
+
+Static Function ReportDef()
+    oReport := TReport():new("TRFOR","Relatorio - Titulos por Fornecedor",cPerg,{|oReport| PrintReport(oReport) })
+    oReport:SetLandScape(.T.)// define relatirio no formato em paisagem
+
+    //controle da seção do relatorio
+    oSection1 :=TRSection():New(oReport,"Fornecedor","SA2") 
+    // inserir campos/colunas no relatorio
+    TRCell():New(oSection1, "A2_COD"    ,"SA2")
+    TRCell():New(oSection1, "A2_LOJA"   ,"SA2")
+    TRCell():New(oSection1, "A2_NOME"   ,"SA2")
+
+    oSection2 := TRSection():New(oSection1,"Titulos por Fornecedor","SE2")        
+    TRCell():New(oSection2, "E2_NUM"    ,"SE2")        
+    TRCell():New(oSection2, "E2_PREFIXO","SE2")  
+    TRCell():New(oSection2, "E2_EMISSAO","SE2")    
+    TRCell():New(oSection2, "E2_VALOR"  ,"SE2")
+    TRCell():New(oSection2, "E2_SALDO"  ,"SE2")
+
+    TRFunction():New(oSection2:Cell("E2_VALOR"),, "SUM")
+    TRFunction():New(oSection2:Cell("E2_SALDO"),, "SUM")
+    TRFunction():New(oSection2:Cell("E2_NUM"),, "COUNT")
+
+Return 
+
+Static Function PrintReport(oReport)
+    Local cAlias    := GetNextAlias()
+
+    oSection1:beginQuery()//relatorio começa a ser construido
+    // inicio da query
+    BeginSql Alias cAlias
+        SELECT A2_COD, A2_NOME,A2_LOJA, E2_NUM,E2_PREFIXO,E2_EMISSAO, E2_VALOR , E2_SALDO
+        FROm %table:SE2% SE2
+        INNER JOIN %table:SA2% SA2 
+        ON SE2.E2_FORNECE = SA2.A2_COD AND E2_LOJA = A2_LOJA
+        WHERE E2_FORNECE BETWEEN %exp:(MV_PAR01)% AND %exp:(MV_PAR02)%
+        AND SE2.D_E_L_E_T_ = '' AND SA2.D_E_L_E_T_ = ''
+    EndSql        
+
+    oSection1:EndQuery()// fim da query
+    //informa que session2 tem PAI
+    oSection2:SetParentQuery()
+    //informa o relacionamento
+    oSection2:SetParentFilter(;
+        {|cForloja| (cAlias)->A2_COD + (cAlias)->A2_LOJA = cForloja },;//0000101
+        {|| (cAlias)->A2_COD + (cAlias)->A2_LOJA})
+    oSection1:Print() // impressão do relatorio
+
+    (cAlias)->(DBCLOSEAREA())
+        
+Return
+
+Static Function ValidPerg()
+	Local aArea  := SX1->(GetArea())
+	Local aRegs := {}
+	Local i,j
+
+	aadd( aRegs, { cPerg,"01","Fornecedor de ?","Fornecedor de ?","Fornecedor de ?","mv_ch1","C", 6,0,0,"G","","mv_par01","","","mv_par01"," ","",""," ","","","","","","","","","","","","","","","","","","SA2"          } )
+	aadd( aRegs, { cPerg,"02","Fornecedor ate ?","Fornecedor ate ?","Fornecedor ate ?","mv_ch2","C", 6,0,0,"G","","mv_par02","","","mv_par02"," ","",""," ","","","","","","","","","","","","","","","","","","SA2"       } )
+
+	DbselectArea('SX1')
+	SX1->(DBSETORDER(1))
+	For i:= 1 To Len(aRegs)
+		If ! SX1->(DBSEEK( AvKey(cPerg,"X1_GRUPO") +aRegs[i,2]) )
+			Reclock('SX1', .T.)
+			FOR j:= 1 to SX1->( FCOUNT() )
+				IF j <= Len(aRegs[i])
+					FieldPut(j,aRegs[i,j])
+				ENDIF
+			Next j
+			SX1->(MsUnlock())
+		Endif
+	Next i 
+	RestArea(aArea) 
+Return(cPerg)
