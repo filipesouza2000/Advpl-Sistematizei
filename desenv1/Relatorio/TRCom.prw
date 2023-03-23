@@ -1,16 +1,9 @@
 #INCLUDE 'Protheus.ch'
 #INCLUDE 'TOPCONN.ch'
  // Formação Desenvolvedor Protheus
- // Módulo 7- Aula 3- TReport, titulos a pagar por fornecedor
+ // Módulo 7- Aula 4- TReport ,pedido de compra por fornecedor
 
-/*/{Protheus.doc} User TRFOR
-    Relatório no modelo TReport
-    @type  Function
-    @author user
-    @since 21/01/2022
-    @version 1.0
-    /*/
-User Function TRFOR() //TRFOR  AULA_SIS
+User Function TRCom() 
     Private  oReport := Nil
     Private  oSecCab := Nil
     Private  cPerg   :="TRFOR"
@@ -32,44 +25,46 @@ Return
     @version 1.0    
 /*/
 Static Function ReportDef()
-    oReport := TReport():new("TRFOR","Relatorio - Titulos por Fornecedor",cPerg,{|oReport| PrintReport(oReport) })
+    oReport := TReport():new("TRCom","Relatorio SZ7- Pedido de Compras/Fornecedor",cPerg,{|oReport| PrintReport(oReport) })
     oReport:SetLandScape(.T.)// define relatirio no formato em paisagem
 
     //controle da seção do relatorio
-    oSecCab := TRSection():New(oReport,"Titulos por Fornecedor")
+    oSecCab := TRSection():New(oReport," Pedido de Compras/Fornecedor")
 
     // inserir campos/colunas no relatorio
-    TRCell():New(oSecCab, "E2_NUM" ,"SE2")
-    TRCell():New(oSecCab, "A2_COD" ,"SA2")
-    TRCell():New(oSecCab, "A2_NOME" ,"SA2")
-    TRCell():New(oSecCab, "E2_VALOR" ,"SE2")
+    TRCell():New(oSecCab, "Z7_NUM"      ,"SZ7")
+    TRCell():New(oSecCab, "Z7_EMISSAO"  ,"SZ7")
+    TRCell():New(oSecCab, "Z7_FORNECE"  ,"SA2")
+    TRCell():New(oSecCab, "A2_NOME"     ,"SA2")    
+    TRCell():New(oSecCab, "Z7_PRODUTO"  ,"SZ7")
+    TRCell():New(oSecCab, "B1_DESC"     ,"SB1")
+    TRCell():New(oSecCab, "Z7_QUANT"    ,"SZ7")
+    TRCell():New(oSecCab, "Z7_PRECO"    ,"SZ7")
+    TRCell():New(oSecCab, "Z7_TOTAL"    ,"SZ7")
 
-oBreak := TRBreak():New(oSecCab, oSecCab:Cell("A2_COD"),"Sub Total Titulos")
+oBreak := TRBreak():New(oSecCab, oSecCab:Cell("Z7_FORNECE"),"Sub Total")
 
-TRFunction():New(oSecCab:Cell("E2_VALOR"),Nil, "SUM",oBreak)
-TRFunction():New(oSecCab:Cell("A2_COD"),, "COUNT")
+TRFunction():New(oSecCab:Cell("Z7_NUM"),Nil, "COUNT",oBreak)
+TRFunction():New(oSecCab:Cell("Z7_QUANT"),Nil, "SUM",oBreak)
+TRFunction():New(oSecCab:Cell("Z7_TOTAL"),Nil, "SUM",oBreak)
 
 Return 
 
-
-/*/{Protheus.doc} PrintReport
-    (long_description)
-    @type  Static Function
-    @author user
-    @since 21/01/2022
-    @version 1.0
-/*/
 Static Function PrintReport(oReport)
     Local cAlias    := GetNextAlias()
 
     oSecCab:beginQuery()//relatorio começa a ser construido
     // inicio da query
     BeginSql Alias cAlias
-        SELECT E2_PREFIXO, E2_NUM, A2_COD, A2_NOME, E2_VALOR FROm %table:SE2% SE2
-        INNER JOIN %table:SA2% SA2 
-        ON SE2.E2_FORNECE = SA2.A2_COD AND E2_LOJA = A2_LOJA
-        WHERE E2_FORNECE BETWEEN %exp:(MV_PAR01)% AND %exp:(MV_PAR02)%
-        AND SE2.D_E_L_E_T_ = '' AND SA2.D_E_L_E_T_ = ''
+        SELECT  Z7_NUM,Z7_FORNECE,A2_COD, A2_NOME, Z7_EMISSAO,Z7_PRODUTO,B1_DESC,Z7_QUANT,Z7_PRECO,Z7_TOTAL
+        FROM		%table:SZ7% Z7 
+        INNER JOIN	%table:SA2% A2
+        ON	    Z7.Z7_LOJA   = A2.A2_LOJA
+        AND     Z7.Z7_FORNECE= A2.A2_COD
+        AND     Z7.D_E_L_E_T_ = A2.D_E_L_E_T_
+        INNER JOIN %table:SB1%  B1 ON B1_COD = Z7_PRODUTO
+        WHERE   A2.%NOTDEL%
+        AND     Z7_FORNECE BETWEEN %exp:(MV_PAR01)% AND %exp:(MV_PAR02)%       
     EndSql        
 
     oSecCab:EndQuery()// fim da query
