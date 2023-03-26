@@ -1,0 +1,102 @@
+<mxfile host="app.diagrams.net" modified="2023-03-26T14:45:13.113Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36" etag="NJlQZZPsWlvYNXtg4c5N" version="21.1.1" type="device" pages="2">
+  <diagram name="1seção" id="b520641d-4fe3-3701-9064-5fc419738815">
+    <mxGraphModel dx="1114" dy="484" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" background="none" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="21ea969265ad0168-6" value="&lt;b&gt;User Function TReport1()&lt;/b&gt;" style="swimlane;html=1;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=#e0e0e0;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;swimlaneFillColor=#ffffff;align=center;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=12" parent="1" vertex="1">
+          <mxGeometry x="10" y="50" width="210" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="21ea969265ad0168-7" value="&lt;div&gt;Private&amp;nbsp; oReport := Nil&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; Private&amp;nbsp; oSecCab := Nil&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; Private&amp;nbsp; cPerg&amp;nbsp; &amp;nbsp;:=&quot;TRPV&quot;&lt;br&gt;pergunte(cPerg)&lt;br&gt;&lt;b&gt;ReportDef&lt;/b&gt;()&lt;br&gt;&lt;br&gt;&lt;i&gt;oReport&lt;/i&gt;:PrintDialog()&lt;br&gt;return&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;whiteSpace=wrap;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="21ea969265ad0168-6" vertex="1">
+          <mxGeometry y="26" width="210" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="SSNHQ9sucXIklANh5-mf-6" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.002;entryY=0.062;entryDx=0;entryDy=0;entryPerimeter=0;" parent="21ea969265ad0168-6" target="21ea969265ad0168-10" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="70" y="98" as="sourcePoint" />
+            <mxPoint x="260" y="100" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="21ea969265ad0168-10" value="&lt;b&gt;Static Function ReportDef()&lt;/b&gt;" style="swimlane;html=1;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=#e0e0e0;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;swimlaneFillColor=#ffffff;align=center;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=12" parent="1" vertex="1">
+          <mxGeometry x="290" y="133" width="420" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="SSNHQ9sucXIklANh5-mf-8" value="" style="endArrow=classic;html=1;rounded=0;entryX=-0.006;entryY=0.067;entryDx=0;entryDy=0;entryPerimeter=0;" parent="21ea969265ad0168-10" target="21ea969265ad0168-22" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="280" y="56" as="sourcePoint" />
+            <mxPoint x="570" y="60" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="21ea969265ad0168-11" value="&lt;div&gt;&amp;nbsp;&lt;i&gt;oReport &lt;/i&gt;:= TReport():new(&quot;TReport1&quot;,&quot;título&quot;,cPerg,;&lt;br&gt;&lt;span style=&quot;white-space: pre;&quot;&gt; &lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt; &lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt; &lt;/span&gt;{|oReport| &lt;b&gt;PrintReport(oReport)&lt;/b&gt; })&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; oReport:SetLandScape(.T.)// define relatirio no formato em paisagem&lt;br&gt;&lt;div&gt;//controle da seção do relatorio&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; oSecCab := TRSection():New(oReport,&quot; titulo da seção&quot;)&lt;br&gt;&lt;div&gt;// inserir campos/colunas no relatorio&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; TRCell():New(oSecCab, &quot;C6_NUM&quot;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;,&quot;SC6&quot;)&lt;br&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&amp;nbsp; &amp;nbsp; TRCell():New(oSecCab, &quot;C6_PRODUTO&quot;&amp;nbsp; ,&quot;SC6&quot;)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;//faz agrupamento da seção por Pedido&lt;br&gt;&lt;div&gt;oBreak := TRBreak():New(oSecCab, oSecCab:Cell(&quot;C6_NUM&quot;),&quot;Sub Total&quot;)&lt;/div&gt;&lt;div&gt;//totalizadores&lt;/div&gt;&lt;div&gt;TRFunction():New(oSecCab:Cell(&quot;C6_NUM&quot;),Nil,&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &quot;COUNT&quot;,oBreak)&lt;/div&gt;&lt;div&gt;TRFunction():New(oSecCab:Cell(&quot;C6_QTDVEN&quot;),Nil, &quot;SUM&quot;,oBreak)&lt;/div&gt;&lt;div&gt;Return&amp;nbsp;&lt;/div&gt;&lt;/div&gt;&lt;br&gt;&lt;/div&gt;&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;whiteSpace=wrap;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="21ea969265ad0168-10" vertex="1">
+          <mxGeometry y="26" width="420" height="214" as="geometry" />
+        </mxCell>
+        <mxCell id="21ea969265ad0168-22" value="&lt;b&gt;Static Function PrintReport(oReport)&lt;/b&gt;" style="swimlane;html=1;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=#e0e0e0;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;swimlaneFillColor=#ffffff;align=center;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=12" parent="1" vertex="1">
+          <mxGeometry x="760" y="173" width="330" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="21ea969265ad0168-23" value="&lt;div&gt;&amp;nbsp;Local cAlias&amp;nbsp; &amp;nbsp; := GetNextAlias()&lt;/div&gt;&lt;div&gt;&amp;nbsp;oSecCab:beginQuery()//relatorio começa a ser construido&lt;/div&gt;&lt;div&gt;&amp;nbsp;// inicio da query&lt;/div&gt;&lt;div&gt;&amp;nbsp;BeginSql Alias cAlias&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; SELECT&amp;nbsp; C6_NUM,C6_PRODUTO,C6_QTDVEN&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; FROM&amp;nbsp; &amp;nbsp; &amp;nbsp;%table:SC6% C6&amp;nbsp;&lt;span style=&quot;background-color: initial;&quot;&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; WHERE&amp;nbsp; &amp;nbsp;C6.%NOTDEL%&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; AND&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;C6_NUM BETWEEN %exp:(MV_PAR01)% &lt;br&gt;&lt;span style=&quot;white-space: pre;&quot;&gt; &lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt; &lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt; &lt;/span&gt;AND %exp:(MV_PAR02)%&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; EndSql&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&amp;nbsp;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; oSecCab:EndQuery()// fim da query&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; oSecCab:Print()&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;// impressão do relatorio&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; (cAlias)-&amp;gt;(DBCLOSEAREA())&lt;span style=&quot;background-color: initial;&quot;&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&amp;nbsp;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;Return&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;whiteSpace=wrap;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="21ea969265ad0168-22" vertex="1">
+          <mxGeometry y="26" width="330" height="214" as="geometry" />
+        </mxCell>
+        <mxCell id="SSNHQ9sucXIklANh5-mf-11" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="295" y="175" as="sourcePoint" />
+            <mxPoint x="142" y="175" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="SSNHQ9sucXIklANh5-mf-12" value="Objeto para impressão" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=middle;" parent="SSNHQ9sucXIklANh5-mf-11" connectable="0" vertex="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="SSNHQ9sucXIklANh5-mf-13" value="&lt;h1&gt;TReport 1 seção&lt;/h1&gt;&lt;p&gt;Modelo de relatório Treport apresentando somente uma seção agrupada por um campo, totalizadores.&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="400" y="30" width="330" height="120" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="2seções" id="a84PapwhJ_RCFX4sAlfJ">
+    <mxGraphModel dx="1105" dy="432" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" background="none" math="0" shadow="0">
+      <root>
+        <mxCell id="NliZjfZJS_3sJkS933Xa-0" />
+        <mxCell id="NliZjfZJS_3sJkS933Xa-1" parent="NliZjfZJS_3sJkS933Xa-0" />
+        <mxCell id="NliZjfZJS_3sJkS933Xa-2" value="&lt;b&gt;User Function TReport2()&lt;/b&gt;" style="swimlane;html=1;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=#e0e0e0;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;swimlaneFillColor=#ffffff;align=center;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=12" vertex="1" parent="NliZjfZJS_3sJkS933Xa-1">
+          <mxGeometry x="8" y="31" width="210" height="181" as="geometry" />
+        </mxCell>
+        <mxCell id="NliZjfZJS_3sJkS933Xa-3" value="&lt;div&gt;Private&amp;nbsp; oReport := Nil&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp;&amp;nbsp;Private&amp;nbsp; oReport := Nil&lt;div&gt;&amp;nbsp; &amp;nbsp; Private&amp;nbsp; oSection1 := Nil&lt;/div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&amp;nbsp; &amp;nbsp; Private&amp;nbsp; oSection2:= Nil&lt;/span&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&amp;nbsp; &amp;nbsp;&lt;br&gt;&amp;nbsp; &amp;nbsp; Private&amp;nbsp; cPerg&amp;nbsp; &amp;nbsp;:=&quot;TRFor&quot;&lt;/span&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;pergunte(cPerg)&lt;br&gt;&lt;b&gt;ReportDef&lt;/b&gt;()&lt;br&gt;&lt;i&gt;oReport&lt;/i&gt;:PrintDialog()&lt;br&gt;return&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;whiteSpace=wrap;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="NliZjfZJS_3sJkS933Xa-2">
+          <mxGeometry y="26" width="210" height="154" as="geometry" />
+        </mxCell>
+        <mxCell id="NliZjfZJS_3sJkS933Xa-5" value="&lt;b&gt;Static Function ReportDef()&lt;/b&gt;" style="swimlane;html=1;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=#e0e0e0;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;swimlaneFillColor=#ffffff;align=center;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=12" vertex="1" parent="NliZjfZJS_3sJkS933Xa-1">
+          <mxGeometry x="290" y="135" width="360" height="350" as="geometry" />
+        </mxCell>
+        <mxCell id="NliZjfZJS_3sJkS933Xa-7" value="&lt;div&gt;&amp;nbsp;&lt;i&gt;oReport &lt;/i&gt;:= TReport():new(&quot;TReport1&quot;,&quot;título&quot;,cPerg,;&lt;br&gt;&lt;span style=&quot;&quot;&gt; &lt;/span&gt;&lt;span style=&quot;&quot;&gt; &lt;/span&gt;&lt;span style=&quot;&quot;&gt; &lt;/span&gt;{|oReport| &lt;b&gt;PrintReport(oReport)&lt;/b&gt; })&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; oReport:SetLandScape(.T.)// define formato em paisagem&lt;br&gt;&lt;div&gt;//controle da seção do relatorio&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&amp;nbsp; &amp;nbsp; oSection1 :=TRSection():New(oReport,&quot;Forn&quot;,&quot;SA2&quot;)&amp;nbsp;&lt;/span&gt;&lt;br&gt;&lt;div&gt;// inserir campos/colunas no relatorio&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp;&amp;nbsp;TRCell():New(oSection1, &quot;A2_COD&quot;&amp;nbsp; &amp;nbsp; ,&quot;SA2&quot;)&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; TRCell():New(oSection1, &quot;A2_LOJA&quot;&amp;nbsp; &amp;nbsp;,&quot;SA2&quot;)&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; TRCell():New(oSection1, &quot;A2_NOME&quot;&amp;nbsp; ,&quot;SA2&quot;)&lt;/div&gt;&lt;div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp;&lt;br&gt;&amp;nbsp; &amp;nbsp; oSection2 := TRSection():New(oSection1,&quot;Titulos&quot;,&quot;SE2&quot;)&amp;nbsp; &amp;nbsp; &amp;nbsp;&amp;nbsp;&lt;span style=&quot;background-color: initial;&quot;&gt;TRCell():New(oSection2, &quot;E2_NUM&quot;&amp;nbsp; &amp;nbsp; ,&quot;SE2&quot;)&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&amp;nbsp;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; TRCell():New(oSection2, &quot;E2_PREFIXO&quot;,&quot;SE2&quot;)&amp;nbsp;&amp;nbsp;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; TRCell():New(oSection2, &quot;E2_EMISSAO&quot;,&quot;SE2&quot;)&amp;nbsp;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; TRCell():New(oSection2, &quot;E2_VALOR&quot;&amp;nbsp; ,&quot;SE2&quot;)&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; TRCell():New(oSection2, &quot;E2_SALDO&quot;&amp;nbsp; ,&quot;SE2&quot;)&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; TRFunction():New(oSection2:Cell(&quot;E2_VALOR&quot;),, &quot;SUM&quot;)&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; TRFunction():New(oSection2:Cell(&quot;E2_SALDO&quot;),, &quot;SUM&quot;)&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; TRFunction():New(oSection2:Cell(&quot;E2_NUM&quot;),,&amp;nbsp; &amp;nbsp; &amp;nbsp;&quot;COUNT&quot;)&lt;/div&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;Return&amp;nbsp;&lt;/span&gt;&lt;br&gt;&lt;/div&gt;&lt;br&gt;&lt;/div&gt;&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;whiteSpace=wrap;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="NliZjfZJS_3sJkS933Xa-5">
+          <mxGeometry y="26" width="360" height="324" as="geometry" />
+        </mxCell>
+        <mxCell id="NliZjfZJS_3sJkS933Xa-8" value="&lt;b&gt;Static Function PrintReport(oReport)&lt;/b&gt;" style="swimlane;html=1;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=#e0e0e0;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;swimlaneFillColor=#ffffff;align=center;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=12" vertex="1" parent="NliZjfZJS_3sJkS933Xa-1">
+          <mxGeometry x="710" y="170" width="373" height="390" as="geometry" />
+        </mxCell>
+        <mxCell id="NliZjfZJS_3sJkS933Xa-9" value="&lt;div&gt;&amp;nbsp;Local cAlias&amp;nbsp; &amp;nbsp; := GetNextAlias()&lt;/div&gt;oSection1&lt;span style=&quot;background-color: initial;&quot;&gt;:beginQuery()//relatorio começa a ser construido&lt;/span&gt;&lt;br&gt;&lt;div&gt;&amp;nbsp;// inicio da query&lt;/div&gt;&lt;div&gt;&amp;nbsp;BeginSql Alias cAlias&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;SELECT A2_COD, A2_NOME,A2_LOJA, E2_NUM,&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;E2_PREFIXO,E2_EMISSAO, E2_VALOR , E2_SALDO&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;FROm %table:SE2% SE2&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;INNER JOIN %table:SA2% SA2&amp;nbsp;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;ON SE2.E2_FORNECE = SA2.A2_COD &lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; AND E2_LOJA = A2_LOJA&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; WHERE E2_FORNECE &lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; BETWEEN %exp:(MV_PAR01)% AND %exp:(MV_PAR02)%&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; AND SE2.D_E_L_E_T_ = &#39;&#39; AND SA2.D_E_L_E_T_ = &#39;&#39;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; EndSql&amp;nbsp;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp;&amp;nbsp;oSection1:EndQuery()&lt;br&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;//informa que session2 tem PAI&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; oSection2:SetParentQuery()&lt;/div&gt;&lt;div&gt;//informa o relacionamento&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; oSection2:SetParentFilter(&lt;span style=&quot;background-color: initial;&quot;&gt;&amp;nbsp;{|cForloja|;&lt;/span&gt;&lt;/div&gt;&lt;blockquote style=&quot;margin: 0 0 0 40px; border: none; padding: 0px;&quot;&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&amp;nbsp; &amp;nbsp; (cAlias)-&amp;gt;A2_COD + (cAlias)-&amp;gt;A2_LOJA = cForloja },;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;{|| (cAlias)-&amp;gt;A2_COD + (cAlias)-&amp;gt;A2_LOJA})&lt;/div&gt;&lt;/blockquote&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; oSection1:Print() // impressão do relatorio&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; (cAlias)-&amp;gt;(DBCLOSEAREA())&lt;span style=&quot;background-color: initial;&quot;&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&amp;nbsp;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;Return&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;whiteSpace=wrap;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="NliZjfZJS_3sJkS933Xa-8">
+          <mxGeometry y="26" width="373" height="364" as="geometry" />
+        </mxCell>
+        <mxCell id="NliZjfZJS_3sJkS933Xa-10" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.533;entryY=0.799;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="NliZjfZJS_3sJkS933Xa-1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="298" y="175" as="sourcePoint" />
+            <mxPoint x="127.93000000000006" y="175.046" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NliZjfZJS_3sJkS933Xa-11" value="Objeto para impressão" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=middle;" connectable="0" vertex="1" parent="NliZjfZJS_3sJkS933Xa-10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="NliZjfZJS_3sJkS933Xa-12" value="&lt;h1&gt;TReport 2 seções&lt;/h1&gt;&lt;p&gt;Modelo de relatório Treport apresentando 2 seções agrupadas por um campo, totalizadores.&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="NliZjfZJS_3sJkS933Xa-1">
+          <mxGeometry x="400" y="30" width="330" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="NliZjfZJS_3sJkS933Xa-4" value="" style="endArrow=classic;html=1;rounded=0;entryX=-0.006;entryY=0.099;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="NliZjfZJS_3sJkS933Xa-1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="82" y="156" as="sourcePoint" />
+            <mxPoint x="289.48" y="154.76" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NliZjfZJS_3sJkS933Xa-6" value="" style="endArrow=classic;html=1;rounded=0;entryX=-0.006;entryY=0.067;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="NliZjfZJS_3sJkS933Xa-1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="488" y="189" as="sourcePoint" />
+            <mxPoint x="712.7620000000002" y="189.13" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
