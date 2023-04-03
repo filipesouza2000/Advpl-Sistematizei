@@ -1,0 +1,96 @@
+#INCLUDE 'PROTHEUS.CH'
+#INCLUDE 'TOPCONN.CH'
+ // Formação Desenvolvedor Protheus
+ // Módulo 7- Aula 12 - FwMsExcel Relatório Excel - Saldos de Produtos em Estoque
+//                      copia o arquivo no servidor para o diretório específico
+User Function RelProSald()  
+    Local cPerg     :="TRPROD"
+    Private oSay
+
+    pergunte(cperg,.T.)
+    // mensagem de processamento
+    FwMsgRun(,{|oSay| GeraDados()},"Aguarde!","Processando dados")
+Return
+
+
+Static Function GeraDados()
+    Local cAlias := GetNextAlias()
+    Local aDados    :={}
+    
+    BEGINSQL Alias cAlias
+        SELECT B1.B1_COD as cod, B1.B1_DESC as descr, B1.B1_GRUPO as gr, B1.B1_TIPO as tp, B2.B2_QATU as qtd, B2.B2_VATU1 as val
+        FROM %table:SB1% B1 
+        INNER JOIN %table:SB2% B2
+        ON B2.B2_COD = B1.B1_COD AND B1.D_E_L_E_T_ = B2.D_E_L_E_T_
+        WHERE B1.%notdel%
+        AND B1.B1_COD BETWEEN %exp:MV_PAR01% AND %exp:MV_PAR02%
+    EndSql
+
+    While !(cAlias)->(EOF())
+        aAdd(aDados,{COD, DESCR, GR, TP, QTD, VAL})
+        (cAlias)->(DBSkip())
+    ENDDO
+    (cAlias)->(DBCloseArea())
+    FwMsgRun(,{|oSay| GeraExcel(aDados,oSay)},"Gerando planilha", "Aguarde")
+Return
+
+Static Function GeraExcel(aDados,oSay)
+    Local oExcel    := FwMsExcel():New()
+    Local oExcelApp := Nil
+    Local cPasta    := "Saldo_Fisico"    
+    Local cPlan     := "Saldo_Fisico"
+    Local cFile     := cPasta+"_"+dtos(Date())+"_"+Replace(Time(),":","-")
+    Local cDir      := "C:\Relato"
+    Local cDefaultDir:=GetSrvProfString("Startpath","\system\")
+    Local nCount
+
+    if !ExistDir(cDir)
+        MakeDir(cDir)
+    endif
+
+    if !Len(aDados)>0
+        MSGALERT( "Não existem dados no saldo", "Atenção" )
+    else
+        if !ApOleclient("MSEXCEL")
+            MSGALERT( "Excel não instalado", "Contate o setor de TI" )
+            Return    
+        endif
+
+        oSay:SetText("Cliando estrutura da planilha")
+        //cria planilha e aba1
+        oExcel:addWorkSheet(cPasta)
+        oExcel:addTable(cPasta,cPlan)
+        //cria colunas
+        oExcel:addColumn(cPasta,cPlan,"Codigo"   ,1,1,.F.)
+        oExcel:addColumn(cPasta,cPlan,"Descrição",1,1,.F.)
+        oExcel:addColumn(cPasta,cPlan,"Grupo"    ,1,1,.F.)//,1 é alinhamento Left
+        oExcel:addColumn(cPasta,cPlan,"Tipo"     ,1,1,.F.)//1 é general, F não tem totalizador 
+        oExcel:addColumn(cPasta,cPlan,"Saldo"    ,1,2,.F.)//2 é numero
+        oExcel:addColumn(cPasta,cPlan,"Valor"    ,1,3,.F.)//3 é monetário
+
+        For nCount:= 1 to Len(aDados)             
+            oExcel:AddRow(cPasta,cPlan,;
+            {;
+                aDados[nCount,1],;//codigo
+                aDados[nCount,2],;//descrição
+                aDados[nCount,3],;//grupo
+                aDados[nCount,4],;//tipo
+                aDados[nCount,5],;//saldo
+                aDados[nCount,6] })//valor            
+        Next nCount
+
+        //quando for termina é criado aWorkSheet pelo sistema
+        if !Empty(oExcel:aWorkSheet)// se array não estiver vazio, tem linhas
+            oSay:SetText("Abrinda arquivo...")
+            oExcel:Activate()
+            oExcel:GetXMLFile(cFile)
+            //copia o arquivo no servidor para o diretório específico
+            CpyS2T(cDefaultDir+cFile,cDir,.T.,.T.)
+
+            oExcelApp:=MsExcel():New()
+            oExcelApp:WorkBooks:Open(cDir+"\"+cFile)
+            oExcelApp:SetVisible(.T.)
+            //oExcelApp:Destroy() 
+        endif
+    endif
+Return
