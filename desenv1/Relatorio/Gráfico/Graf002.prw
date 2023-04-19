@@ -80,7 +80,7 @@ User Function Graf002()
     ACTIVATE MSDIALOG oDlg CENTERED ON INIT (oChart:SaveToPng(0,0,nLarg,nAlt,cDir +'Graf002.png'),oDlg:End())
     oPrintPvt:SayBitMap(nLinAtu,nColIni,cDir + 'Graf002.png',nLarg/2,nAlt/1.6)
     nLinAtu += nAlt + 5
-    oPrintPvt:EndPage()
+    U_xRodape002() 
     oPrintPvt:Preview()
 
     RestArea(aArea)
@@ -98,3 +98,23 @@ User Function Query002()
     cQuery:= ChangeQuery(cQuery)
     DBUseArea(.T.,"TOPCONN",TCGENQRY( , ,cQuery ),"TMP",.F.,.T.)
 return NIL
+
+User Function xRodape002()
+    Local nLinha := nLinFin
+    //escrevendo dados
+    Local cTitle:= " Relatório de Clientes - "+DToC(Date())+" | "+cHoraEx+" | "+cUserName
+    
+
+    //linha divisória
+    oPrintPvt:Line(nLinha,nColIni,nLinha,nColFin,RGB(0,0,200))
+    nLinha+=4
+
+    oPrintPvt:SayAlign(nLinha, nColIni,cTitle,oFontRod,200,07,0,)
+
+    //paginação a direita
+    cTitle:= "Página "+cValToChar(nPagAtu)
+    oPrintPvt:SayAlign(nLinha, nColFin-40,cTitle,oFontRod,040,07,1,)
+
+    oPrintPvt:Endpage()
+    nPagAtu++
+return .T.
