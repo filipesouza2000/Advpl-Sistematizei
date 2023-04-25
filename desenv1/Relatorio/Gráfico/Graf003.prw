@@ -2,6 +2,7 @@
 #INCLUDE 'TopConn.ch'
 #INCLUDE 'RPTDef.ch'
 #INCLUDE 'FWPrintSetup.ch'
+#include "fileio.ch"
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ---Data---|-----Autor-------|-------Descrição------------
@@ -10,7 +11,12 @@
                                 – FWChartFunnel – Gráficos de Funil
                                 – FWChartLine   – Gráficos de Linha
                                 – FWChartPie    – Gráficos de Pizza   
-                              Ao confirmar executa a principal GrafType().                                                        
+                              Ao confirmar executa a principal GrafType(). 
+20/02/2023| Filipe Souza    | Solução de erro:
+Ao utilizar a classe FWMsPrinter é apresentado o erro: arquivo. rel não pode ser criado. 
+Esse incidente ocorre, pois já existe o arquivo SCXXXXX dentro da pasta System,
+impossibilitando a sua criação novamente. 
+Para solucionar essa ocorrência, precisará limpar a pasta System todos os arquivos SCXXXXX.
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 */
 User Function Graf003()    
@@ -41,6 +47,8 @@ User Function GrafType()
     Local aRand :={}
     Local aNotas:={}
     Local cCli  :=""
+    Local aFiles
+    Local nX
     Private cHoraEx    := Time()
     Private nPagAtu    := 1
     Private oPrintPvt
@@ -58,6 +66,15 @@ User Function GrafType()
 
     //Processa({|| Query002()},"Espere","Consultando....")
     U_Query003()
+    
+    //verificar se existem arquivos SCXXXX para apaga-los
+    aFiles := Directory('sc*')
+    if len(Directory('sc*')) > 0
+        For nX:= 1 to len(Directory('sc*'))
+            FErase(CurDir() + aFiles[nX][1])
+        Next        
+    endif  
+
     //criando objeto de impressão
     oPrintPvt   := FWMSPrinter():New(cNomeRel,IMP_PDF,.F.,,.T.,,@oPrintPvt,,,,,.T.)
     oPrintPvt:cPathPDF:=GetTempPath()
