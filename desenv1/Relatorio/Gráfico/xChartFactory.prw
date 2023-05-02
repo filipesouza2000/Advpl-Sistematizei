@@ -1,4 +1,10 @@
 #include 'protheus.ch'
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+---Data---|-----Autor-------|-------Descrição------------
+25/02/2023| Filipe Souza    | Modelo de gráfico com FWChartFactory 
+@see https://tdn.totvs.com/display/public/framework/FwChartFactory
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+*/
 
 User Function xChartFactory()
     Local oDlg

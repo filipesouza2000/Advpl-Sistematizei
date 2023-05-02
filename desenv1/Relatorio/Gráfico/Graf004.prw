@@ -7,6 +7,7 @@
 ---Data---|-----Autor-------|-------Descrição------------
 25/02/2023| Filipe Souza    | Modelo de gráfico com FWChartFactory 
                               com monitor de menu miniatura
+@see https://www.blogadvpl.com/criando-grafico-no-protheus/#page-content
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 */
 User Function Graf004()
