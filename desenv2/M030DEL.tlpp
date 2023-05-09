@@ -1,0 +1,18 @@
+#INCLUDE 'Protheus.ch'
+
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++DATA++++|++++AUTOR+++++|++++++++++++++++DESCRIÇÂO++++++++++++++++++++++++++++++
+11/02/2023 | Filipe Souza | Ponto de entrada valida exclusão de cliente, 
+                            
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++                            
+*/
+
+User Function M030DEL()
+    Local lRet := .F.
+    if __cUserID == '000000'
+        lRet:= .T.
+    else    
+        lRet:= .F.
+        FwAlertError('Não é possível excluir o cliente, só administrador tem permissão!','Erro na exclusão')   
+    endif
+return lRet
