@@ -1,0 +1,22 @@
+#INCLUDE 'Protheus.ch'
+
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++DATA++++|++++AUTOR+++++|++++++++++++++++DESCRIÇÂO++++++++++++++++++++++++++++++
+11/02/2023 | Filipe Souza | Ponto de entrada na inclusão de cliente, 
+                            para inserir o código do usuario ocorrente,
+                            no campo customizado A1_XUSEIN
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++                            
+*/
+
+User Function M030INC()
+    Local aArea := GetArea()
+
+    if !Empty(M->A1_NOME)
+        FwAlertSuccess("Registrado com sucesso o cliente "+ Alltrim(M->A1_NOME))
+        RECLOCK( "SA1", .F. )
+            SA1->A1_XUSEIN := RETCODUSR()// __cUserID
+        SA1->(MSUNLOCK())    
+    endif
+    
+    RestArea(aArea)
+return 
