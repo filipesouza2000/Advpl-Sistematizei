@@ -34,7 +34,9 @@ User Function xCodProd()
         CASE cGrupo=='0015'//CHAPA LAMINADA   
             cCod :='CLCA'+PADL(cRec,6,'0')
         CASE cGrupo=='0016'//CHAPA FINA
-            cCod :='CFCA'+PADL(cRec,6,'0')        
+            cCod :='CFCA'+PADL(cRec,6,'0')
+        OTHERWISE
+            cCod:=Year2Str(Date())+PADL(cRec,6,'0')       
     ENDCASE
     
     //(cAlias)->(DBCLOSEAREA())
