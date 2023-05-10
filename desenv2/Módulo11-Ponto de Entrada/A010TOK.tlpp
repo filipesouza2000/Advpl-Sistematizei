@@ -1,0 +1,19 @@
+#INCLUDE 'Protheus.ch'
+
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++DATA++++|++++AUTOR+++++|++++++++++++++++DESCRIÇÂO++++++++++++++++++++++++++++++
+11/02/2023 | Filipe Souza | Ponto de entrada valida inclusão e alteração de Produto                             
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++                            
+*/
+
+user Function A010TOK()
+    Local lRet := .T.
+        // variável interna, INCLUI ALTERA
+    if (INCLUI .OR. ALTERA) .AND. !Empty(M->B1_GRUPO) .AND. M->B1_GRUPO $ '0005|0008|0009'
+        lRet:= .F.
+        FwAlertError('Não é possível incluir o produto com Grupo '+Alltrim(M->B1_GRUPO)+chr(13)+chr(10)+;
+                    'Não adquirimos mais este, somente está para venda.',;
+                    'Validação de Produto')   
+    endif
+
+return lRet
