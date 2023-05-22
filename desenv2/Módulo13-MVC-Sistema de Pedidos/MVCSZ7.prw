@@ -1,12 +1,10 @@
 #INCLUDE 'Protheus.ch'
 #INCLUDE 'FWMVCDEF.ch'
+/*++++DATA++++|++++AUTOR+++++|++++++++++++++++DESCRIÇÂO+++++++++++++
+  04/01/2023  | Filipe Souza |  Função principal para a tela de Solicitação de Compras
+  10/03/2023  | Filipe Souza |  PE  MVCSZ7m.prw, validação na grid limitar para 10 qtd.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-/*/{Protheus.doc} User Function MVCSZ7
-    Função principal para a tela de Solicitação de Compras
-    @type  Function
-    @author Filipe Souza
-    @since 04/01/2023
-    /*/
 User Function MVCSZ7()
     //criação do browse
     Local aArea     :=GetArea()
