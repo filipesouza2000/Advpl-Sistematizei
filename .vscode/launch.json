@@ -9,77 +9,63 @@
 			"cwb": "${workspaceFolder}",
 			"smartclientBin": "C:/TOTVS12133/Protheus/Protheus/bin/smartclient/smartclient.exe",
 			"isMultiSession": true,
-			"enableTableSync": true
+			"enableTableSync": true,
+			"enableMultiThread": true
 		}
 	],
 	"lastPrograms": [
 		{
-			"label": "U_zTDialog"
+			"label": "xxxxxx"
 		},
 		{
-			"label": "sigamdi"
-		},
-		{
-			"args": [
-				"ZZ1"
-			],
-			"label": "U_xNextCod"
-		},
-		{
-			"label": "U_Projeto02"
-		},
-		{
-			"args": [
-				"ZZ1",
-				"ZZ1_COD"
-			],
-			"label": "U_xNextCod"
-		},
-		{
-			"label": "U_APTST03"
-		},
-		{
-			"label": "U_APPTST03"
-		},
-		{
-			"label": "U_APTSTO01"
-		},
-		{
-			"label": "U_APPTSTO01"
-		},
-		{
-			"label": "U_xCEPAPI"
-		},
-		{
-			"args": [
-				"27333002",
-				"1"
-			],
-			"label": "U_xViaCep"
-		},
-		{
-			"args": [
-				"27333001",
-				"1"
-			],
-			"label": "U_xViaCep"
-		},
-		{
-			"label": "sigacfg"
-		},
-		{
-			"label": "U_BRWZZ1"
-		},
-		{
-			"label": "U_MVCZZ1"
-		},
-		{
-			"label": "U_MvcMod1"
+			"label": "SIGAMDI"
 		},
 		{
 			"args": [],
-			"label": "U_Modelo2"
+			"label": "U_ProtheuzeiroExec"
+		},
+		{
+			"args": [],
+			"label": "U_SB1A2Excel"
+		},
+		{
+			"args": [],
+			"label": "U_RelTxt"
+		},
+		{
+			"label": "U_ExportDic"
+		},
+		{
+			"args": [],
+			"label": "U_RelProSald"
+		},
+		{
+			"args": [],
+			"label": "U_RLHTML"
+		},
+		{
+			"label": "U_Graf001"
+		},
+		{
+			"label": "U_Graf002"
+		},
+		{
+			"label": "U_SearchDefault"
+		},
+		{
+			"label": "U_ComboBox"
+		},
+		{
+			"label": "U_RadioButtonn"
+		},
+		{
+			"args": [],
+			"label": "U_criachart"
+		},
+		{
+			"args": [],
+			"label": "U_xChartFactory"
 		}
 	],
-	"lastProgramExecuted": "sigamdi"
+	"lastProgramExecuted": "SIGAMDI"
 }
