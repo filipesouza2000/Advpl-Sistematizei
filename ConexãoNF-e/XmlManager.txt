@@ -1,0 +1,19 @@
+oXml:Parse(MemoRead(cXml))
+oXML:DOMGetAtt('versao')      "4.00"
+
+oXML:DOMGetAttArray()
+   oXML:DOMGetAttArray()[1][1]:"versao"
+   oXML:DOMGetAttArray()[1][2]:"4.00"
+
+oXML:DOMGetChildArray()
+
+oXML:DOMParentNode()-- passa para a chave pai(acima)
+oXML:DOMChildNode() -- passa para a chave filho(abaixo)
+oXML:DOMPrevNode()  -- retorna 1 chave no mesmo nivel
+oXML:DOMNextNode()  -- próxima chave no mesmo nivel
+oXML:cname 	    -- titulo da chave
+oXML:DOMGetAtt('n') -- retorna valor do atributo da chave
+oXML:DOMSiblingCount()--ndica a quantidade de nós no mesmo nível do nó atual.
+
+
+
