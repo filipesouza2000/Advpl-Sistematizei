@@ -3,7 +3,11 @@
 #INCLUDE "TopConn.ch"
 
 User Function MakeZZ1()
-    DbSelectArea("ZZ1")
+    Local cPerg    := 'XTAB'
+
+    pergunte(cPerg,.T.)
+
+    DbSelectArea(MV_PAR01)
     DbSetOrder(1)
-    DbCloseArea("ZZ1")
+    DbCloseArea(MV_PAR01)
 Return
