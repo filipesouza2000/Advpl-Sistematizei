@@ -20,7 +20,7 @@ Static Function MakeQuest()
 	Local aRegs := {}
 	Local i,j
 
-	aadd( aRegs, { cPerg,"01","Tabela","Tabela","Tabela","mv_ch1","C", 3,0,0,"G","","mv_par01","","","mv_par01"," ","",""," ","","","","","","","","","","","","","","","","","",/*F3*/} )
+	aadd( aRegs, { cPerg,"01","Tabela","Tabela","Tabela","mv_ch1","C", 3,0,0,"G","","mv_par01","","","mv_par01"," ","",""," ","","","","","","","","","","","","","","","","","",""/*F3*/} )
 	
 	DbselectArea('SX1')
 	SX1->(DBSETORDER(1))
