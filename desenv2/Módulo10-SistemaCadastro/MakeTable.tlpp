@@ -1,0 +1,39 @@
+#INCLUDE "Protheus.ch"
+#INCLUDE "TOTVS.ch"
+#INCLUDE "TopConn.ch"
+
+User Function MakeTable()
+    Local cP1  
+	Private cPerg    := 'XTAB'
+    //verifica se já existe a pergunta na base, senão cria.    
+    MakeQuest()
+    pergunte(cPerg,.T.)
+
+    cP1 := MV_PAR01
+    DbSelectArea(cP1)
+    DbSetOrder(1)
+    cP1->(DbCloseArea())
+Return
+
+Static Function MakeQuest()
+	Local aArea  := SX1->(GetArea())
+	Local aRegs := {}
+	Local i,j
+
+	aadd( aRegs, { cPerg,"01","Tabela","Tabela","Tabela","mv_ch1","C", 3,0,0,"G","","mv_par01","","","mv_par01"," ","",""," ","","","","","","","","","","","","","","","","","",/*F3*/} )
+	
+	DbselectArea('SX1')
+	SX1->(DBSETORDER(1))
+	For i:= 1 To Len(aRegs)
+		If ! SX1->(DBSEEK( AvKey(cPerg,"X1_GRUPO") +aRegs[i,2]) )
+			Reclock('SX1', .T.)
+			FOR j:= 1 to SX1->( FCOUNT() )
+				IF j <= Len(aRegs[i])
+					FieldPut(j,aRegs[i,j])
+				ENDIF
+			Next j
+			SX1->(MsUnlock())
+		Endif
+	Next i 
+	RestArea(aArea) 
+Return(cPerg)
