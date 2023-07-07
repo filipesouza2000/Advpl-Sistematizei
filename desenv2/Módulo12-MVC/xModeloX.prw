@@ -23,17 +23,18 @@ User Function xModeloX()
     oBrowse:DisableDetails()
 
     oBrowse:ACTIVATE()
-
+    RestArea(aArea)
 return NIL
 
 Static Function MenuDef()
-    Local aRotina:={}
+    Local aRotina   := FwMvcmenu("xModeloX")
+    /*Local aRotina:={}
 
-    ADD Option aRotina TITLE "Visualizar" ACTION "VIEWDEF.xModeloX" OPERATION 1 ACCESS 0
-    ADD Option aRotina TITLE "Incluir"    ACTION "VIEWDEF.xModeloX" OPERATION 3 ACCESS 0
-    ADD Option aRotina TITLE "Alterar"    ACTION "VIEWDEF.xModeloX" OPERATION 4 ACCESS 0
-    ADD Option aRotina TITLE "Excluir"    ACTION "VIEWDEF.xModeloX" OPERATION 5 ACCESS 0
-    
+    ADD Option aRotina TITLE "Visualizar" ACTION "VIEWDEF.xModeloX" OPERATION MODEL_OPERATION_VIEW ACCESS 0
+    ADD Option aRotina TITLE "Incluir"    ACTION "VIEWDEF.xModeloX" OPERATION MODEL_OPERATION_INSERT ACCESS 0
+    ADD Option aRotina TITLE "Alterar"    ACTION "VIEWDEF.xModeloX" OPERATION MODEL_OPERATION_UPDATE ACCESS 0
+    ADD Option aRotina TITLE "Excluir"    ACTION "VIEWDEF.xModeloX" OPERATION MODEL_OPERATION_DELETE ACCESS 0
+    */
 return aRotina
 
 
@@ -58,7 +59,7 @@ Static Function ModelDef()
     //propriedade do cod do artista é obrigatório na tabela, mas seta como não obrigatório para não exibir
     oStruFilho:SetProperty("ZD2_ARTIST", MODEL_FIELD_OBRIGAT, .F.)
     aAdd(aRelFilho, {"ZD2_FILIAL","FwxFilial('ZD2')"})
-    aAdd(aRelFilho, {"ZD2_ARTIST","ZD1_COD"})
+    aAdd(aRelFilho, {"ZD2_ARTIST","ZD1_CODIGO"})
     oModel:SetRelation("ZD2Detail", aRelFilho, ZD2->(IndexKey(1)))
 
     aAdd(aRelNeto,{"ZD3_FILIAL","FwxFilial('ZD3')"})
@@ -98,6 +99,6 @@ Static Function ViewDef()
     oStruFilho:RemoveField("ZD2_NOME")
     oStruNeto:RemoveField("ZD3_CD")
 
-    oView:AddIncrementalField("VIEW_ZD3","ZD3_ITEM")
+    oView:AddIncrementField("ZD3Detail","ZD3_ITEM")
 
 return oView
