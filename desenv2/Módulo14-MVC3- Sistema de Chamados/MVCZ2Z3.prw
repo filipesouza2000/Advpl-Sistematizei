@@ -134,7 +134,7 @@ Static Function ViewDef()
     oView:AddGrid("VIEWSZ3",oStZ3,"SZ3DETAIL")
 
     //campo do item auto incremental
-    oView:AddIncrementalField("SZ3DETAIL","Z3_CODIGO")
+    oView:AddIncrementField("SZ3DETAIL","Z3_CODIGO")
 
     //criar box horizontais da view
     oView:CreateHorizontalBox("Head",60)
