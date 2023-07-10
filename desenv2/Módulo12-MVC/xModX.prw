@@ -68,6 +68,9 @@ Static Function ModelDef()
 
     oModel:GetModel("ZD2Detail"):SetUniqueLine({"ZD2_CD"})
     oModel:GetModel("ZD3Detail"):SetUniqueLine({"ZD3_MUSICA"})
+    //totalizador-  titulo,     relacionamento, camo a calcular,visrtual,operação,,,display    
+    oModel:AddCalc('Totais','ZD1Master','ZD2Detail','ZD2_CD','XX_TOTCD','COUNT',,,'Total CDs')
+    oModel:AddCalc('Totais','ZD2Detail','ZD3Detail','ZD3_MUSICA','XX_TOTM','COUNT',,,'Total Musicas')
 return oModel
 
 Static Function ViewDef()
@@ -75,6 +78,7 @@ Static Function ViewDef()
     Local oStruPai  :=FWFormStruct(2,cTabPai)
     Local oStruFilho:=FWFormStruct(2,cTabFilho, {|x| !AllTrim(x) $ 'ZD2_NOME'})
     Local oStruNeto :=FWFormStruct(2,cTabNeto)
+    Local oStruTot  :=FWCalcStruct(oModel:GetModel('Totais'))
     Local oView
 
     oView:= FwFormView():New()
@@ -82,13 +86,16 @@ Static Function ViewDef()
     oView:addField("VIEW_ZD1",oStruPai  ,"ZD1Master")
     oView:addGrid("VIEW_ZD2",oStruFilho,"ZD2Detail")
     oView:addGrid("VIEW_ZD3",oStruNeto ,"ZD3Detail")
+    oView:addField("VIEW_TOT",oStruTot,"Totais")
 
     oView:CreateHorizontalBox("CAB_PAI",30)
-    oView:CreateHorizontalBox("GRID_FILHO",30)
+    oView:CreateHorizontalBox("GRID_FILHO",20)
     oView:CreateHorizontalBox("GRID_NETO",40)
+    oView:CreateHorizontalBox("ENCH_TOT",10)
     oView:SetOwnerView("VIEW_ZD1","CAB_PAI")
     oView:SetOwnerView("VIEW_ZD2","GRID_FILHO")
     oView:SetOwnerView("VIEW_ZD3","GRID_NETO")
+    oView:SetOwnerView("VIEW_TOT","ENCH_TOT")
 
     oView:EnableTitleView("VIEW_ZD1", "Artistas")
     oView:EnableTitleView("VIEW_ZD2", "CDs")
@@ -101,4 +108,9 @@ Static Function ViewDef()
     oView:AddIncrementField("ZD2Detail","ZD2_COD")
     oView:AddIncrementField("ZD3Detail","ZD3_ITEM")
     oView:SetCloseOnOk({||.T.})
+
+    //adicionar botões no outras ações do ViewDef
+    //parâmetros: (cTitle,cResource,bBloco,cTooltip,nShortcut,aOptions,lShowbar)
+    oView:addUserButton("Detalhes","MAGIC_BMP", {|| FWAlertInfo("Detalhes sobre artista")},,,,.T.)//.T. para exibir na barra
+    oView:addUserButton("Histórico","MAGIC_BMP",{|| FWAlertInfo("Histórico do artista")},,,,.F.)//.F. para exibir em outras ações
 return oView
