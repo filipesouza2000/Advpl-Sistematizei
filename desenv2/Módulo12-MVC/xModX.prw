@@ -8,6 +8,8 @@ Static cTabNeto := "ZD3"
 
 /*++++DATA++++|++++AUTOR+++++|++++++++++++++++DESCRIÇÂO+++++++++++++
   05/01/2023  | Filipe Souza |  Modelo X em MVC, tabelas Artistas x Cds x Músicas
+  10/07/2023  | Filipe Souza |  Inserindo totalizadores, Inserindo botões na barra e em outras ações 
+                                Layout da View em VerticalBox    
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 User Function xModX()
@@ -89,12 +91,18 @@ Static Function ViewDef()
     oView:addField("VIEW_TOT",oStruTot,"Totais")
 
     oView:CreateHorizontalBox("CAB_PAI",30)
-    oView:CreateHorizontalBox("GRID_FILHO",20)
-    oView:CreateHorizontalBox("GRID_NETO",40)
+    oView:CreateHorizontalBox("BOXMEIO",60)
+        oView:CreateVerticalBox("MEIOLEFT",50,"BOXMEIO")
+        oView:CreateVerticalBox("MEIORIGHT",50,"BOXMEIO")
+    //oView:CreateHorizontalBox("GRID_FILHO",20)
+    //oView:CreateHorizontalBox("GRID_NETO",40)
     oView:CreateHorizontalBox("ENCH_TOT",10)
+
     oView:SetOwnerView("VIEW_ZD1","CAB_PAI")
-    oView:SetOwnerView("VIEW_ZD2","GRID_FILHO")
-    oView:SetOwnerView("VIEW_ZD3","GRID_NETO")
+        oView:SetOwnerView("VIEW_ZD2","MEIOLEFT")
+        oView:SetOwnerView("VIEW_ZD3","MEIORIGHT")
+    //oView:SetOwnerView("VIEW_ZD2","GRID_FILHO")
+    //oView:SetOwnerView("VIEW_ZD3","GRID_NETO")
     oView:SetOwnerView("VIEW_TOT","ENCH_TOT")
 
     oView:EnableTitleView("VIEW_ZD1", "Artistas")
