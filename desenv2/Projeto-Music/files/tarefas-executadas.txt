@@ -1,0 +1,41 @@
+-projeto xCDModX()
+-Artistas serão clientes a efetuar gravação e criar CD, 
+sendo também fornecedor para a venda de seu produto gravado no mesmo ou em outro estudio.
+-Rever sobre novos campos e relacionamento entre:
+	SA1 - SB1
+	SB1 - ZD3
+-Criar campo B1_XART para relacionar com A1_COD
+-Criar campo B1_XEST para receber codigo de estudio, podendo ser na X5 ou outra customizada.
+
+-Alterar Layout de horinzontal para vertical
+-Remover campo B1_XART da estrutura a não exibir.
+-Remover campo B1_AFAMAD da estrutura a não exibir.
+-Desabiliar campo A1_COD, iniciar com GETXENUM
+-Desabiliar campo A2_COD, iniciar com GETXENUM
+-Desabilitar e retirar autoincrement do B1_COD, utilizar gatilho a função xCodProd 
+	-mudar gatilho para chamar só B1_TIPO
+	-resolver a sequencia B1_COD que pára em único registro.
+	-no evento cancelar, zerar a variável Private que lega o cod do registro.
+
+	
+  
+-Cenario Ensaio:
+	Cliente solicita estudio e é consultado a disponibilidade, 
+	Cliente não existente é cadastrado -SA1, 
+	com dia e hora disponivel ele agenda serviço com dia, horário e tempo para serviço -ZD1,
+	cliente recebe um documento do registro com os dados do agendamento,	 
+	O estudio local-ZD2 recebe agenda, cliente utiliza o estudio e finaliza sua agenda
+	recebendo nota fiscal do serviço com data de vencimento e valor.
+	
+-Cenario Gravação:
+	cliente solitica serviço de gravação, Cliente não existente é cadastrado -SA1,
+	também é registrado um Artista -ZD4 para este cliente e -ZD5 de Artista x Cliente,
+	com dia e hora disponivel ele agenda serviço com dia, horário para serviço -ZD1 
+	e CD -SB1 com sua(s) música(s) -ZD3,
+
+	após agendamento são especificados CDs com suas musicas,
+	no produto tipo CD deve colocar status de ativo 'não', para ainda não liberar para venda.
+	
+	
+	
+  

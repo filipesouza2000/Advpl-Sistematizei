@@ -25,11 +25,17 @@ Static cMusica := "ZD3"
                                     -resolvido a sequencia B1_COD que parava em único registro.
                                     -no evento cancelar, zerar a variável Private que lega o cod do registro.
                                 Totalizadores para CD e Musicas
+  11/07/2023  | Filipe Souza |  Reanálise dos cenários para Agendamento de ensaio e gravação.   
+                               
 
     Planejamento
 @see https://docs.google.com/document/d/1V0EWr04f5LLvjhhBhYQbz8MrneLWxDtVqTkCJIA9kTA/edit?usp=drive_link
     UML
-@see https://drive.google.com/file/d/1wFO2CKqSrvzxg5RZDYTfGayHrAUcCcfL/view?usp=drive_link                                      
+@see https://drive.google.com/file/d/1wFO2CKqSrvzxg5RZDYTfGayHrAUcCcfL/view?usp=drive_link 
+    Scrum e kanban
+@see https://trello.com/w/protheusadvplmusicbusiness       
+    GitHug
+@see https://github.com/filipesouza2000/Advpl-Sistematizei/tree/main/desenv2/Projeto-Music                                  
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 User Function xCDModX()
