@@ -22,19 +22,28 @@ sendo também fornecedor para a venda de seu produto gravado no mesmo ou em outro
 -Cenario Ensaio:
 	Cliente solicita estudio e é consultado a disponibilidade, 
 	Cliente não existente é cadastrado -SA1, 
-	com dia e hora disponivel ele agenda serviço com dia, horário e tempo para serviço -ZD1,
+	com dia e hora disponivel ele agenda serviço com dia, horário e tempo para serviço -ZD1, com status 1-ON
 	cliente recebe um documento do registro com os dados do agendamento,	 
 	O estudio local-ZD2 recebe agenda, cliente utiliza o estudio e finaliza sua agenda
 	recebendo nota fiscal do serviço com data de vencimento e valor.
+	atualiza status 2-OK
 	
 -Cenario Gravação:
-	cliente solitica serviço de gravação, Cliente não existente é cadastrado -SA1,
-	também é registrado um Artista -ZD4 para este cliente e -ZD5 de Artista x Cliente,
-	com dia e hora disponivel ele agenda serviço com dia, horário para serviço -ZD1 
-	e CD -SB1 com sua(s) música(s) -ZD3,
-
-	após agendamento são especificados CDs com suas musicas,
-	no produto tipo CD deve colocar status de ativo 'não', para ainda não liberar para venda.
+	cliente fecha contrato de gravação de CD ou solicita novo agendamento,
+	para agendamento inicial do projeto são especificados CDs -SB1 com suas musicas -ZD3,
+	Cliente não existente é cadastrado -SA1, também é registrado um Artista -ZD4 para este cliente e -ZD5 de Artista x Cliente,
+	com dia e hora disponivel ele agenda gravação de seu instrumento , para cd e música em andamento, na -ZD1 com status 1-ON
+	Em projeto em andamento, é gerado novo agendamento para cada instrumentista em cada música na lista,
+	no produto tipo CD e sua música em gravação deve manter status de 'ON', 
+	indicando projeto em andamento e ainda não liberar para venda.
+	O estudio local-ZD2 recebe agenda desabilitando datas e horários solicitados,
+	cliente utiliza o estudio e grava dentro do tempo especificado,
+	se necessário gerará novo agendamento para mesma música e instrumento ou próximos.
+	Quando finaliza cada gravação é atalizado seu status,
+	Concluindo músicas o estudio produz o CD e atualiza os Status do produto e músicas.
+	
+	
+	
 	
 	
 	
