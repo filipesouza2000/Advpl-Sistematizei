@@ -30,24 +30,32 @@ User Function xCodProd()
     //criar prefixo do codigo referente ao TIPO
     //depois inserir no final o próximo R_E_C_N_O_ completando 10 digitos
     DO CASE
-        CASE cTipo=='BB' ////.AND cGrupo=='0010'//bobina  de flandres
+        CASE cTipo=='BB' //bobina  de flandres
             cCod :='BFLA'+PADL(cRec,6,'0')
-        CASE cTipo=='FL'//.AND cGrupo=='0011'//folha de flandres
+        CASE cTipo=='FL'//folha de flandres
             cCod :='FFLA'+PADL(cRec,6,'0')
-        CASE cTipo=='FL'//.AND cGrupo=='0012'//folha cromada 
+        CASE cTipo=='FL'//folha cromada 
             cCod :='FCRA'+PADL(cRec,6,'0')
-        CASE cTipo=='CH'//.AND cGrupo=='0013'//CHAPA ZINCADA 
+        CASE cTipo=='CH'//CHAPA ZINCADA 
             cCod :='CZCA'+PADL(cRec,6,'0')
-        CASE cTipo=='CH'//.AND cGrupo=='0014'//CHAPA GROSSA
+        CASE cTipo=='CH'//CHAPA GROSSA
             cCod :='CGCA'+PADL(cRec,6,'0')
-        CASE cTipo=='CH'//.AND cGrupo=='0015'//CHAPA LAMINADA   
+        CASE cTipo=='CH'//CHAPA LAMINADA   
             cCod :='CLCA'+PADL(cRec,6,'0')
-        CASE cTipo=='CH'//.AND cGrupo=='0016'//CHAPA FINA
+        CASE cTipo=='CH'//CHAPA FINA
             cCod :='CFCA'+PADL(cRec,6,'0')
-        CASE cTipo=='CD'//.AND cGrupo=='0017'// tipo cd
+        CASE cTipo=='CD'// tipo cd
             cCod :='CD'+PADL(cRec,8,'0')  
-        CASE cTipo=='DVD'//.AND cGrupo=='0017'// tipo dvd
-            cCod :='DVD'+PADL(cRec,7,'0')        
+        CASE cTipo=='DVD'// tipo dvd
+            cCod :='DVD'+PADL(cRec,7,'0')  
+        CASE cTipo=='IM'// tipo instrumento musical
+            cCod :='IM'+PADL(cRec,8,'0')            
+        CASE cTipo=='PC'// tipo peça
+            cCod :='PC'+PADL(cRec,8,'0')   
+        CASE cTipo=='CS'// tipo caixa de som
+            cCod :='CS'+PADL(cRec,8,'0')       
+        CASE cTipo=='CB'// tipo cabo de som
+            cCod :='CB'+PADL(cRec,8,'0')       
         OTHERWISE
             cCod:=Year2Str(Date())+PADL(cRec,6,'0')       
     ENDCASE

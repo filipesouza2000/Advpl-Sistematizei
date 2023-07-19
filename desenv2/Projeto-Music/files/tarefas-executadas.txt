@@ -41,6 +41,8 @@ sendo também fornecedor para a venda de seu produto gravado no mesmo ou em outro
 	se necessário gerará novo agendamento para mesma música e instrumento ou próximos.
 	Quando finaliza cada gravação é atalizado seu status,
 	Concluindo músicas o estudio produz o CD e atualiza os Status do produto e músicas.
+validação campo de horário	
+(Left(M->CAMPO,2)>'00' .And. Left(M->CAMPO,2)<='24' .And. Right(M->CAMPO,2)>='00' .And. Right(M->CAMPO,2)<='59')                                                                                       
 	
 	
 	
