@@ -17,8 +17,7 @@ sendo também fornecedor para a venda de seu produto gravado no mesmo ou em outro
 	-resolver a sequencia B1_COD que pára em único registro.
 	-no evento cancelar, zerar a variável Private que lega o cod do registro.
 
-	
-  
+ 
 -Cenario Ensaio:
 	Cliente solicita estudio e é consultado a disponibilidade, 
 	Cliente não existente é cadastrado -SA1, 
@@ -41,9 +40,31 @@ sendo também fornecedor para a venda de seu produto gravado no mesmo ou em outro
 	se necessário gerará novo agendamento para mesma música e instrumento ou próximos.
 	Quando finaliza cada gravação é atalizado seu status,
 	Concluindo músicas o estudio produz o CD e atualiza os Status do produto e músicas.
-validação campo de horário	
-(Left(M->CAMPO,2)>'00' .And. Left(M->CAMPO,2)<='24' .And. Right(M->CAMPO,2)>='00' .And. Right(M->CAMPO,2)<='59')                                                                                       
 	
+-Cenário contrato gravação
+	Cliente faz o contrato contendo os serviços de gravação, mixagem e masterização, apresentando dados do CD
+	com suas respectivas músicas, determinando o total de tempo a ser gravado.
+	Contrato gera pedido de venda contendo o CD da gravação, gera Documento de saída Nota Fiscal.
+	
+02/08 - rever estrutura necessária das tabelas, integridade, normalização.
+	x	criar consultas padrões para ZD0
+	x	formular tamalhos de campo código de 15 para 9
+	x	Criar campo B1_XCONTR  para relacionamento de CD - Cod Contrato
+	x	gerar SX5 para Instrumentos para gravação. Pois não são produtos do estudio a venda.
+	x	pesquisa padrão no campo ZD1_INSTR para tabela 'IM - Instrumento musical na gavação'
+	x	mudar campos de Status nas tabelas ZD1 ZD3 para 1-OFF 2-ON 3-OK
+	x	Retirar da grid Musica o campo codigo.
+	x	habilitar e boquear campos referente ao serviço selecionado ZD1_SERV
+	x	criar pesquisas padrão para auto preencher campos da ZD0-Contrato
+
+	validação campo de horário	
+(Left(M->CAMPO,2)>'00' .And. Left(M->CAMPO,2)<='24' .And. Right(M->CAMPO,2)>='00' .And. Right(M->CAMPO,2)<='59')                                                                                       
+
+	oBrowse:SetOnlyFields({'ZD1_STATUS','ZD1_COD','ZD1_SERV','ZD1_INSTR','ZD1_DATA','ZD1_INI','ZD1_FIM','ZD1_CODCA','ZD1_CLI'})
+
+ Local oStruMu       :=FWFormStruct(1,cMusica, {|x| !AllTrim(x) $ "ZD3_CODCD"})
+
+ Local bCancel       :={|| FWFORMCANCEL(SELF)}
 	
 	
 	
