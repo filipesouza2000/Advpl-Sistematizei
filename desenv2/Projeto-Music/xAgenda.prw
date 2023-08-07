@@ -39,7 +39,9 @@
                                 mudar campos de Status nas tabelas ZD1 ZD3 para 1-OFF 2-ON 3-OK
                                 Retirar da grid Musica o campo codigo.
                                 habilitar e boquear campos referente ao serviço selecionado ZD1_SERV
-                                criar pesquisas padrão para auto preencher campos da ZD0-Contrato                               
+                                criar pesquisas padrão para auto preencher campos da ZD0-Contrato  
+  05/08/2023  | Filipe Souza |  Gatilhos para campo ZD1_SERV, apaga campos ZD1_INSTR,ZD1_NINSTR,ZD1_CODA,ZD1_ART
+                                quando o usuário preenche e depois muda de gravaçao para ensaio.
 
 
     Planejamento @see https://docs.google.com/document/d/1V0EWr04f5LLvjhhBhYQbz8MrneLWxDtVqTkCJIA9kTA/edit?usp=drive_link
@@ -102,9 +104,9 @@ Static Function ModelDef()
     oModel:AddGrid("ZD3Detail","SB1Detail",oStruMu,/*bLinePre*/,/*bLinePos*/,/*bPre-Grid Full*/,/*bLoad-Carga do modelo manual*/,)
     oModel:SetPrimaryKey({"ZD1_FILIAL","ZD1_COD"})//,"A1_CGC"
    
-       //CD- relacionamento B1-CD com A1-Cli 
     //propriedade do cod do artista é obrigatório na tabela, mas seta como não obrigatório para não exibir
     oStruCD:SetProperty("B1_XART", MODEL_FIELD_OBRIGAT, .F.)
+    //CD- relacionamento B1-CD com AZD1 agenda 
     aAdd(aRelCD, {"B1_FILIAL","FwxFilial('ZD1')"})
     aAdd(aRelCD, {"B1_COD","ZD1_CODCD"})
     oModel:SetRelation("SB1Detail", aRelCD, SB1->(IndexKey(1)))
