@@ -1,36 +1,29 @@
 #INCLUDE "TOTVS.CH"
 #INCLUDE "FwMVCDef.ch"
-#INCLUDE "TOPCONN.CH"
-
-Static cTitulo  := "Contrato de Serviço-Gravação"
-Static cCont     := "ZD0"
-Static cCli     := "SA1"
-Static cCD      := "SB1"
-Static cMusica  := "ZD3"
 
 /*++++DATA++++|++++AUTOR+++++|++++++++++++++++DESCRIÇÂO+++++++++++++
   21/07/2023  | Filipe Souza |  Análise cenário contrato de gravação
                                 O layout inicial da agenda passa ser de contrato.
                                 O layout da agenda atual é modelo 1, ao selecionar serviço de gravação
                                 habilita ou exibe campos para buscar cd e música para a gravação.
-
-BOTÃO INCLUIR NÂO EXECUTA £££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
-                                
     Planejamento @see https://docs.google.com/document/d/1V0EWr04f5LLvjhhBhYQbz8MrneLWxDtVqTkCJIA9kTA/edit?usp=drive_link
     UML          @see https://drive.google.com/file/d/1wFO2CKqSrvzxg5RZDYTfGayHrAUcCcfL/view?usp=drive_link 
     Scrum-kanban @see https://trello.com/w/protheusadvplmusicbusiness       
     GitHug       @see https://github.com/filipesouza2000/Advpl-Sistematizei/tree/main/desenv2/Projeto-Music                                  
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+Static cTitulo  := "Contrato de Serviço-Gravação"
+Static cCont     := "ZD5"
+//Static cCli     := "SA1"
+//Static cCD      := "SB1"
+//Static cMusica  := "ZD3"
 
-User Function xContrato()
+User Function xContr()
     Local aArea     := GetArea()
     Local oBrowse   
-    Local cArtist
+//    Local cArtist
     Private aRotina :={}
-    Private cRegCd  :=''
 
     aRotina := MenuDef()
-    //cArtist := U_xArtXcd()
     oBrowse:= FwMBrowse():New()
     oBrowse:SetAlias(cCont)
     oBrowse:SetDescription(cTitulo)
@@ -42,13 +35,13 @@ User Function xContrato()
 return NIL
 
 Static Function MenuDef()
-    //Local aRotina   := FwMvcmenu("xContrato")
+    //Local aRotina   := FwMvcmenu("xContr")
     Local aRotina:={}
 
-    ADD OPTION aRotina TITLE "Visualizar" ACTION "VIEWDEF.xContrato" OPERATION MODEL_OPERATION_VIEW ACCESS 0
-    ADD Option aRotina TITLE "Incluir"    ACTION "VIEWDEF.xContrato" OPERATION MODEL_OPERATION_INSERT ACCESS 0
-    ADD Option aRotina TITLE "Alterar"    ACTION "VIEWDEF.xContrato" OPERATION MODEL_OPERATION_UPDATE ACCESS 0
-    ADD Option aRotina TITLE "Excluir"    ACTION "VIEWDEF.xContrato" OPERATION MODEL_OPERATION_DELETE ACCESS 0
+    ADD OPTION aRotina TITLE "Visualizar" ACTION "VIEWDEF.xContr" OPERATION MODEL_OPERATION_VIEW ACCESS 0
+    ADD Option aRotina TITLE "Incluir"    ACTION "VIEWDEF.xContr" OPERATION MODEL_OPERATION_INSERT ACCESS 0
+    ADD Option aRotina TITLE "Alterar"    ACTION "VIEWDEF.xContr" OPERATION MODEL_OPERATION_UPDATE ACCESS 0
+    ADD Option aRotina TITLE "Excluir"    ACTION "VIEWDEF.xContr" OPERATION MODEL_OPERATION_DELETE ACCESS 0
     
 return aRotina
 
@@ -65,17 +58,17 @@ Static Function ModelDef()
     Local bCommit       :=NIL
     Local bCancel       :={|| FWFORMCANCEL(SELF)}
 
-    oModel:=MPFormModel():New("xContratoM",bPre,bPos,bCommit,bCancel)
-    oModel:addFields("ZD0Master",/*cOwner*/,oStruCon)
-    //oModel:AddGrid("SB1Detail","ZD0Master",oStruCD,/*bLinePre*/,/*bLinePos*/,/*bPre-Grid Full*/,/*bLoad-Carga do modelo manual*/,)
+    oModel:=MPFormModel():New("xContrM",bPre,bPos,bCommit,bCancel)
+    oModel:addFields("ZD5Master",/*cOwner*/,oStruCon)
+    //oModel:AddGrid("SB1Detail","ZD5Master",oStruCD,/*bLinePre*/,/*bLinePos*/,/*bPre-Grid Full*/,/*bLoad-Carga do modelo manual*/,)
     //oModel:AddGrid("ZD3Detail","SB1Detail",oStruMu,/*bLinePre*/,/*bLinePos*/,/*bPre-Grid Full*/,/*bLoad-Carga do modelo manual*/,)
-    oModel:SetPrimaryKey({"ZD0_FILIAL","ZD0_COD"})//,"A1_CGC"
+    oModel:SetPrimaryKey({"ZD5_FILIAL","ZD5_COD"})//,"A1_CGC"
     
     //CD- relacionamento B1-CD com A1-Cli 
     //propriedade do cod do artista é obrigatório na tabela, mas seta como não obrigatório para não exibir
     //oStruCD:SetProperty("B1_XART", MODEL_FIELD_OBRIGAT, .F.)
-    //aAdd(aRelCD, {"B1_FILIAL","FwxFilial('ZD0')"})
-    //aAdd(aRelCD, {"B1_COD","ZD0_CODCD"})
+    //aAdd(aRelCD, {"B1_FILIAL","FwxFilial('ZD5')"})
+    //aAdd(aRelCD, {"B1_COD","ZD5_CODCD"})
     //oModel:SetRelation("SB1Detail", aRelCD, SB1->(IndexKey(1)))
     
     //Musica- relacionamento B1-CD com ZD3-Musica
@@ -86,13 +79,13 @@ Static Function ModelDef()
     //oModel:GetModel("SB1Detail"):SetUniqueLine({"B1_COD"})
     //oModel:GetModel("ZD3Detail"):SetUniqueLine({"ZD3_MUSICA"})
     //totalizador-  titulo,     relacionamento, camo a calcular,visrtual,operação,,,display    
-    //oModel:AddCalc('Totais','ZD0Master','SB1Detail','B1_COD','XX_TOTCD','COUNT',,,'Total CDs')
+    //oModel:AddCalc('Totais','ZD5Master','SB1Detail','B1_COD','XX_TOTCD','COUNT',,,'Total CDs')
     //oModel:AddCalc('Totais','SB1Detail','ZD3Detail','ZD3_MUSICA','XX_TOTM','COUNT',,,'Total Musicas')
 
 return oModel
 
 Static Function ViewDef()
-    Local oModel    :=FwLoadModel("xContrato")
+    Local oModel    :=FwLoadModel("xContr")
     Local oStruCon  :=FWFormStruct(2,cCont)
     //Local oStruCD   :=FWFormStruct(2,cCD, {|x| !AllTrim(x) $ 'B1_AFAMAD'})
     //Local oStruMu   :=FWFormStruct(2,cMusica)
@@ -101,7 +94,8 @@ Static Function ViewDef()
     
     oView:= FwFormView():New()
     oView:SetModel(oModel)
-    oView:addField("VIEW_ZD0",oStruCon  ,"ZD0Master")
+    
+    oView:addField("VIEW_ZD5",oStruCon  ,"ZD5Master")
     //oView:addGrid("VIEW_SB1",oStruCD,"SB1Detail")
     //oView:addGrid("VIEW_ZD3",oStruMu ,"ZD3Detail")
     //oView:addField("VIEW_TOT",oStruTot,"Totais")
@@ -120,8 +114,8 @@ Static Function ViewDef()
         oView:EnableTitleView("VIEW_SB1", "CDs")
         oView:EnableTitleView("VIEW_ZD3", "Músicas")
     */
-    oView:SetOwnerView("VIEW_ZD0","CONT_BOX")
-    oView:EnableTitleView("VIEW_ZD0", "Contrato")
+    oView:SetOwnerView("VIEW_ZD5","CONT_BOX")
+    oView:EnableTitleView("VIEW_ZD5", "Contrato")
     
 
     //oStruCD:RemoveField("B1_NOME")
