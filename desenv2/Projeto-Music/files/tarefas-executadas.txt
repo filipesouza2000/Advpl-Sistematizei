@@ -57,11 +57,27 @@ sendo também fornecedor para a venda de seu produto gravado no mesmo ou em outro
 
 11/08-	xContrato de gravação
 	x	gerar protótipo do layout- xContr modelo1 ZD5
-			criar gatilho no capo cod cliente, para filtrar somente os que existem em ZD4
+	x	criar gatilho no campo cod cliente, para filtrar somente os que existem em ZD4
+28/08- xContr
+	x	gerar campo ZD5_DATA para iniciar com data do sistema.
+	x	atualizar para modelo 2 e 3	
+	x	Gatilho B1_TIPO, campo B1_COD recebe U_xCodProd()
+	x	Gerar auto preenchimento de ZD5_QCD,ZD5_FAIXAS e ZD5_TEMPO relativo a totalizadores. 
+	x		U_xTotCd()  no campo B1_TIPO   ,validação do usuário, para chamar função ao editar. Preenche ZD5_QCD
+	x		U_xTotMus() no campo ZD3_MUSICA,validação do usuário, para chamar função ao editar. Preenche ZD5_FAIXAS
+	x		U_xTotDur() no campo ZD3_DURAC, validação do usuário, para chamar função ao editar. Preenche ZD5_TEMPO
+			otimizar soma, validando digitos do tempo.
+		Cd OK, erro no totalizador de musicas
+	erro--primeiro item conta correto,mas no proximo cd não conta músicas, só se teclar para baixo, incluindo mais.
+		--nos totalizadores não decrementam após clicar para baixo e para cima,só adiciona.
+		https://tdn.totvs.com/display/public/framework/FWFormView
+			If Type( 'oView' ) != "U"
+			 oView:Refresh( 'V_FILHO2')
+			EndIf		
+		gerar documento do contrato
+		identificar formas de pagamento	
 		
-		
-		
-		
+https://tdn.totvs.com/display/tec/TTimer		
 https://advplconsulting.wordpress.com/2016/11/03/funcoes-de-horas/
 	validação campo de horário	
 (Left(M->CAMPO,2)>'00' .And. Left(M->CAMPO,2)<='24' .And. Right(M->CAMPO,2)>='00' .And. Right(M->CAMPO,2)<='59')                                                                                       

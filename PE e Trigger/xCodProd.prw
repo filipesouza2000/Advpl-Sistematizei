@@ -11,7 +11,7 @@ User Function xCodProd()
     Local cCod  
     Local cRec
     //Local cGrupo:=''
-    Local cTipo:=''
+    //Local cTipo:=''
     //cGrupo  := AllTrim(M->B1_GRUPO)
     cTipo  := AllTrim(M->B1_TIPO)
     
@@ -46,7 +46,7 @@ User Function xCodProd()
             cCod :='CFCA'+PADL(cRec,6,'0')
         CASE cTipo=='CD'// tipo cd
             cCod :='CD'+PADL(cRec,8,'0')  
-        CASE cTipo=='DVD'// tipo dvd
+        CASE cTipo=='DV'// tipo dvd
             cCod :='DVD'+PADL(cRec,7,'0')  
         CASE cTipo=='IM'// tipo instrumento musical
             cCod :='IM'+PADL(cRec,8,'0')            

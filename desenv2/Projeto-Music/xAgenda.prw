@@ -58,7 +58,6 @@ Static cMusica  := "ZD3"
 User Function xAgenda()
     Local aArea     := GetArea()
     Local oBrowse   
-    Local cArtist
     Private aRotina :={}
     Private cRegCd  :=''
 
@@ -107,16 +106,16 @@ Static Function ModelDef()
     //propriedade do cod do artista é obrigatório na tabela, mas seta como não obrigatório para não exibir
     oStruCD:SetProperty("B1_XART", MODEL_FIELD_OBRIGAT, .F.)
     //CD- relacionamento B1-CD com AZD1 agenda 
-    aAdd(aRelCD, {"B1_FILIAL","FwxFilial('ZD1')"})
-    aAdd(aRelCD, {"B1_COD","ZD1_CODCD"})
+    aAdd(aRelCD, {"B1_FILIAL","FwxFilial('SB1')"})
+    aAdd(aRelCD, {"B1_XCONTR","ZD5_COD"})
     oModel:SetRelation("SB1Detail", aRelCD, SB1->(IndexKey(1)))
     
     //Musica- relacionamento B1-CD com ZD3-Musica
-    aAdd(aRelMusic,{"ZD3_FILIAL","FwxFilial('SB1')"})
+    aAdd(aRelMusic,{"ZD3_FILIAL","FwxFilial('ZD3')"})
     aAdd(aRelMusic,{"ZD3_CODCD", "B1_COD"})
-    oModel:SetRelation("SB1Detail", aRelMusic,SB1->(IndexKey(1)))
+    oModel:SetRelation("ZD3Detail", aRelMusic,ZD3->(IndexKey(2)))
 
-    oModel:GetModel("SB1Detail"):SetUniqueLine({"B1_COD"})
+    oModel:GetModel("SB1Detail"):SetUniqueLine({"B1_DESC"})
     oModel:GetModel("ZD3Detail"):SetUniqueLine({"ZD3_MUSICA"})
     //totalizador-  titulo,     relacionamento, camo a calcular,visrtual,operação,,,display    
     oModel:AddCalc('Totais','ZD1Master','SB1Detail','B1_COD','XX_TOTCD','COUNT',,,'Total CDs')
