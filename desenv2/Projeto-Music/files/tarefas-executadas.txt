@@ -73,10 +73,22 @@ sendo também fornecedor para a venda de seu produto gravado no mesmo ou em outro
 	x		criar campo ZD3_XCONT  para o relacionamento com música.
 	x		atualizar relacionamento Musica com Contrato adicionando campo ZD3_XCONT
 	x		validar digitos do tempo , xTotDur().   
-	x		somar tempo formatado e atribuir ao totalizador e campos, IncTime('10:50:40',20,15,25 ) 
+	x		somar tempo formatado e atribuir ao totalizador e campos, IncTime('10:50:40',20,15,25 )
+13/09
+	x		otimizar soma do tempo na lista de musicas, ao alterar é atualizada.
+	x		ponto de entrada FORMLINEPRE em "ZD3Detail", pegar valor da linha ativa, para decrementar ao editar
+	x		ao invalidar valor, faz cálculo mesmo assim, precisa impedir o cálculo.
+	£££££££	ao editar e confirmar com o mesmo número, é somado no Totalizador padrão.	
+				
+			10:10
+			05:05   15:15
+			
+			10:10   20:20	
+				
 		
 	erro-- 1ª Musica do 1º CD conta correto,mas no proximo cd não conta a 1ª, só se teclar para baixo, incluindo mais.
 		--nos totalizadores não decrementam após clicar para baixo e para cima,só adiciona.
+
 		
 		gerar documento do contrato
 		identificar formas de pagamento	

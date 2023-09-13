@@ -1,4 +1,5 @@
-#INCLUDE "TOTVS.CH"
+#INCLUDE 'PROTHEUS.CH'
+#INCLUDE 'TOTVS.CH'
 #INCLUDE "FwMVCDef.ch"
 
 /*++++DATA++++|++++AUTOR+++++|++++++++++++++++DESCRIÇÂO+++++++++++++
@@ -31,7 +32,12 @@
                             atualizar relacionamento Musica com Contrato adicionando campo ZD3_XCONT
                             validar digitos do tempo , xTotDur().   
                             somar tempo formatado e atribuir ao totalizador e campo, IncTime('10:50:40',20,15,25 ) 
-
+ 13/09/2023  | Filipe Souza |
+                            otimizar soma do tempo na lista de musicas, ao alterar é atualizada.
+                            ponto de entrada FORMLINEPRE em "ZD3Detail", pegar valor da linha ativa, para decrementar ao editar
+                            ao invalidar valor, faz cálculo mesmo assim, precisa impedir o cálculo.
+                            £££££££	ao editar e confirmar com o mesmo número, é somado no Totalizador padrão.	
+                            
     Planejamento @see https://docs.google.com/document/d/1V0EWr04f5LLvjhhBhYQbz8MrneLWxDtVqTkCJIA9kTA/edit?usp=drive_link
     UML          @see https://drive.google.com/file/d/1wFO2CKqSrvzxg5RZDYTfGayHrAUcCcfL/view?usp=drive_link 
     Scrum-kanban @see https://trello.com/w/protheusadvplmusicbusiness       
@@ -46,10 +52,10 @@ Static cMusica  := "ZD3"
 User Function xContr()
     Local aArea     := GetArea()
     Local oBrowse   
-//    Local cArtist
     Private aRotina :={}
     Private cRegCd  :=''
     Private cTempo  := '00:00:00'
+    Private nOldT   :=0
 
     aRotina := MenuDef()
     oBrowse:= FwMBrowse():New()
@@ -161,11 +167,14 @@ Static Function ViewDef()
     oStruCD:RemoveField("B1_XART")
    
     //refresh para tentar atualziar Totalizadores
-/*    oView:AddUserButton('Refresh','MAGIC.BMP',{|| oView:Refresh()},,,,.T.)
-    oView:SetViewAction('REFRESH',      {|| oView:Refresh()})
-    oView:SetViewAction('DELETELINE',   {|| oView:Refresh()})
-    oView:SetViewAction('UNDELETELINE', {|| oView:Refresh()})
-*/   
+    /*    oView:AddUserButton('Refresh','MAGIC.BMP',{|| oView:Refresh()},,,,.T.)
+        oView:SetViewAction('REFRESH',      {|| oView:Refresh()})
+        oView:SetViewAction('DELETELINE',   {|| oView:Refresh()})
+        oView:SetViewAction('UNDELETELINE', {|| oView:Refresh()})
+    */
+    //para zerar o tempo ao sair da view
+    oView:SetViewAction('BUTTONOK',    {|| cTempo  := '00:00:00'})
+    oView:SetViewAction('BUTTONCANCEL',{|| cTempo  := '00:00:00'})
     //oView:AddIncrementField("SB1Detail","B1_COD")// gatilho xCodProd()
     oView:AddIncrementField("ZD3Detail","ZD3_COD")
     oView:AddIncrementField("ZD3Detail","ZD3_ITEM")
@@ -201,28 +210,84 @@ User Function xTotMus()
     
 return .T.
 
-User Function xTotDur()
+User Function xTotDur(nOld)
+    DEFAULT nOld :=0
     Local oModel
     Local oModelTot := FwModelActive()
     Local oModelDur 
     //Local nDur
     Local xRet := .T.    
-    Local cDur := alltrim(str(M->ZD3_DURAC))
-    Local cS   := IIF(Len(cDur)>=2,right( cDur ,2), '')
+    Local cDur := IIF( nOld>0,alltrim(str(nOld)) ,alltrim(str(M->ZD3_DURAC))  )
+    Local cS   := ''
     Local cM   := ''    
     Local cH   := ''
-    Local nT   
+    Local nNewT     
+    
+    if U_xValTime(M->ZD3_DURAC)    
+        //atribuir Seg Min Hora
+        if Len(cDur)==2
+            cS := right( cDur ,2)
+            elseIf Len(cDur)==3 
+                cS := right( cDur ,2)
+                cM := Left(cDur, 1)  // 1 30
+                elseif Len(cDur)==4
+                    cS := right( cDur ,2)
+                    cM :=  Left(cDur, 2)  //11 30
+                    elseif Len(cDur)==5
+                        cS := right( cDur ,2)                
+                        cM := SubStr(cDur,2,2)//1 11 30
+                        cH := Left(cDur,1)
+                        elseif Len(cDur)==6
+                            cS := right( cDur ,2)                
+                            cM := SubStr(cDur,3,2) //10 11 30            
+                            cH := Left(cDur,2)                      
+        EndIf    
+        //se estiver correto, adiciona ou dubtrai
+        cTempo  := IIF( nOld>0, DecTime(cTempo,val(cH),+val(cM),+val(cS)) , ;//se houver tempo anterior e diferente, decrementa no totalizador
+                        IncTime(cTempo,val(cH),+val(cM),+val(cS)) ) 
+        nNewT      := strtran(cTempo,':','')     
+    else
+    xRet := .F.    
+    EndIf
+    
+    //somahoras(28.55,5.10)          
+    //IncTime('10:50:40',20,15,25 ) 
+    //DecTime  
+    If xRet .and. oModelTot:Adependency[1][1] == "ZD5Master"
+        oModelDur := oModelTot:GetModel("TotaisM")
+        //nDur      := oModelDur:GetValue("XX_TOTDUR")
+        oModelDur:SetValue("XX_TOTDUR",val(nNewT))
+        oModel:= oModelTot:GetModel("ZD5Master")
+        oModel:SetValue("ZD5_TEMPO",val(nNewT)) 
+    EndIf
+    
+return xRet
+
+
+User Function xValTime(nDur)
+    Local xRet := .T.    
+    Local cDur := alltrim(str(nDur))
+    Local cS   := ''
+    Local cM   := ''    
+    Local cH   := ''
+    
     //atribuir Min Hora
-    If Len(cDur)==3 
-        cM := Left(cDur, 1)  // 1 30
-        elseif Len(cDur)==4
-            cM :=  Left(cDur, 2)  //11 30
-            elseif Len(cDur)==5
-                cM := SubStr(cDur,2,2)//1 11 30
-                cH := Left(cDur,1)
-                elseif Len(cDur)==6
-                    cM := SubStr(cDur,3,2) //10 11 30            
-                    cH := Left(cDur,2)
+    if Len(cDur)==2 //11
+        cS := right( cDur ,2)
+        elseIf Len(cDur)==3 
+            cS := right( cDur ,2)
+            cM := Left(cDur, 1)  // 1 30
+            elseif Len(cDur)==4
+                cS := right( cDur ,2)
+                cM :=  Left(cDur, 2)  //11 30
+                elseif Len(cDur)==5
+                    cS := right( cDur ,2)                
+                    cM := SubStr(cDur,2,2)//1 11 30
+                    cH := Left(cDur,1)
+                    elseif Len(cDur)==6
+                        cS := right( cDur ,2)                
+                        cM := SubStr(cDur,3,2) //10 11 30            
+                        cH := Left(cDur,2)
     EndIf
                                                  
     If  cS=='' .OR. val(cS)>59 //validar segundos       
@@ -230,20 +295,7 @@ User Function xTotDur()
         elseif val(cM)>59 //validar minutos
             xRet  :=.F.
             elseIf val(cH)>23 //validar hora
-                xRet  :=.F.
+                xRet  :=.F.            
     EndIf
-    cTempo  := IncTime(cTempo,val(cH),+val(cM),+val(cS))
-    nT      := strtran(cTempo,':','')
-    //somahoras(28.55,5.10)          
-    //IncTime('10:50:40',20,15,25 )   
-    If xRet .and. oModelTot:Adependency[1][1] == "ZD5Master"
-        oModelDur := oModelTot:GetModel("TotaisM")
-        //nDur      := oModelDur:GetValue("XX_TOTDUR")
-        oModelDur:SetValue("XX_TOTDUR",val(nT))
-        oModel:= oModelTot:GetModel("ZD5Master")
-        oModel:SetValue("ZD5_TEMPO",val(nT)) 
-    EndIf
-    
 return xRet
-
 
