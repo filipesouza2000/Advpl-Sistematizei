@@ -6,6 +6,32 @@
                                 O layout inicial da agenda passa ser de contrato.
                                 O layout da agenda atual é modelo 1, ao selecionar serviço de gravação
                                 habilita ou exibe campos para buscar cd e música para a gravação.
+  05/08/2023  | Filipe Souza |Gatilho via codigo para campo ZD1_SERV quando muda, para 1, apaga campos ZD1_INSTR ,ZD1_NINSTR , ZD1_CODA , ZD1_ART já preenchidos
+                              Gerar Browse de registro para tabela ZD4-ARTISTA, com relação com SA1-Cliente
+                                    Não foi possível pelo protheus não ter relacionamentos integrados, formei somente ZD4
+                              Na View retirar da oStrArt o campo ZD4_CLI
+                              GetSxEnum no ZD4_COD
+                              Criar tabela genérica para Gênero Musical, consulta padrão para campo ZD4_GENERO	
+                              testados registros com integridade de dados
+  11/08/2023  | Filipe Souza |gerar protótipo do layout- xContr modelo1 ZD5
+	                          criar gatilho no campo cod cliente, para filtrar somente os que existem em ZD4
+  28/08/2023  | Filipe Souza |
+                            gerar campo ZD5_DATA para iniciar com data do sistema.
+                            atualizar para modelo 2 e 3	
+                            Gatilho B1_TIPO, campo B1_COD recebe U_xCodProd()
+                            Gerar auto preenchimento de ZD5_QCD,ZD5_FAIXAS e ZD5_TEMPO relativo a totalizadores. 
+                            U_xTotCd()  no campo B1_TIPO   ,validação do usuário, para chamar função ao editar. Preenche ZD5_QCD
+                            U_xTotMus() no campo ZD3_MUSICA,validação do usuário, para chamar função ao editar. Preenche ZD5_FAIXAS
+                            U_xTotDur() no campo ZD3_DURAC, validação do usuário, para chamar função ao editar. Preenche ZD5_TEMPO
+  12/09/2023  | Filipe Souza |  
+                            Alterar tabelaSB1 como Compartilhada de filial em SX2
+                            atualizar pesquisa padrão ZD5 do campo cod artista para retornar ZD4_CLI==M->ZD5_CLI
+                            gatilho para zerar campos de artista ao alterar o campo cod cliente.
+                            criar campo ZD3_XCONT  para o relacionamento com música.
+                            atualizar relacionamento Musica com Contrato adicionando campo ZD3_XCONT
+                            validar digitos do tempo , xTotDur().   
+                            somar tempo formatado e atribuir ao totalizador e campo, IncTime('10:50:40',20,15,25 ) 
+
     Planejamento @see https://docs.google.com/document/d/1V0EWr04f5LLvjhhBhYQbz8MrneLWxDtVqTkCJIA9kTA/edit?usp=drive_link
     UML          @see https://drive.google.com/file/d/1wFO2CKqSrvzxg5RZDYTfGayHrAUcCcfL/view?usp=drive_link 
     Scrum-kanban @see https://trello.com/w/protheusadvplmusicbusiness       
@@ -23,6 +49,7 @@ User Function xContr()
 //    Local cArtist
     Private aRotina :={}
     Private cRegCd  :=''
+    Private cTempo  := '00:00:00'
 
     aRotina := MenuDef()
     oBrowse:= FwMBrowse():New()
@@ -69,22 +96,22 @@ Static Function ModelDef()
     //propriedade do cod do artista é obrigatório na tabela, mas seta como não obrigatório para não exibir
     oStruCD:SetProperty("B1_XART", MODEL_FIELD_OBRIGAT, .F.)
                   
-    aAdd(aRelCD, {"B1_FILIAL","FwxFilial('SB1')"})
+    aAdd(aRelCD, {"B1_FILIAL","FWxFilial('SB1')"})
     aAdd(aRelCD, {"B1_XCONTR","ZD5_COD"})
     oModel:SetRelation("SB1Detail", aRelCD, SB1->(IndexKey(1)))
     
-    //Musica- relacionamento B1-CD com ZD3-Musica
-    aAdd(aRelMusic,{"ZD3_FILIAL","FwxFilial('ZD3')"})
-    aAdd(aRelMusic,{"ZD3_CODCD", "B1_COD"})
-    oModel:SetRelation("ZD3Detail", aRelMusic,ZD3->(IndexKey(2)))
+    //Musica- relacionamento ZD3-Musica com ZD5-Contrato
+    aAdd(aRelMusic,{"ZD3_FILIAL","FWxFilial('ZD5')"})    
+    AAdd(aRelMusic,{"ZD3_XCONT","ZD5_COD"})
+    oModel:SetRelation("ZD3Detail", aRelMusic,ZD3->(IndexKey(3)))
 
     oModel:GetModel("SB1Detail"):SetUniqueLine({"B1_DESC"})
     oModel:GetModel("ZD3Detail"):SetUniqueLine({"ZD3_MUSICA"})
     //totalizador-  titulo,     relacionamento, campo a calcular,virtual,operação,,,display    
-    oModel:AddCalc('Totais','ZD5Master','SB1Detail','B1_COD','XX_TOTCD','COUNT',,,'Total CDs')
-    oModel:AddCalc('Totais','SB1Detail','ZD3Detail','ZD3_MUSICA','XX_TOTM','COUNT',,,'Total Musicas')
-    oModel:AddCalc('Totais','SB1Detail','ZD3Detail','ZD3_DURAC' ,'XX_TOTDUR','SUM',,,'Total Duração')
-
+    oModel:AddCalc('TotaisCd','ZD5Master','SB1Detail','B1_COD'    ,'XX_TOTCD' ,'COUNT',,,'Total CDs')
+    oModel:AddCalc('TotaisM','ZD5Master','ZD3Detail','ZD3_MUSICA','XX_TOTM'  ,'COUNT',,,'Total Musicas')
+    oModel:AddCalc('TotaisM','ZD5Master','ZD3Detail','ZD3_DURAC' ,'XX_TOTDUR','SUM',,,'Total Duração')
+    
 return oModel
 
 Static Function ViewDef()
@@ -92,7 +119,8 @@ Static Function ViewDef()
     Local oStruCon  :=FWFormStruct(2,cCont)
     Local oStruCD   :=FWFormStruct(2,cCD, {|x| !AllTrim(x) $ 'B1_AFAMAD'})
     Local oStruMu   :=FWFormStruct(2,cMusica)
-    Local oStruTot  :=FWCalcStruct(oModel:GetModel('Totais'))
+    Local oStruTotCd:=FWCalcStruct(oModel:GetModel('TotaisCd'))
+    Local oStruTotM :=FWCalcStruct(oModel:GetModel('TotaisM'))
     Local oView
     
     oView:= FwFormView():New()
@@ -101,18 +129,23 @@ Static Function ViewDef()
     oView:addField("VIEW_ZD5",oStruCon  ,"ZD5Master")
     oView:addGrid("VIEW_SB1",oStruCD,"SB1Detail")
     oView:addGrid("VIEW_ZD3",oStruMu ,"ZD3Detail")
-    oView:addField("VIEW_TOT",oStruTot,"Totais")
+    oView:addField("VIEW_TOTCD",oStruTotCd,"TotaisCd")
+    oView:addField("VIEW_TOTM",oStruTotM,"TotaisM")
 
     oView:CreateHorizontalBox("CONT_BOX",50)
     
     oView:CreateHorizontalBox("MEIO_BOX",40)
     oView:CreateVerticalBox("MEIOLEFT",50,"MEIO_BOX")// Vertical BOX
     oView:CreateVerticalBox("MEIORIGHT",50,"MEIO_BOX")// Vertical BOX    
-    oView:CreateHorizontalBox("ENCH_TOT",10)   
+    
+    oView:CreateHorizontalBox("BARTOT",10)   
+    oView:CreateVerticalBox("TOTLEFT",50,"BARTOT")// Vertical BOX
+    oView:CreateVerticalBox("TOTRIGHT",50,"BARTOT")// Vertical BOX
     
     oView:SetOwnerView("VIEW_SB1","MEIOLEFT")
     oView:SetOwnerView("VIEW_ZD3","MEIORIGHT")
-    oView:SetOwnerView("VIEW_TOT","ENCH_TOT")
+    oView:SetOwnerView("VIEW_TOTCD","TOTLEFT")
+    oView:SetOwnerView("VIEW_TOTM","TOTRIGHT")
 
     oView:EnableTitleView("VIEW_SB1", "CDs")
     oView:EnableTitleView("VIEW_ZD3", "Músicas")
@@ -124,8 +157,15 @@ Static Function ViewDef()
     //oStruCD:RemoveField("B1_NOME")
     oStruMu:RemoveField("ZD3_CODCD")
     oStruMu:RemoveField("ZD3_COD")
+    oStruMu:RemoveField("ZD3_XCONT")
     oStruCD:RemoveField("B1_XART")
-
+   
+    //refresh para tentar atualziar Totalizadores
+/*    oView:AddUserButton('Refresh','MAGIC.BMP',{|| oView:Refresh()},,,,.T.)
+    oView:SetViewAction('REFRESH',      {|| oView:Refresh()})
+    oView:SetViewAction('DELETELINE',   {|| oView:Refresh()})
+    oView:SetViewAction('UNDELETELINE', {|| oView:Refresh()})
+*/   
     //oView:AddIncrementField("SB1Detail","B1_COD")// gatilho xCodProd()
     oView:AddIncrementField("ZD3Detail","ZD3_COD")
     oView:AddIncrementField("ZD3Detail","ZD3_ITEM")
@@ -138,7 +178,7 @@ User Function xTotCd()
     Local oModelCd       
 
     If oModelTot:Adependency[1][1] == "ZD5Master"
-        oModelCd  := oModelTot:GetModel("Totais")        
+        oModelCd  := oModelTot:GetModel("TotaisCd")        
         nCd       := oModelCd:GetValue("XX_TOTCD")        
         oModel:= oModelTot:GetModel("ZD5Master")
         oModel:SetValue("ZD5_QCD",nCd)         
@@ -153,7 +193,7 @@ User Function xTotMus()
     Local nMus       
 
     If oModelTot:Adependency[1][1] == "ZD5Master"
-        oModelMu  := oModelTot:GetModel("Totais")
+        oModelMu  := oModelTot:GetModel("TotaisM")
         nMus      := oModelMu:GetValue("XX_TOTM")
         oModel:= oModelTot:GetModel("ZD5Master")
         oModel:SetValue("ZD5_FAIXAS",nMus) 
@@ -165,15 +205,45 @@ User Function xTotDur()
     Local oModel
     Local oModelTot := FwModelActive()
     Local oModelDur 
-    Local nDur       
-
-    If oModelTot:Adependency[1][1] == "ZD5Master"
-        oModelDur := oModelTot:GetModel("Totais")
-        nDur      := oModelDur:GetValue("XX_TOTDUR")
+    //Local nDur
+    Local xRet := .T.    
+    Local cDur := alltrim(str(M->ZD3_DURAC))
+    Local cS   := IIF(Len(cDur)>=2,right( cDur ,2), '')
+    Local cM   := ''    
+    Local cH   := ''
+    Local nT   
+    //atribuir Min Hora
+    If Len(cDur)==3 
+        cM := Left(cDur, 1)  // 1 30
+        elseif Len(cDur)==4
+            cM :=  Left(cDur, 2)  //11 30
+            elseif Len(cDur)==5
+                cM := SubStr(cDur,2,2)//1 11 30
+                cH := Left(cDur,1)
+                elseif Len(cDur)==6
+                    cM := SubStr(cDur,3,2) //10 11 30            
+                    cH := Left(cDur,2)
+    EndIf
+                                                 
+    If  cS=='' .OR. val(cS)>59 //validar segundos       
+        xRet  :=.F.
+        elseif val(cM)>59 //validar minutos
+            xRet  :=.F.
+            elseIf val(cH)>23 //validar hora
+                xRet  :=.F.
+    EndIf
+    cTempo  := IncTime(cTempo,val(cH),+val(cM),+val(cS))
+    nT      := strtran(cTempo,':','')
+    //somahoras(28.55,5.10)          
+    //IncTime('10:50:40',20,15,25 )   
+    If xRet .and. oModelTot:Adependency[1][1] == "ZD5Master"
+        oModelDur := oModelTot:GetModel("TotaisM")
+        //nDur      := oModelDur:GetValue("XX_TOTDUR")
+        oModelDur:SetValue("XX_TOTDUR",val(nT))
         oModel:= oModelTot:GetModel("ZD5Master")
-        oModel:SetValue("ZD5_TEMPO",nDur) 
+        oModel:SetValue("ZD5_TEMPO",val(nT)) 
     EndIf
     
-return .T.
+return xRet
 
 
