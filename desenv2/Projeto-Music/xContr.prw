@@ -16,28 +16,33 @@
                               testados registros com integridade de dados
   11/08/2023  | Filipe Souza |gerar protótipo do layout- xContr modelo1 ZD5
 	                          criar gatilho no campo cod cliente, para filtrar somente os que existem em ZD4
-  28/08/2023  | Filipe Souza |
-                            gerar campo ZD5_DATA para iniciar com data do sistema.
+  28/08/2023  | Filipe Souza |gerar campo ZD5_DATA para iniciar com data do sistema.
                             atualizar para modelo 2 e 3	
                             Gatilho B1_TIPO, campo B1_COD recebe U_xCodProd()
                             Gerar auto preenchimento de ZD5_QCD,ZD5_FAIXAS e ZD5_TEMPO relativo a totalizadores. 
                             U_xTotCd()  no campo B1_TIPO   ,validação do usuário, para chamar função ao editar. Preenche ZD5_QCD
                             U_xTotMus() no campo ZD3_MUSICA,validação do usuário, para chamar função ao editar. Preenche ZD5_FAIXAS
                             U_xTotDur() no campo ZD3_DURAC, validação do usuário, para chamar função ao editar. Preenche ZD5_TEMPO
-  12/09/2023  | Filipe Souza |  
-                            Alterar tabelaSB1 como Compartilhada de filial em SX2
+  12/09/2023  | Filipe Souza |Alterar tabelaSB1 como Compartilhada de filial em SX2
                             atualizar pesquisa padrão ZD5 do campo cod artista para retornar ZD4_CLI==M->ZD5_CLI
                             gatilho para zerar campos de artista ao alterar o campo cod cliente.
                             criar campo ZD3_XCONT  para o relacionamento com música.
                             atualizar relacionamento Musica com Contrato adicionando campo ZD3_XCONT
                             validar digitos do tempo , xTotDur().   
                             somar tempo formatado e atribuir ao totalizador e campo, IncTime('10:50:40',20,15,25 ) 
- 13/09/2023  | Filipe Souza |
-                            otimizar soma do tempo na lista de musicas, ao alterar é atualizada.
+  13/09/2023  | Filipe Souza |otimizar soma do tempo na lista de musicas, ao alterar é atualizada.
                             ponto de entrada FORMLINEPRE em "ZD3Detail", pegar valor da linha ativa, para decrementar ao editar
                             ao invalidar valor, faz cálculo mesmo assim, precisa impedir o cálculo.
-                            £££££££	ao editar e confirmar com o mesmo número, é somado no Totalizador padrão.	
-                            
+                            ao editar e confirmar com o mesmo número, é decrementado o anterior e somado o novo no Totalizador padrão.	
+  14/09/2023  | Filipe Souza |ao editar e confirmar com o mesmo número, deve decrementar para ser somado no Totalizador padrão
+                              ao deletar linha na grid deve decrementar. Depois só precisa mudar de linha na grid que atualiza a view.
+  16/09/2023  | Filipe Souza | 2º cd não incrementa 1ª música.Corrigido.
+                                Recuperar linha na grid para incrementar, nao sincroniza totalizadores, só o XX_TotDur ---fazer Refresh()				
+                                Deletar musica, sincronizar ZD5_TEMPO---fazer Refresh(), decrementar musica ZD5_FAIXAS
+                                Ao clicar para baixo e inserir linha e voltar para cima, só incrementa total mas não decrementa automaticamente.
+                                estava sendo chamado U_xTotMus(2) nos 2 eventos de 'Deletar' e 'seta apra cima' que também deleta,
+  20/09/2023  | Filipe Souza | Adicionei na condição do ponto de entrada para verificar se campos estão vazios, assim não foi confirmada linha. Solucionada questão acima.
+
     Planejamento @see https://docs.google.com/document/d/1V0EWr04f5LLvjhhBhYQbz8MrneLWxDtVqTkCJIA9kTA/edit?usp=drive_link
     UML          @see https://drive.google.com/file/d/1wFO2CKqSrvzxg5RZDYTfGayHrAUcCcfL/view?usp=drive_link 
     Scrum-kanban @see https://trello.com/w/protheusadvplmusicbusiness       
@@ -175,12 +180,18 @@ Static Function ViewDef()
     //para zerar o tempo ao sair da view
     oView:SetViewAction('BUTTONOK',    {|| cTempo  := '00:00:00'})
     oView:SetViewAction('BUTTONCANCEL',{|| cTempo  := '00:00:00'})
+    //para decrementar o tempo ao deletar a linha
+    oView:SetViewAction('DELETELINE',   {|| U_xDelL()})
+    //para incrementar o tempo ao desdeletar a linha
+    oView:SetViewAction('UNDELETELINE', {|| U_xDelL()})
+
     //oView:AddIncrementField("SB1Detail","B1_COD")// gatilho xCodProd()
     oView:AddIncrementField("ZD3Detail","ZD3_COD")
     oView:AddIncrementField("ZD3Detail","ZD3_ITEM")
     oView:SetCloseOnOk({||.T.})
 return oView
 
+//enviar total de CD para o campo ZD5_QCD na view
 User Function xTotCd()
     Local oModel
     Local oModelTot := FwModelActive()
@@ -195,7 +206,9 @@ User Function xTotCd()
     
 return .T.
 
-User Function xTotMus()
+//enviar total de Musica para o campo ZD5_FAIXAS na view
+User Function xTotMus(nOpt)
+    DEFAULT nOpt :=0
     Local oModel
     Local oModelTot := FwModelActive()
     Local oModelMu 
@@ -204,26 +217,44 @@ User Function xTotMus()
     If oModelTot:Adependency[1][1] == "ZD5Master"
         oModelMu  := oModelTot:GetModel("TotaisM")
         nMus      := oModelMu:GetValue("XX_TOTM")
+        //no 2º CD não incrementa a 1ª música, chamar U_xTotMus() para incrementar. Ou recuperando música deletada.
+        If nOpt==1 
+            nMus++
+            oModelMu:SetValue("XX_TOTM",nMus)            
+        elseIf nOpt==2 // DELETE, seta para cima, decrementar música 
+                nMus--
+                oModelMu:SetValue("XX_TOTM",nMus)         
+        EndIf
         oModel:= oModelTot:GetModel("ZD5Master")
         oModel:SetValue("ZD5_FAIXAS",nMus) 
     EndIf
+    nOpt :=0   
     
 return .T.
 
+
+/* enviar total de Duração para o campo ZD5_TEMPO na view
+    -participa do evento editar Duração, para decrementar valor antigo e incrementar valor novo.
+    -participa do evento DeleteLine e UndeleteLine,para decrementar valor ou incrementar valor. 
+    atribuindo valores para o Totalizador e campos na view, sincronizando-os.
+*/
 User Function xTotDur(nOld)
     DEFAULT nOld :=0
-    Local oModel
+    Local oModel,oModelB1,oModelM
     Local oModelTot := FwModelActive()
-    Local oModelDur 
+    //Local oModelDur 
     //Local nDur
-    Local xRet := .T.    
+    Local xRet := .T. //se nOld>0 é que será digitado outro valor, senão, é o 1º dígito e traz este   
     Local cDur := IIF( nOld>0,alltrim(str(nOld)) ,alltrim(str(M->ZD3_DURAC))  )
     Local cS   := ''
     Local cM   := ''    
     Local cH   := ''
     Local nNewT     
     
-    if U_xValTime(M->ZD3_DURAC)    
+    // se ZD3_DURAC==Nil não digitou valor ainda e pega nOld do parâmetro para decrementar
+    //      ou está sendo deletada linha e passou nOld para decrementar
+    // senão, foi digitado novo valor para incrementar. 
+    if U_xValTime(IIF(M->ZD3_DURAC==Nil,nOld,M->ZD3_DURAC) )    
         //atribuir Seg Min Hora
         if Len(cDur)==2
             cS := right( cDur ,2)
@@ -252,7 +283,7 @@ User Function xTotDur(nOld)
     
     //somahoras(28.55,5.10)          
     //IncTime('10:50:40',20,15,25 ) 
-    //DecTime  
+    //DecTime('10:50:40',20,15,25 )   
     If xRet .and. oModelTot:Adependency[1][1] == "ZD5Master"
         oModelDur := oModelTot:GetModel("TotaisM")
         //nDur      := oModelDur:GetValue("XX_TOTDUR")
@@ -260,10 +291,19 @@ User Function xTotDur(nOld)
         oModel:= oModelTot:GetModel("ZD5Master")
         oModel:SetValue("ZD5_TEMPO",val(nNewT)) 
     EndIf
+    oModelB1:=oModel:GetModel("SB1Detail")
+    oModelB1:=oModelB1:GetModel("SB1Detail")
+    oModelM:=oModel:GetModel("ZD3Detail")
+    oModelM:=oModelM:GetModel("ZD3Detail")
+    //no 2º CD não incrementa a 1ª música, chamar U_xTotMus() para incrementar.
+    If oModelB1:Length() ==2 .and. oModelM:Length()==1
+        U_xTotMus(1)    
+    EndIf
+    
     
 return xRet
 
-
+//validar se número está dentro do escopo de horário, 23:59:59
 User Function xValTime(nDur)
     Local xRet := .T.    
     Local cDur := alltrim(str(nDur))
@@ -298,4 +338,30 @@ User Function xValTime(nDur)
                 xRet  :=.F.            
     EndIf
 return xRet
+
+User Function xDelL()
+    Local oModel:= FwModelActive()      //pegar modelo ativo
+    Local oModelM:=oModel:GetModel("ZD3Detail")//pegar submodelo, a grid musica
+    Local oView:=FwViewActive()
+
+    //se linha já está deletada, recupera e adiciona valor no totalizador
+    //exec função xTotDur() com valor do campo da linha posicionada na grid
+    If oModelM:IsDeleted()//deletando
+        // no parâmetro é para decrementar                
+        U_xTotDur(oModelM:GetValue('ZD3_DURAC'))  
+        U_xTotMus()   //decrementar música     
+        else //recuperando
+            //senão deletará, decrementa valor no totalizador
+            M->ZD3_DURAC:=oModelM:GetValue('ZD3_DURAC')//atribui na variável de memória para incrementar
+            U_xTotDur()     
+            U_xTotMus()                                      
+    EndIf    
+    oView:Refresh()
+return Nil
+
+User Function xUnDelL()
+
+    FWAlertSuccess( "Desdeletado registro com sucesso.", "Desdeletado" )
+    
+return Nil
 

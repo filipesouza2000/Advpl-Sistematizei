@@ -68,39 +68,104 @@ sendo também fornecedor para a venda de seu produto gravado no mesmo ou em outro
 	x		U_xTotDur() no campo ZD3_DURAC, validação do usuário, para chamar função ao editar. Preenche ZD5_TEMPO
 	x	Alterada tabelaSB1 como Compartilhada de filial em SX2
 12/09 	
-	x		atualizar pesquisa padrão ZD5 do campo cod artista para retornar ZD4_CLI==M->ZD5_CLI
-	x		gatilho para zerar campos de artista ao alterar o campo cod cliente.
-	x		criar campo ZD3_XCONT  para o relacionamento com música.
-	x		atualizar relacionamento Musica com Contrato adicionando campo ZD3_XCONT
-	x		validar digitos do tempo , xTotDur().   
-	x		somar tempo formatado e atribuir ao totalizador e campos, IncTime('10:50:40',20,15,25 )
+	x	atualizar pesquisa padrão ZD5 do campo cod artista para retornar ZD4_CLI==M->ZD5_CLI
+	x	gatilho para zerar campos de artista ao alterar o campo cod cliente.
+	x	criar campo ZD3_XCONT  para o relacionamento com música.
+	x	atualizar relacionamento Musica com Contrato adicionando campo ZD3_XCONT
+	x	validar digitos do tempo , xTotDur().   
+	x	somar tempo formatado e atribuir ao totalizador e campos, IncTime('10:50:40',20,15,25 )
 13/09
-	x		otimizar soma do tempo na lista de musicas, ao alterar é atualizada.
-	x		ponto de entrada FORMLINEPRE em "ZD3Detail", pegar valor da linha ativa, para decrementar ao editar
-	x		ao invalidar valor, faz cálculo mesmo assim, precisa impedir o cálculo.
-	£££££££	ao editar e confirmar com o mesmo número, é somado no Totalizador padrão.	
-				
-			10:10
-			05:05   15:15
-			
-			10:10   20:20	
-				
+	x	otimizar soma do tempo na lista de musicas, ao alterar é atualizada.
+	x	ponto de entrada FORMLINEPRE em "ZD3Detail", pegar valor da linha ativa, para decrementar ao editar
+	x	ao invalidar valor, faz cálculo mesmo assim, precisa impedir o cálculo.
+14/09	
+	x	ao editar e confirmar com o mesmo número, deve decrementar para ser somado no Totalizador padrão.	
+	x	ao deletar linha na grid deve decrementar. Depois só precisa mudar de linha na grid que atualiza a view.
 		
-	erro-- 1ª Musica do 1º CD conta correto,mas no proximo cd não conta a 1ª, só se teclar para baixo, incluindo mais.
-		--nos totalizadores não decrementam após clicar para baixo e para cima,só adiciona.
-
+16/09
+	x	2º cd não incrementa 1ª música.Corrigido.
+	x	recuperar linha na grid para incrementar, nao sincroniza totalizadores, só o XX_TotDur ---fazer Refresh()				
+	x	deletar musica, sincronizar ZD5_TEMPO---fazer Refresh(), decrementar musica ZD5_FAIXAS
+	x	ao clicar para baixo e inserir linha e voltar para cima, só incrementa total mas não decrementa automaticamente.
+	x	estava sendo chamado U_xTotMus(2) nos 2 eventos de 'Deletar' e 'seta apra cima' que também deleta,
+20/09  
+	x	adicionei na condição do ponto de entrada para verificar se campos estão vazios, assim não foi confirmada linha.
+	
 		
+							
 		gerar documento do contrato
 		identificar formas de pagamento	
 		
 		
-https://advplconsulting.wordpress.com/2016/11/03/funcoes-de-horas/
-	validação campo de horário	
-(Left(M->CAMPO,2)>'00' .And. Left(M->CAMPO,2)<='24' .And. Right(M->CAMPO,2)>='00' .And. Right(M->CAMPO,2)<='59')                                                                                       
-
-	
-
-	
+----fluxo
+		*ao iniciar e *finalizar edição da linha chama ponto de entrada xContrM, para verificar se já havia valor no campo ZD3_DURAC
+			se tem valor na memoria, valida em xValTime(), 
+			
+				se campo digitado for diferente do valor anterior e valor anterior maior que 0, 
+				significa que está sendo editado e chama U_xTotDur(nOldT) decrementar antes de adicionar.
+			
+				se campo digitado for igual ao anterior, só ao editar mas não alterar, atribui variável do valor anterior = o já existente,
+				chama xTotDur(nOldT), deve decrementar para ser adicionado automaticamente pelo totalizador.
+			senão (antes de digitar) nOldT recebe 0 , sempre antes de digitar valor nOldT recebe valor existente no campo.			
+			validador do campo ZD3_MUSICA chama xTotMus(), enviar total de Musica para o campo ZD5_FAIXAS
+			
+		inserir 1º registro:
+			ponto de entrada xContrM valida o digitado
+			validador do campo ZD3_DURAC	chama xTotDur() 
+			incrementa tempo digitado na variavel cTempo, cria nNewT no formado numero sem :
+			seta em ZD5_TEMPO o valor nNewT		
+			
+		inserir 2º cd 1ª musica:
+			No validador do campo ZD3_DURAC chama xTotDur(nOld=0),
+			incrementa tempo digitado na variavel cTempo, cria nNewT no formado numero sem :
+			seta em ZD5_TEMPO o valor nNewT
+			verifica se tem 2 Cds e 1 música, para chamar xTotMus(1) para incrementar musica.
+			se nOpt=1 é para incrementar, recebe o valor do totalizador e incrementa sentando o novo valor.
+			seta novo valor para ZD5_FAIXAS
+		inserir mais músicas:
+			igual 1º registro
+			
+		alterar registro de tempo:
+			ponto de entrada xContrM valida o digitado, verifica se for diferente  e o anterior mairo que 0, 
+			antes de digitar nOldT recebe valor existente,
+			chama xTotDur(nOldT) para decrementar aontes de adicionar,
+			seta nNewT no ZD5_TEMPO,
+			
+			No validador do campo ZD3_DURAC chama xTotDur(0),
+			xValTime valida o novo valor digitado,
+			incrementa tempo digitado na variavel cTempo, cria nNewT no formado numero sem :
+			seta em ZD5_TEMPO o valor nNewT		
+			
+		deletar música:
+			ponto de entrada xContrM, nOldT recebe valor existente
+			evento DELETELINE chama xDell()
+			se oModelM:IsDeleted() , 
+				xTotDur(ZD3_DURAC) //decrementar tempo
+					decrementa tempo digitado na variavel cTempo, cria nNewT no formado numero sem :
+					atribui nNewT para ZD5_TEMPO,
+				xTotMus(2) //decrementar música
+					nMus recebe o totalizador XX_TOTM, já decrentado
+					atribui nMus para ZD5_FAIXAS,					
+			view.Refresh(), sincronizados campos.
+			
+		recuperar música:	
+			ponto de entrada xContrM, nOldT recebe valor existente
+			evento UNDELETELINE chama xDell()
+			se oModelM:IsDeleted(),senão
+			M->ZD3_DURAC recebe model.ZD3_DURAC , atribui na variável de memória para incrementar
+			xTotDur()
+			incrementa tempo,atribui nNewT para ZD5_TEMPO,
+			xTotMus(1)
+			incrementa música em XX_TOTM,
+			atribui nMus para ZD5_FAIXAS,
+			view.Refresh(), 
+			
+			
+4 anos no TOTVS Protheus em: Suporte N1 e N2. 
+atualizações de patch, LIB, UPDDISTR, e APO.
+Módulos: COM,EST,FAT,FIS,TMS,COM,GPE. Comunicação TSS.
+SIGACFG,APSDU, SqlServer.
+Desenvolvimento em ADVPL
 	
 	
 	
