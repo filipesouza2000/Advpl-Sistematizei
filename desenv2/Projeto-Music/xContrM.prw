@@ -26,16 +26,32 @@ User Function xContrM()
     Local cIdPonto  := aparam[2] // id do local de execução do ponto de entrada
     Local cIdModel  := aparam[3] //id do formulario
     Local oModel, oModelG
+    Local nModel    :=0
+    Local aCampos   :={}
     
     If aparam[2] <> Nil
-        If cIdModel=='ZD3Detail' .and. cIdPonto == "FORMLINEPRE"
+        //nOpt, cTotalM, cXX_TOT
+        //verifica qual módulo foi chamado, qual Grid        
+        If cIdModel=='SB1Detail'
+            nModel:=1
+            aAdd(aCampos,'B1_COD')
+            aAdd(aCampos,'B1_DESC')
+        elseif cIdModel=='ZD3Detail'
+            nModel:=2            
+            aAdd(aCampos,'ZD3_MUSICA')            
+            aAdd(aCampos,'ZD3_DURAC')
+        EndIf
+        
+        If (nModel==1 .or. nModel==2) .and. cIdPonto == "FORMLINEPRE"
             oModel  :=FwModelActive()
             oModelG :=oModel:GetModel(cIdModel)
             //evento de seta para cima                          campos vazios
-            If  Len(aparam) >4 .and. aparam[5]=="DELETE" .and. Empty(AllTrim(oModelG:GetValue('ZD3_DURAC'))) .and. Empty(AllTrim(oModelG:GetValue('ZD3_MUSICA')))
-                U_xTotMus(2)
+            If  Len(aparam) >4 .and. aparam[5]=="DELETE" .and. Empty(AllTrim(oModelG:GetValue(aCampos[1]))) .and. Empty(AllTrim(oModelG:GetValue(aCampos[2])))
+                //xTotQtd(modulo master,2=decrementar qtd,1=cd 2=musica,)
+                U_xTotQtd("ZD5Master",2,nModel)                
             EndIf
-            If !Empty(M->ZD3_DURAC)
+            //tratar duração da música e totalizador
+            If nModel==2  .and. !Empty(M->ZD3_DURAC)
                 xRet := U_xValTime(M->ZD3_DURAC)//valida tempo digitado 
                 If xRet
                     If M->ZD3_DURAC <> nOldT .and. nOldT >0//valor editado
@@ -48,11 +64,11 @@ User Function xContrM()
                  Help(NIL, NIL, "Validação!", NIL, "Número incoreto para o campo de duração", 1, 0, NIL, NIL, NIL, NIL, NIL, {"Digite números dentro do formato da hora."})
                     
                 EndIf
-            else  //recebe valor anterior da edição
-                nOldT:= omodelg:GetValue('ZD3_DURAC')
+            elseif nModel==2  // recebe valor duração anterior da edição
+                nOldT:= omodelg:GetValue(aCampos[2])
             EndIf    
         
         EndIf
     EndIf    
-
+    aCampos   :={}
 return xRet

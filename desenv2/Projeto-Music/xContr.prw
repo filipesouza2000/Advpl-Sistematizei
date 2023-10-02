@@ -42,6 +42,18 @@
                                 Ao clicar para baixo e inserir linha e voltar para cima, só incrementa total mas não decrementa automaticamente.
                                 estava sendo chamado U_xTotMus(2) nos 2 eventos de 'Deletar' e 'seta apra cima' que também deleta,
   20/09/2023  | Filipe Souza | Adicionei na condição do ponto de entrada para verificar se campos estão vazios, assim não foi confirmada linha. Solucionada questão acima.
+                                Criar a mesma condição de eventos Deletar para a grid CD.   xTotCd()
+  21/09/2023  | Filipe Souza | Otimizar função xTotMus() para ser função genérica com parâmetros a ser reutilzada para outros totais, 
+			                    xTotQtd(cModM,nOpt,nModulo) em xContr e xContrM                                
+  27/09/2023  | Filipe Souza | Resolvendo o problema do evento Delete da linha de músicas,que totalizada duas vezes,
+                                na função xDelL() chama  U_xTotQtd("ZD5Master",2,2,.T.)
+                                parametro .T. para informar que foi do evento da tecla Delete, IIF( lDell, , nTot++ ),
+                                se for pelo ponto de entrada, identificando seta para cima ou baixo, chama U_xTotQtd("ZD5Master",2,nModel)
+                                para incrementar e decrementar totalizador.         
+  02/102023  | Filipe Souza  | Testar eventos na grid CD,INSERT UPDATE OK
+                               Ao deletar CD verificar se tem música relaciona para invalidar com Help().                                                      
+                               DELETE em análise, ao chamar xDelL() oView:ACURRENTSELECT[1]    "VIEW_SB1", 
+				               erro- ao recuperar registro deletado,oView:ACURRENTSELECT[1] é "VIEW_ZD3"
 
     Planejamento @see https://docs.google.com/document/d/1V0EWr04f5LLvjhhBhYQbz8MrneLWxDtVqTkCJIA9kTA/edit?usp=drive_link
     UML          @see https://drive.google.com/file/d/1wFO2CKqSrvzxg5RZDYTfGayHrAUcCcfL/view?usp=drive_link 
@@ -206,30 +218,48 @@ User Function xTotCd()
     
 return .T.
 
-//enviar total de Musica para o campo ZD5_FAIXAS na view
-User Function xTotMus(nOpt)
-    DEFAULT nOpt :=0
+//chamdo no validador do usuario no campo B1_TIPO, ZD3_MUSICA      U_xTotQtd('ZD5Master',0,2)
+//enviar total de CD, Musica para o campo do Form na view
+//no 2º CD não incrementa a 1ª música, chamar U_xTotQtd() para incrementar.
+//Deletar ou recuperando música deletada.
+User Function xTotQtd(cModM,nOpt,nModulo,lDell)//xTotMus(nOpt)
+    DEFAULT cModM   :=''
+    DEFAULT nOpt    :=0
+    DEFAULT nModulo :=0
+    DEFAULT lDell   :=.F.   //para tratar do evento DELETE, diferenciar ao de seta para cima
     Local oModel
     Local oModelTot := FwModelActive()
-    Local oModelMu 
-    Local nMus       
+    Local oModelG 
+    Local nTot      :=0 
+    Local aTot      :={}   
 
-    If oModelTot:Adependency[1][1] == "ZD5Master"
-        oModelMu  := oModelTot:GetModel("TotaisM")
-        nMus      := oModelMu:GetValue("XX_TOTM")
-        //no 2º CD não incrementa a 1ª música, chamar U_xTotMus() para incrementar. Ou recuperando música deletada.
-        If nOpt==1 
-            nMus++
-            oModelMu:SetValue("XX_TOTM",nMus)            
-        elseIf nOpt==2 // DELETE, seta para cima, decrementar música 
-                nMus--
-                oModelMu:SetValue("XX_TOTM",nMus)         
-        EndIf
-        oModel:= oModelTot:GetModel("ZD5Master")
-        oModel:SetValue("ZD5_FAIXAS",nMus) 
+    If nModulo==1//'SB1Detail'             
+            aAdd(aTot,'TotaisCd')//modulo
+            aAdd(aTot,'XX_TOTCD')//totalizador qtd
+            aAdd(aTot,'ZD5_QCD') //campo do form
+    elseif nModulo==2//'ZD3Detail'            
+            aAdd(aTot,'TotaisM')            
+            aAdd(aTot,'XX_TOTM')
+            aAdd(aTot,'ZD5_FAIXAS')
     EndIf
-    nOpt :=0   
-    
+
+    If oModelTot:Adependency[1][1] == cModM
+        oModelG  := oModelTot:GetModel(aTot[1])//TotaisM
+        nTot     := oModelG:GetValue(aTot[2])//XX_TOTM
+        //no 2º CD não incrementa a 1ª música, chamar XX_TOTM para incrementar. Ou recuperando música deletada.
+        If nOpt==1 
+            IIF( lDell, , nTot++ )
+            oModelG:SetValue(aTot[2],nTot)  //"XX_TOTM",nMus          
+        elseIf nOpt==2 // DELETE, seta para cima, decrementar música 
+                IIF( lDell, , nTot-- )//se DELETE não decremetna pois totalizador ao ser chamado ln 237 o executa, senão é seta para cima é preciso decremetnar. 
+                oModelG:SetValue(aTot[2],nTot)         
+        EndIf
+        oModel:= oModelTot:GetModel(cModM)//ZD5Master
+        oModel:SetValue(aTot[3],nTot)    //"ZD5_FAIXAS",nMus
+    EndIf
+    cModM   :=''
+    nOpt    :=0   
+    nModulo :=0
 return .T.
 
 
@@ -295,9 +325,9 @@ User Function xTotDur(nOld)
     oModelB1:=oModelB1:GetModel("SB1Detail")
     oModelM:=oModel:GetModel("ZD3Detail")
     oModelM:=oModelM:GetModel("ZD3Detail")
-    //no 2º CD não incrementa a 1ª música, chamar U_xTotMus() para incrementar.
-    If oModelB1:Length() ==2 .and. oModelM:Length()==1
-        U_xTotMus(1)    
+    //no 2º CD não incrementa a 1ª música, chamar U_aTot() para incrementar.
+    If oModelB1:Length() >=2 .and. oModelM:Length()==1
+        U_xTotQtd("ZD5Master",1,2)//cModM,nOpt,nModulo    
     EndIf
     
     
@@ -340,23 +370,49 @@ User Function xValTime(nDur)
 return xRet
 
 User Function xDelL()
-    Local oModel:= FwModelActive()      //pegar modelo ativo
-    Local oModelM:=oModel:GetModel("ZD3Detail")//pegar submodelo, a grid musica
-    Local oView:=FwViewActive()
+    Local oModel    := FwModelActive()      //pegar modelo ativo
+    Local oModelM,oModelZD3       //pegar submodelo, a grid cd ou musica 
+    Local oView     :=FwViewActive()
+    Local nGrid     :=0    // 1 = SB1Detail   2=ZD3Detail
+    Local aSaveLines:= {}
 
+    IF      oView:ACURRENTSELECT[1]=="VIEW_SB1"//verifica se está posicionado na grid CD
+        nGrid:=1
+        oModelM:=oModel:GetModel("SB1Detail")
+    elseif  oView:ACURRENTSELECT[1]=="VIEW_ZD3" //verifica se está posicionado na grid Musica
+        nGrid:=2
+        oModelM:=oModel:GetModel("ZD3Detail")
+    EndIf    
+    aSaveLines := FWSaveRows()
     //se linha já está deletada, recupera e adiciona valor no totalizador
     //exec função xTotDur() com valor do campo da linha posicionada na grid
     If oModelM:IsDeleted()//deletando
-        // no parâmetro é para decrementar                
-        U_xTotDur(oModelM:GetValue('ZD3_DURAC'))  
-        U_xTotMus()   //decrementar música     
-        else //recuperando
-            //senão deletará, decrementa valor no totalizador
+        // no parâmetro é para decrementar
+        IF nGrid==2  //executa se for grid música                      
+            U_xTotDur(oModelM:GetValue('ZD3_DURAC'))
+        else
+        oModelZD3:=oModel:GetModel("ZD3Detail")
+        //se deletar CD e tem 1 música com dados 
+            If (oModelZD3:length()==1 .and. !Empty(AllTrim(oModelZD3:GetValue('ZD3_MUSICA'))) .and. !Empty(AllTrim(oModelZD3:GetValue('ZD3_DURAC')))) .OR.;
+                oModelZD3:length()>1
+                 Help(NIL, NIL, "Não é possível excluir", NIL, "Contém registro de música relacionado a este CD.", 1, 0, NIL, NIL, NIL, NIL, NIL, {"Atenção! Delete os registros de música deste CD."})            
+                return nil
+            EndIf    
+        EndIf
+        //xTotQtd(modulo master,2=decrementar qtd,1=cd 2=musica,)
+         U_xTotQtd("ZD5Master",2,nGrid,.T.)   //decrementar cd ou música     
+    else //recuperando
+        //senão deletará, decrementa valor no totalizador
+        IF nGrid==2
             M->ZD3_DURAC:=oModelM:GetValue('ZD3_DURAC')//atribui na variável de memória para incrementar
             U_xTotDur()     
-            U_xTotMus()                                      
+        EndIf            
+        //xTotQtd(modulo master,2=decrementar qtd,1=cd 2=musica,)
+            U_xTotQtd("ZD5Master",1,nGrid,.T.)  
     EndIf    
     oView:Refresh()
+    IIF( nGrid==1, oView:Refresh('VIEW_SB1'), oView:Refresh('VIEW_ZD3') )
+    FWRestRows(aSaveLines)
 return Nil
 
 User Function xUnDelL()

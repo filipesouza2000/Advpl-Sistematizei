@@ -90,9 +90,27 @@ sendo também fornecedor para a venda de seu produto gravado no mesmo ou em outro
 	x	estava sendo chamado U_xTotMus(2) nos 2 eventos de 'Deletar' e 'seta apra cima' que também deleta,
 20/09  
 	x	adicionei na condição do ponto de entrada para verificar se campos estão vazios, assim não foi confirmada linha.
-	
-		
-							
+	x	usar function xTotMus como genérica para servir para música e cd para c ontrolar totalizdor e frame
+	x	otimizar totalizador de música-duração, validar o tempo sem edição, seta para baixo.
+21/09
+		Otimizar função xTotMus() para ser função genérica com parâmetros a ser reutilzada para outros totais, 
+			xTotQtd(cModM,nOpt,nModulo) em xContr e xContrM
+27/09	Resolvendo o problema do evento Delete da linha de músicas,que totalizada duas vezes,
+			na função xDelL() chama  U_xTotQtd("ZD5Master",2,2,.T.)
+			parametro .T. para informar que foi do evento da tecla Delete, IIF( lDell, , nTot++ ),
+			se for pelo ponto de entrada, identificando seta para cima ou baixo, chama U_xTotQtd("ZD5Master",2,nModel)
+			para incrementar e decrementar totalizador.
+		Testar eventos na grid CD,INSERT UPDATE OK
+		x	ao deletar CD verificar se tem música relaciona para invalidar
+				Help() , EMPTYFORM, o formulario Cds preenchido, Delete registros.
+			DELETE em análise, ao chamar xDelL()  xxxxxxxxxxxxxxxxxxxxxxxxx mudar para PE xContrM	
+			oView:ACURRENTSELECT[1]    "VIEW_SB1", 
+				erro- ao recuperar registro deletado,oView:ACURRENTSELECT[1] é "VIEW_ZD3"
+			
+				
+				música campo vazio
+				música preenchida
+				
 		gerar documento do contrato
 		identificar formas de pagamento	
 		
@@ -137,8 +155,9 @@ sendo também fornecedor para a venda de seu produto gravado no mesmo ou em outro
 			seta em ZD5_TEMPO o valor nNewT		
 			
 		deletar música:
-			ponto de entrada xContrM, nOldT recebe valor existente
-			evento DELETELINE chama xDell()
+			se for seta para cima com registro vazio: ponto de entrada xContrM, nOldT recebe valor existente
+			
+			evento DELETELINE chama xDelL()
 			se oModelM:IsDeleted() , 
 				xTotDur(ZD3_DURAC) //decrementar tempo
 					decrementa tempo digitado na variavel cTempo, cria nNewT no formado numero sem :
@@ -150,7 +169,7 @@ sendo também fornecedor para a venda de seu produto gravado no mesmo ou em outro
 			
 		recuperar música:	
 			ponto de entrada xContrM, nOldT recebe valor existente
-			evento UNDELETELINE chama xDell()
+			evento UNDELETELINE chama xDelL()
 			se oModelM:IsDeleted(),senão
 			M->ZD3_DURAC recebe model.ZD3_DURAC , atribui na variável de memória para incrementar
 			xTotDur()
