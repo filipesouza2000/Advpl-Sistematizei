@@ -51,23 +51,28 @@ User Function xContrM()
                 U_xTotQtd("ZD5Master",2,nModel)                
             EndIf
             //tratar duração da música e totalizador
-            If nModel==2  .and. !Empty(M->ZD3_DURAC)
-                xRet := U_xValTime(M->ZD3_DURAC)//valida tempo digitado 
-                If xRet
-                    If M->ZD3_DURAC <> nOldT .and. nOldT >0//valor editado
-                        xRet := U_xTotDur(nOldT)//decrementa antes de adicionar
-                        elseif M->ZD3_DURAC == nOldT    
-                            nOldT  := M->ZD3_DURAC 
-                            xRet := U_xTotDur(nOldT)//mesmo igual, deve decrementar para adicionar automaticamente pelo totalizador.
-                    EndIf
-                else
-                 Help(NIL, NIL, "Validação!", NIL, "Número incoreto para o campo de duração", 1, 0, NIL, NIL, NIL, NIL, NIL, {"Digite números dentro do formato da hora."})
-                    
-                EndIf
+            If nModel==2  .and. !Empty(M->ZD3_DURAC) .and. M->ZD3_DURAC > 0
+                xRet := U_xValTime(M->ZD3_DURAC)//valida tempo digitado                 
+            elseif nModel==2 .and.  M->ZD3_DURAC <= 0
+               xRet:=.F.   
             elseif nModel==2  // recebe valor duração anterior da edição
                 nOldT:= omodelg:GetValue(aCampos[2])
+            EndIf
+
+            If xRet
+                If M->ZD3_DURAC <> nOldT .and. nOldT >0//valor editado
+                    xRet := U_xTotDur(nOldT)//decrementa antes de adicionar
+                    elseif M->ZD3_DURAC == nOldT    
+                        nOldT  := M->ZD3_DURAC 
+                        xRet := U_xTotDur(nOldT)//mesmo igual, deve decrementar para adicionar automaticamente pelo totalizador.
+                EndIf
+            else
+                Help(NIL, NIL, "Validação!", NIL, "Número incoreto para o campo de duração", 1, 0, NIL, NIL, NIL, NIL, NIL, {"Digite números dentro do formato da hora."})
+                
             EndIf    
-        
+        /*££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
+        totalizador de tempo usa NEGATIVO
+        ¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢*/
         EndIf
     EndIf    
     aCampos   :={}

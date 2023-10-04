@@ -109,7 +109,7 @@ sendo também fornecedor para a venda de seu produto gravado no mesmo ou em outro
 			oModel:GetModel("ZD3Detail"): 	CID:xContrM			
 			oModel:GetModel("ZD3Detail"):AALLSUBMODELS[3]   CID:"ZD3Detail"
 			FWFldGet("ZD3_MUSICA")	
-			
+
 			oModel:GetModel("ZD3Detail"):AALLSUBMODELS[3]:length() =2     1 deletado
 			verificar se existe 1 ativo
 				
