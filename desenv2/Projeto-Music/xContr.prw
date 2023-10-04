@@ -50,11 +50,13 @@
                                 parametro .T. para informar que foi do evento da tecla Delete, IIF( lDell, , nTot++ ),
                                 se for pelo ponto de entrada, identificando seta para cima ou baixo, chama U_xTotQtd("ZD5Master",2,nModel)
                                 para incrementar e decrementar totalizador.         
-  02/102023  | Filipe Souza  | Testar eventos na grid CD,INSERT UPDATE OK
+  02/102023   | Filipe Souza | Testar eventos na grid CD,INSERT UPDATE OK
                                Ao deletar CD verificar se tem música relaciona para invalidar com Help().                                                      
                                DELETE em análise, ao chamar xDelL() oView:ACURRENTSELECT[1]    "VIEW_SB1", 
 				               erro- ao recuperar registro deletado,oView:ACURRENTSELECT[1] é "VIEW_ZD3"
-
+  03/10/2023  | Filipe souza | xLinePre- Função validadora da grid CD, 
+                                para bloquear deleção de linha quando existe música com dados e não deletada na outra grid relacionada ao CD.
+                                
     Planejamento @see https://docs.google.com/document/d/1V0EWr04f5LLvjhhBhYQbz8MrneLWxDtVqTkCJIA9kTA/edit?usp=drive_link
     UML          @see https://drive.google.com/file/d/1wFO2CKqSrvzxg5RZDYTfGayHrAUcCcfL/view?usp=drive_link 
     Scrum-kanban @see https://trello.com/w/protheusadvplmusicbusiness       
@@ -108,10 +110,10 @@ Static Function ModelDef()
     Local bPos          :=NIL
     Local bCommit       :=NIL
     Local bCancel       :={|| FWFORMCANCEL(SELF)}
-
+    Local bPreGrid      :={|oModel,nLine,cAction| xLinePre(oModel,nLine,cAction)}
     oModel:=MPFormModel():New("xContrM",bPre,bPos,bCommit,bCancel)
     oModel:addFields("ZD5Master",/*cOwner*/,oStruCon)
-    oModel:AddGrid("SB1Detail","ZD5Master",oStruCD,/*bLinePre*/,/*bPos*/,/*bPre-Grid Full*/,/*bLoad-Carga do modelo manual*/,)
+    oModel:AddGrid("SB1Detail","ZD5Master",oStruCD,/*bLinePre*/,/*bLinePos*/,bPreGrid,/*bLoad-Carga do modelo manual*/,)
     oModel:AddGrid("ZD3Detail","SB1Detail",oStruMu,/*bLinePre*/,/*bLinePos*/,/*bPre-Grid Full*/,/*bLoad-Carga do modelo manual*/,)
     oModel:SetPrimaryKey({"ZD5_FILIAL","ZD5_COD"})//,"A1_CGC"
     
@@ -369,55 +371,74 @@ User Function xValTime(nDur)
     EndIf
 return xRet
 
+/*Função executa no evento view-Delete, para controlar totalizador de duração
+         e sincronizar totalizadores com formulario*/
 User Function xDelL()
     Local oModel    := FwModelActive()      //pegar modelo ativo
-    Local oModelM,oModelZD3       //pegar submodelo, a grid cd ou musica 
+    Local oModelM//,oModelZD3       //pegar submodelo, a grid cd ou musica 
     Local oView     :=FwViewActive()
     Local nGrid     :=0    // 1 = SB1Detail   2=ZD3Detail
-    Local aSaveLines:= {}
-
-    IF      oView:ACURRENTSELECT[1]=="VIEW_SB1"//verifica se está posicionado na grid CD
+    //Local aSaveLines:= {}
+            //verifica se está posicionado na grid CD
+    IF      oView:ACURRENTSELECT[1]=="VIEW_SB1" .or. oView:ACURRENTSELECT[1]=="SB1Detail"
         nGrid:=1
         oModelM:=oModel:GetModel("SB1Detail")
-    elseif  oView:ACURRENTSELECT[1]=="VIEW_ZD3" //verifica se está posicionado na grid Musica
+            //verifica se está posicionado na grid Musica
+    elseif  oView:ACURRENTSELECT[1]=="VIEW_ZD3" .or. oView:ACURRENTSELECT[1]=="ZD3Detail"
         nGrid:=2
         oModelM:=oModel:GetModel("ZD3Detail")
     EndIf    
-    aSaveLines := FWSaveRows()
+    //aSaveLines := FWSaveRows()
     //se linha já está deletada, recupera e adiciona valor no totalizador
     //exec função xTotDur() com valor do campo da linha posicionada na grid
     If oModelM:IsDeleted()//deletando
         // no parâmetro é para decrementar
         IF nGrid==2  //executa se for grid música                      
-            U_xTotDur(oModelM:GetValue('ZD3_DURAC'))
-        else
-        oModelZD3:=oModel:GetModel("ZD3Detail")
-        //se deletar CD e tem 1 música com dados 
-            If (oModelZD3:length()==1 .and. !Empty(AllTrim(oModelZD3:GetValue('ZD3_MUSICA'))) .and. !Empty(AllTrim(oModelZD3:GetValue('ZD3_DURAC')))) .OR.;
-                oModelZD3:length()>1
-                 Help(NIL, NIL, "Não é possível excluir", NIL, "Contém registro de música relacionado a este CD.", 1, 0, NIL, NIL, NIL, NIL, NIL, {"Atenção! Delete os registros de música deste CD."})            
-                return nil
-            EndIf    
+            U_xTotDur(oModelM:GetValue('ZD3_DURAC'))                        
         EndIf
-        //xTotQtd(modulo master,2=decrementar qtd,1=cd 2=musica,)
-         U_xTotQtd("ZD5Master",2,nGrid,.T.)   //decrementar cd ou música     
+            //xTotQtd(modulo master,2=decrementar qtd,1=cd 2=musica,)
+            U_xTotQtd("ZD5Master",2,nGrid,.T.)   //decrementar cd ou música     
     else //recuperando
         //senão deletará, decrementa valor no totalizador
         IF nGrid==2
             M->ZD3_DURAC:=oModelM:GetValue('ZD3_DURAC')//atribui na variável de memória para incrementar
             U_xTotDur()     
         EndIf            
-        //xTotQtd(modulo master,2=decrementar qtd,1=cd 2=musica,)
+        //xTotQtd(modulo master,1=incrementar qtd,1=cd 2=musica,)
             U_xTotQtd("ZD5Master",1,nGrid,.T.)  
-    EndIf    
+    EndIf      
     oView:Refresh()
     IIF( nGrid==1, oView:Refresh('VIEW_SB1'), oView:Refresh('VIEW_ZD3') )
-    FWRestRows(aSaveLines)
+    //FWRestRows(aSaveLines)
 return Nil
 
-User Function xUnDelL()
+/*
+Função validadora da grid CD, 
+para bloquear deleção de linha quando existe música com dados e não deletada na outra grid relacionada ao CD.
+*/
+Static Function xLinePre(oModel,nLine,cAction)
+    Local oModelM    
+    Local lRet    :=.T.
+    Local nL 
 
-    FWAlertSuccess( "Desdeletado registro com sucesso.", "Desdeletado" )
-    
-return Nil
+    oModel:GoLine(nLine)//linha do CD com foco
+    If cAction=='DELETE' .and. !oModel:IsDeleted()//verifica se está no comando Delete e a  linha não está deletada        
+        //Inicia com modelo B1, mas chama o modelo ativo, do Ponto de entrada
+        oModelM:=oModel:GetModel("ZD3Detail")//CID:xContrM
+        oModelM:=oModel:GetModel("ZD3Detail"):AALLSUBMODELS[3]//recebe modelo grid Música
+        
+        //navega na grid de musica
+        for nL :=1  to oModelM:length()
+            oModelM:GoLine(nL)
+            if !oModelM:IsDeleted()
+                If (!Empty(AllTrim(FWFldGet("ZD3_MUSICA"))) .and. FWFldGet("ZD3_DURAC")>0)                        
+                        lRet :=.F.                 
+                EndIf               
+            EndIf
+        next
+        If !lRet
+            Help(NIL, NIL, "Não é possível excluir", NIL, "Contém registro de música relacionado a este CD.", 1, 0, NIL, NIL, NIL, NIL, NIL, {"Delete os registros de música deste CD."})                            
+        EndIf                
+    EndIf
+return lRet
 

@@ -103,11 +103,21 @@ sendo também fornecedor para a venda de seu produto gravado no mesmo ou em outro
 		Testar eventos na grid CD,INSERT UPDATE OK
 		x	ao deletar CD verificar se tem música relaciona para invalidar
 				Help() , EMPTYFORM, o formulario Cds preenchido, Delete registros.
+				
+				
+			oModel:CID: "SB1Detail"	
+			oModel:GetModel("ZD3Detail"): 	CID:xContrM			
+			oModel:GetModel("ZD3Detail"):AALLSUBMODELS[3]   CID:"ZD3Detail"
+			FWFldGet("ZD3_MUSICA")	
+			
+			oModel:GetModel("ZD3Detail"):AALLSUBMODELS[3]:length() =2     1 deletado
+			verificar se existe 1 ativo
+				
 			DELETE em análise, ao chamar xDelL()  xxxxxxxxxxxxxxxxxxxxxxxxx mudar para PE xContrM	
 			oView:ACURRENTSELECT[1]    "VIEW_SB1", 
 				erro- ao recuperar registro deletado,oView:ACURRENTSELECT[1] é "VIEW_ZD3"
 			
-				
+
 				música campo vazio
 				música preenchida
 				
