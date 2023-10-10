@@ -55,6 +55,7 @@ User Function xContrM()
         If (nModel==1 .or. nModel==2) .and. cIdPonto == "FORMLINEPRE"
             oModel  :=FwModelActive()
             oModelG :=oModel:GetModel(cIdModel)
+            oModelG:lDelAllLine:=.T.   //habilita deletar todas linhas da Grid
             //evento de seta para cima                          campos vazios
             If  Len(aparam) >4 .and. aparam[5]=="DELETE" .and. Empty(AllTrim(oModelG:GetValue(aCampos[1]))) .and. Empty(AllTrim(oModelG:GetValue(aCampos[2])))
                 //xTotQtd(modulo master,2=decrementar qtd,1=cd 2=musica,)
