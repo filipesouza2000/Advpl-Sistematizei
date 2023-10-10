@@ -56,7 +56,8 @@
 				               erro- ao recuperar registro deletado,oView:ACURRENTSELECT[1] é "VIEW_ZD3"
   03/10/2023  | Filipe souza | xLinePre- Função validadora da grid CD, 
                                 para bloquear deleção de linha quando existe música com dados e não deletada na outra grid relacionada ao CD.
-                                
+  09/10/2023  | Filipe Souza | Comentado oView:Refresh() para não dudar de foco o modelo em uso.
+                            
     Planejamento @see https://docs.google.com/document/d/1V0EWr04f5LLvjhhBhYQbz8MrneLWxDtVqTkCJIA9kTA/edit?usp=drive_link
     UML          @see https://drive.google.com/file/d/1wFO2CKqSrvzxg5RZDYTfGayHrAUcCcfL/view?usp=drive_link 
     Scrum-kanban @see https://trello.com/w/protheusadvplmusicbusiness       
@@ -308,7 +309,8 @@ User Function xTotDur(nOld)
         //se estiver correto, adiciona ou dubtrai
         cTempo  := IIF( nOld>0, DecTime(cTempo,val(cH),+val(cM),+val(cS)) , ;//se houver tempo anterior e diferente, decrementa no totalizador
                         IncTime(cTempo,val(cH),+val(cM),+val(cS)) ) 
-        nNewT      := strtran(cTempo,':','')     
+        nNewT      := strtran(cTempo,':','')    
+        nOldT :=0 
     else
     xRet := .F.    
     EndIf
@@ -380,7 +382,7 @@ User Function xDelL()
     Local nGrid     :=0    // 1 = SB1Detail   2=ZD3Detail
     //Local aSaveLines:= {}
             //verifica se está posicionado na grid CD
-    IF      oView:ACURRENTSELECT[1]=="VIEW_SB1" .or. oView:ACURRENTSELECT[1]=="SB1Detail"
+    IF  oView:ACURRENTSELECT[1]=="VIEW_SB1" .or. oView:ACURRENTSELECT[1]=="SB1Detail"
         nGrid:=1
         oModelM:=oModel:GetModel("SB1Detail")
             //verifica se está posicionado na grid Musica
@@ -407,7 +409,7 @@ User Function xDelL()
         //xTotQtd(modulo master,1=incrementar qtd,1=cd 2=musica,)
             U_xTotQtd("ZD5Master",1,nGrid,.T.)  
     EndIf      
-    oView:Refresh()
+    //oView:Refresh()
     IIF( nGrid==1, oView:Refresh('VIEW_SB1'), oView:Refresh('VIEW_ZD3') )
     //FWRestRows(aSaveLines)
 return Nil
