@@ -102,20 +102,73 @@ sendo também fornecedor para a venda de seu produto gravado no mesmo ou em outro
 			para incrementar e decrementar totalizador.
 		Testar eventos na grid CD,INSERT UPDATE OK
 		x	ao deletar CD verificar se tem música relaciona para invalidar
-				Help() , EMPTYFORM, o formulario Cds preenchido, Delete registros.
+04/10 - xContrM 
+		x	Melhoria no ponto de entrada pré validador do campo ZD3-DURAC, se valor for 0 ou negativo		
+		x	Resolvido evento UnDelete CD, o evento oView:Refresh() mudava o foco, foi retirado.
+09/10 - 		
+		x   Alterar ZD3_DURAC da erro, foi corrigido, após decrementar tempo deve zerar o nOldT, que é utilizado no PE
+						
+			cTempo = 300 
+			ao editar chama PE L59 e atribui o valor já existente no nOldT=200  
+				L64 xRet := U_xTotDur(nOldT)//decrementa antes de adicionar				
+				xTotDur(200)
+				L310  DecTime(300,200)     //decrementa
+				   cTempo=100				  //atribui valor atual do tempo total sem o valor anterior
+				   
+				na grid, digitar novo valor de duração, 400
+				PE L64 novamente 
+				xTotDur(200)
+				L310  DecTime(100,200)     //decrementa
+				cTempo= -100
+				
+				através do validador do campo ZD3_DURAC chama a função xTotDur() //sem parâmetro e nOld é DEFAULT=0 , assim executa:
+				IncTime(cTempo,ZD3_DURAC)    -100 + 400 = 300  
+				-------------------
+				Solução, após decrementar tempo deve zerar o nOldT, que é utilizado no PE
+				No PE adicionar varipavel boleana para informar que está sendo editado
+				Local xEdit :=.F.
+				
+				If nModel==2  .and. !Empty(M->ZD3_DURAC) .and. M->ZD3_DURAC > 0
+                xRet := U_xValTime(M->ZD3_DURAC)//valida tempo digitado                 
+                xEdit :=.T.
+				
+				If M->ZD3_DURAC <> nOldT .and. nOldT >0 .and. xEdit//valor editado
+				-------------------
+				
+		x 	Ao deletar musica da erro no totalizador de tempo.
+				PE L62   xRet==.T.
+				M->ZD3_DURAC <> nOldT      nil<>200
+				xRet := U_xTotDur(nOldT)//decrementa antes de adicionar
+			xTotDur(200)
+				DecTime(600,200)    400
+			evento DELETELINE do oView chama U_xDelL()
+			L395 oModelM:IsDeleted()//deletando
+				IF nGrid==2  			//executa se for grid música 
+				U_xTotDur(oModelM:GetValue('ZD3_DURAC'))   //tem parâmetro é para decrementar
+				DecTime(400,200)
+				xxxxxxx foi executada 2 vezes, no PE e DELETELINE
+				------------
+				Solucioando igual a Edição, com a variável xEdit
+				varipavel boleana para informar quando está sendo editado, ao deletar não executa.
+				Local xEdit :=.F.
+				------------------
+		
+		££££££		Ao deletar cd e músicas, navegando inserindo e apagando musicas, ao navegar para outro cd exibe:
+		Help: VLDDATA_FWGRIDNOLINES
+			
+		
 				
 				
-			oModel:CID: "SB1Detail"	
-			oModel:GetModel("ZD3Detail"): 	CID:xContrM			
-			oModel:GetModel("ZD3Detail"):AALLSUBMODELS[3]   CID:"ZD3Detail"
-			FWFldGet("ZD3_MUSICA")	
+				   
+		
+		
+		
+		
+		
+		No CD deletado deve desabilitar sua grid de musica 				
 
-			oModel:GetModel("ZD3Detail"):AALLSUBMODELS[3]:length() =2     1 deletado
-			verificar se existe 1 ativo
+			
 				
-			DELETE em análise, ao chamar xDelL()  xxxxxxxxxxxxxxxxxxxxxxxxx mudar para PE xContrM	
-			oView:ACURRENTSELECT[1]    "VIEW_SB1", 
-				erro- ao recuperar registro deletado,oView:ACURRENTSELECT[1] é "VIEW_ZD3"
 			
 
 				música campo vazio

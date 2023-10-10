@@ -7,6 +7,10 @@
   20/09/2023  | Filipe Souza | otimização do ponto de entrada, estava sendo chamado U_xTotMus(2) nos 2 eventos
                                 de 'Deletar' e 'seta apra cima' que também deleta. 
                                 adicionei condição para verificar se campos estão vazios, assim não foi confirmada linha.                                
+   09/10/2023  | Filipe Souza | Alterar ZD3_DURAC da erro, foi corrigido, após decrementar tempo deve zerar o nOldT, que é utilizado no PE
+                                boleano para informar que editou valor    
+                                No PE adicionar varipavel boleana para informar que está sendo editado
+				                Local xEdit :=.F.                                 
 @see https://tdn.totvs.com/display/public/framework/Pontos+de+Entrada+para+fontes+Advpl+desenvolvidos+utilizando+o+conceito+MVC
 @see https://tdn.totvs.com/display/public/PROT/DT+PE+MNTA080+Ponto+de+entrada+padrao+MVC
 */  
@@ -22,6 +26,7 @@ User Function xContrM()
 */
     Local aparam    := PARAMIXB
     Local xRet      :=.T.
+    Local xEdit     :=.F.
     //Local oObject   := aparam[1] //objeto do formulário ou do modelo
     Local cIdPonto  := aparam[2] // id do local de execução do ponto de entrada
     Local cIdModel  := aparam[3] //id do formulario
@@ -53,14 +58,15 @@ User Function xContrM()
             //tratar duração da música e totalizador
             If nModel==2  .and. !Empty(M->ZD3_DURAC) .and. M->ZD3_DURAC > 0
                 xRet := U_xValTime(M->ZD3_DURAC)//valida tempo digitado                 
+                xEdit :=.T.//boleano para informar que editou valor
             elseif nModel==2 .and.  M->ZD3_DURAC <= 0
                xRet:=.F.   
             elseif nModel==2  // recebe valor duração anterior da edição
-                nOldT:= omodelg:GetValue(aCampos[2])
+                nOldT:= omodelg:GetValue(aCampos[2])                
             EndIf
 
-            If xRet
-                If M->ZD3_DURAC <> nOldT .and. nOldT >0//valor editado
+            If xRet   //entrar somente para edição do campo
+                If M->ZD3_DURAC <> nOldT .and. nOldT >0 .and. xEdit//valor editado
                     xRet := U_xTotDur(nOldT)//decrementa antes de adicionar
                     elseif M->ZD3_DURAC == nOldT    
                         nOldT  := M->ZD3_DURAC 
@@ -69,11 +75,9 @@ User Function xContrM()
             else
                 Help(NIL, NIL, "Validação!", NIL, "Número incoreto para o campo de duração", 1, 0, NIL, NIL, NIL, NIL, NIL, {"Digite números dentro do formato da hora."})
                 
-            EndIf    
-        /*££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
-        totalizador de tempo usa NEGATIVO
-        ¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢*/
+            EndIf           
         EndIf
     EndIf    
     aCampos   :={}
+    xEdit     :=.F.
 return xRet
