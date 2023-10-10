@@ -6,11 +6,16 @@
                                 totalizador incrementa e é preciso decrementar total de músicas.
   20/09/2023  | Filipe Souza | otimização do ponto de entrada, estava sendo chamado U_xTotMus(2) nos 2 eventos
                                 de 'Deletar' e 'seta apra cima' que também deleta. 
-                                adicionei condição para verificar se campos estão vazios, assim não foi confirmada linha.                                
+                                adicionei condição para verificar se campos estão vazios, assim não foi confirmada linha.
    09/10/2023  | Filipe Souza | Alterar ZD3_DURAC da erro, foi corrigido, após decrementar tempo deve zerar o nOldT, que é utilizado no PE
                                 boleano para informar que editou valor    
                                 No PE adicionar varipavel boleana para informar que está sendo editado
-				                Local xEdit :=.F.                                 
+				                Local xEdit :=.F. 
+  10/10/2023  | Filipe Souza  | Ao deletar cd e músicas, navegando na grid CD em outro foco, exibe:
+                                Help: VLDDATA_FWGRIDNOLINES                                
+                                Solução: modelo com atributo padrão lDelAllLine:=.F.
+                                mudar para oModelG:lDelAllLine:=.T. ao instanciar.                                
+
 @see https://tdn.totvs.com/display/public/framework/Pontos+de+Entrada+para+fontes+Advpl+desenvolvidos+utilizando+o+conceito+MVC
 @see https://tdn.totvs.com/display/public/PROT/DT+PE+MNTA080+Ponto+de+entrada+padrao+MVC
 */  

@@ -152,22 +152,17 @@ sendo também fornecedor para a venda de seu produto gravado no mesmo ou em outro
 				varipavel boleana para informar quando está sendo editado, ao deletar não executa.
 				Local xEdit :=.F.
 				------------------
+10/10 - x	Ao deletar cd e músicas, navegando na grid CD em outro foco, exibe:
+			Help: VLDDATA_FWGRIDNOLINES
+			------------
+			Solução: modelo com atributo padrão lDelAllLine:=.F.
+			mudar para oModelG:lDelAllLine:=.T.
+			-------------		
 		
-		££££££		Ao deletar cd e músicas, navegando inserindo e apagando musicas, ao navegar para outro cd exibe:
-		Help: VLDDATA_FWGRIDNOLINES
-			
-		
+		££££?   No CD deletado com músicas deletadas, ao recuperar primeiro as músicas, 
+				na grid CD deve validar para recuperar tbm o CD referente, ao mudar o foco da linha.
 				
-				
-				   
-		
-		
-		
-		
-		
-		No CD deletado deve desabilitar sua grid de musica 				
-
-			
+						
 				
 			
 
