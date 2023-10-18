@@ -57,6 +57,7 @@
   03/10/2023  | Filipe souza | xLinePre- Função validadora da grid CD, 
                                 para bloquear deleção de linha quando existe música com dados e não deletada na outra grid relacionada ao CD.
   09/10/2023  | Filipe Souza | Comentado oView:Refresh() para não dudar de foco o modelo em uso.
+  17/10/2023  | Filipe Souza | Comentado oView:Refresh() das Grids para não dudar de foco o modelo em uso.
                             
     Planejamento @see https://docs.google.com/document/d/1V0EWr04f5LLvjhhBhYQbz8MrneLWxDtVqTkCJIA9kTA/edit?usp=drive_link
     UML          @see https://drive.google.com/file/d/1wFO2CKqSrvzxg5RZDYTfGayHrAUcCcfL/view?usp=drive_link 
@@ -410,7 +411,7 @@ User Function xDelL()
             U_xTotQtd("ZD5Master",1,nGrid,.T.)  
     EndIf      
     //oView:Refresh()
-    IIF( nGrid==1, oView:Refresh('VIEW_SB1'), oView:Refresh('VIEW_ZD3') )
+    //IIF( nGrid==1, oView:Refresh('VIEW_SB1'), oView:Refresh('VIEW_ZD3') )
     //FWRestRows(aSaveLines)
 return Nil
 
