@@ -68,7 +68,26 @@ User Function xContrM()
             elseif nModel==2 .and.  M->ZD3_DURAC <= 0
                xRet:=.F.   
             elseif nModel==2  // recebe valor duração anterior da edição
-                nOldT:= omodelg:GetValue(aCampos[2])                
+                nOldT:= omodelg:GetValue(aCampos[2])   
+
+                 // Validação: se CD está deletado, grid de musica for editada  
+                 If oModelG:OFORMMODELOWNER:isDeleted() .and. aparam[5]=="CANSETVALUE"
+                    //se tem 1 música, a inicial e sem valor
+                    If oModelG:length()==1 .AND. (Empty(AllTrim(FWFldGet("ZD3_MUSICA"))) .and. FWFldGet("ZD3_DURAC")==0)
+                        oModelG:OFORMMODELOWNER:GoLine(oModelG:OFORMMODELOWNER:nLine)
+                        FwAlerthelp('Validação','Não é possível inserir Música'+Chr(10)+Chr(13)+' com CD deletado'+Chr(10)+Chr(13)+'Recupere o CD '+Alltrim(FWFldGet("B1_DESC")))
+                        xRet :=.F.
+                    //se tem mais de 1 música preenchida, posiciona na ultima linha a saber se não está deletada.    
+                    elseIf oModelG:length()>1           
+                        oModelG:GoLine(oModelG:length())
+                        IF !oModelG:IsDeleted()
+                             oModelG:OFORMMODELOWNER:GoLine(oModelG:OFORMMODELOWNER:nLine)
+                            FwAlerthelp('Validação','Não é possível inserir Música'+Chr(10)+Chr(13)+' com CD deletado'+Chr(10)+Chr(13)+'Recupere o CD '+Alltrim(FWFldGet("B1_DESC")))                                
+                            xRet:=.F.                            
+                        EndIf                     
+                    EndIf
+                EndIf
+
             EndIf
 
             If xRet   //entrar somente para edição do campo
@@ -81,7 +100,7 @@ User Function xContrM()
             else
                 Help(NIL, NIL, "Validação!", NIL, "Número incoreto para o campo de duração", 1, 0, NIL, NIL, NIL, NIL, NIL, {"Digite números dentro do formato da hora."})
                 
-            EndIf           
+            EndIf   
         EndIf
     EndIf    
     aCampos   :={}

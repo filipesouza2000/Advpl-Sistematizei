@@ -157,17 +157,35 @@ sendo também fornecedor para a venda de seu produto gravado no mesmo ou em outro
 			------------
 			Solução: modelo com atributo padrão lDelAllLine:=.F.
 			mudar para oModelG:lDelAllLine:=.T.
-			-------------		
-		
-		££££?   No CD deletado com músicas deletadas, ao recuperar primeiro as músicas, 
-				na grid CD deve validar para recuperar tbm o CD referente, ao mudar o foco da linha.
-				
-						
-				
-			
+			-------------	
 
-				música campo vazio
-				música preenchida
+		x 	recuperar CD sem musica error
+			variable is not an object  on U_XTOTDUR(XCONTR.PRW) 09/10/2023 17:58:06 line : 327
+			-----------------
+			solução: retirado Refresh() da linha 413 da função xDelL
+			-----------------
+		
+		x   Com CD Deletado, com uma música inicial ou a final, na grid Musica ao editar, validar para bloquear inserção.
+			----------		
+			solução: No PE FORMLINEPRE, 
+				//verifica se a linha do CD proprietário da grid Música está deletada.
+				oModelG:OFORMMODELOWNER:isDeleted()     
+				//se a linha está sendo editada
+				aparam[5]=="CANSETVALUE"
+				//se tem 1 música, a inicial e sem valor
+				if oModelG:length()==1 .AND. (Empty(AllTrim(FWFldGet("ZD3_MUSICA"))) .and. FWFldGet("ZD3_DURAC")==0)
+				 //adquire o nome do cd para colocar no alerta
+				 oModelG:OFORMMODELOWNER:GoLine(oModelG:OFORMMODELOWNER:nLine)
+				 FWFldGet("B1_DESC")				
+				//retorna falso para não passar no validador 
+				xRet:=.F.
+				//se tem mais de 1 música preenchida, posiciona na ultima linha a saber se não está deletada.  
+				elseif oModelG:length()>1           
+                oModelG:GoLine(oModelG:length())
+				!oModelG:IsDeleted()
+				////adquire o nome do cd para colocar no alerta
+			--------------
+			
 				
 		gerar documento do contrato
 		identificar formas de pagamento	
