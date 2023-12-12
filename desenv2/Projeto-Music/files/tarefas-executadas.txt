@@ -1,6 +1,6 @@
 -projeto xCDModX()
--Artistas serão clientes a efetuar gravação e criar CD, 
-sendo também fornecedor para a venda de seu produto gravado no mesmo ou em outro estudio.
+-Artistas serï¿½o clientes a efetuar gravaï¿½ï¿½o e criar CD, 
+sendo tambï¿½m fornecedor para a venda de seu produto gravado no mesmo ou em outro estudio.
 -Rever sobre novos campos e relacionamento entre:
 	SA1 - SB1
 	SB1 - ZD3
@@ -8,124 +8,115 @@ sendo também fornecedor para a venda de seu produto gravado no mesmo ou em outro
 -Criar campo B1_XEST para receber codigo de estudio, podendo ser na X5 ou outra customizada.
 
 -Alterar Layout de horinzontal para vertical
--Remover campo B1_XART da estrutura a não exibir.
--Remover campo B1_AFAMAD da estrutura a não exibir.
+-Remover campo B1_XART da estrutura a nï¿½o exibir.
+-Remover campo B1_AFAMAD da estrutura a nï¿½o exibir.
 -Desabiliar campo A1_COD, iniciar com GETXENUM
 -Desabiliar campo A2_COD, iniciar com GETXENUM
--Desabilitar e retirar autoincrement do B1_COD, utilizar gatilho a função xCodProd 
-	-mudar gatilho para chamar só B1_TIPO
-	-resolver a sequencia B1_COD que pára em único registro.
-	-no evento cancelar, zerar a variável Private que pega o cod do registro.
+-Desabilitar e retirar autoincrement do B1_COD, utilizar gatilho a funï¿½ï¿½o xCodProd 
+	-mudar gatilho para chamar sï¿½ B1_TIPO
+	-resolver a sequencia B1_COD que pï¿½ra em ï¿½nico registro.
+	-no evento cancelar, zerar a variï¿½vel Private que pega o cod do registro.
 
- 
--Cenario Ensaio:
-	Cliente solicita estudio e é consultado a disponibilidade, 
-	Cliente não existente é cadastrado -SA1, 
-	com dia e hora disponivel ele agenda serviço com dia, horário e tempo para serviço -ZD1, com status 1-ON
-	cliente recebe um documento do registro com os dados do agendamento,	 
-	O estudio local-ZD2 recebe agenda, cliente utiliza o estudio e finaliza sua agenda
-	recebendo nota fiscal do serviço com data de vencimento e valor.
-	atualiza status 2-OK
-	
--Cenario Gravação:
-	cliente fecha contrato de gravação de CD ou solicita novo agendamento,
-	para agendamento inicial do projeto são especificados CDs -SB1 com suas musicas -ZD3,
-	Cliente não existente é cadastrado -SA1, também é registrado um Artista -ZD4 para este cliente e -ZD5 de Artista x Cliente,
-	com dia e hora disponivel ele agenda gravação de seu instrumento , para cd e música em andamento, na -ZD1 com status 1-ON
-	Em projeto em andamento, é gerado novo agendamento para cada instrumentista em cada música na lista,
-	no produto tipo CD e sua música em gravação deve manter status de 'ON', 
-	indicando projeto em andamento e ainda não liberar para venda.
-	O estudio local-ZD2 recebe agenda desabilitando datas e horários solicitados,
+
+-Cenario Contrato de Gravaï¿½ï¿½o:
+	cliente fecha contrato de gravaï¿½ï¿½o de CD ou solicita novo agendamento,
+	para agendamento inicial do projeto sï¿½o especificados CDs -SB1 com suas musicas -ZD3,
+	Cliente nï¿½o existente ï¿½ cadastrado -SA1, tambï¿½m ï¿½ registrado um Artista -ZD4 para este cliente e -ZD5 de Artista x Cliente,
+	com dia e hora disponivel ele agenda gravaï¿½ï¿½o de seu instrumento , para cd e mï¿½sica em andamento, na -ZD1 com status 1-ON
+	Em projeto em andamento, ï¿½ gerado novo agendamento para cada instrumentista em cada mï¿½sica na lista,
+	no produto tipo CD e sua mï¿½sica em gravaï¿½ï¿½o deve manter status de 'ON', 
+	indicando projeto em andamento e ainda nï¿½o liberar para venda.
+	O estudio local-ZD2 recebe agenda desabilitando datas e horï¿½rios solicitados,
 	cliente utiliza o estudio e grava dentro do tempo especificado,
-	se necessário gerará novo agendamento para mesma música e instrumento ou próximos.
-	Quando finaliza cada gravação é atalizado seu status,
-	Concluindo músicas o estudio produz o CD e atualiza os Status do produto e músicas.
+	se necessï¿½rio gerarï¿½ novo agendamento para mesma mï¿½sica e instrumento ou prï¿½ximos.
+	Quando finaliza cada gravaï¿½ï¿½o ï¿½ atalizado seu status,
+	Concluindo mï¿½sicas o estudio produz o CD e atualiza os Status do produto e mï¿½sicas.
 	
--Cenário contrato gravação
-	Cliente faz o contrato contendo os serviços de gravação, mixagem e masterização, apresentando dados do CD
-	com suas respectivas músicas, determinando o total de tempo a ser gravado.
-	Contrato gera pedido de venda contendo o CD da gravação, gera Documento de saída Nota Fiscal.
+-Cenï¿½rio contrato gravaï¿½ï¿½o
+	Cliente faz o contrato contendo os serviï¿½os de gravaï¿½ï¿½o, mixagem e masterizaï¿½ï¿½o, apresentando dados do CD
+	com suas respectivas mï¿½sicas, determinando o total de tempo a ser gravado.
+	Contrato gera pedido de venda contendo o CD da gravaï¿½ï¿½o, gera Documento de saï¿½da Nota Fiscal.
 	
 05/08 - 
-	x	Gatilho via codigo para campo ZD1_SERV quando muda, para 1, apaga campos ZD1_INSTR ,ZD1_NINSTR , ZD1_CODA , ZD1_ART já preenchidos
-	x	Gerar Browse de registro para tabela ZD4-ARTISTA, com relação com SA1-Cliente
-		  Não foi possível pelo protheus não ter relacionamentos integrados, formei somente ZD4
+	x	Gatilho via codigo para campo ZD1_SERV quando muda, para 1, apaga campos ZD1_INSTR ,ZD1_NINSTR , ZD1_CODA , ZD1_ART jï¿½ preenchidos
+	x	Gerar Browse de registro para tabela ZD4-ARTISTA, com relaï¿½ï¿½o com SA1-Cliente
+		  Nï¿½o foi possï¿½vel pelo protheus nï¿½o ter relacionamentos integrados, formei somente ZD4
 	x	Na View retirar da oStrArt o campo ZD4_CLI
 	x	GetSxEnum no ZD4_COD
-	x	Criar tabela genérica para Gênero Musical, consulta padrão para campo ZD4_GENERO	
+	x	Criar tabela genï¿½rica para Gï¿½nero Musical, consulta padrï¿½o para campo ZD4_GENERO	
 	x	testados registros com integridade de dados
 
-11/08-	xContrato de gravação
-	x	gerar protótipo do layout- xContr modelo1 ZD5
+11/08-	xContrato de gravaï¿½ï¿½o
+	x	gerar protï¿½tipo do layout- xContr modelo1 ZD5
 	x	criar gatilho no campo cod cliente, para filtrar somente os que existem em ZD4
 28/08- xContr
 	x	gerar campo ZD5_DATA para iniciar com data do sistema.
 	x	atualizar para modelo 2 e 3	
 	x	Gatilho B1_TIPO, campo B1_COD recebe U_xCodProd()
 	x	Gerar auto preenchimento de ZD5_QCD,ZD5_FAIXAS e ZD5_TEMPO relativo a totalizadores. 
-	x		U_xTotCd()  no campo B1_TIPO   ,validação do usuário, para chamar função ao editar. Preenche ZD5_QCD
-	x		U_xTotMus() no campo ZD3_MUSICA,validação do usuário, para chamar função ao editar. Preenche ZD5_FAIXAS
-	x		U_xTotDur() no campo ZD3_DURAC, validação do usuário, para chamar função ao editar. Preenche ZD5_TEMPO
+	x		U_xTotCd()  no campo B1_TIPO   ,validaï¿½ï¿½o do usuï¿½rio, para chamar funï¿½ï¿½o ao editar. Preenche ZD5_QCD
+	x		U_xTotMus() no campo ZD3_MUSICA,validaï¿½ï¿½o do usuï¿½rio, para chamar funï¿½ï¿½o ao editar. Preenche ZD5_FAIXAS
+	x		U_xTotDur() no campo ZD3_DURAC, validaï¿½ï¿½o do usuï¿½rio, para chamar funï¿½ï¿½o ao editar. Preenche ZD5_TEMPO
 	x	Alterada tabelaSB1 como Compartilhada de filial em SX2
 12/09 	
-	x	atualizar pesquisa padrão ZD5 do campo cod artista para retornar ZD4_CLI==M->ZD5_CLI
+	x	atualizar pesquisa padrï¿½o ZD5 do campo cod artista para retornar ZD4_CLI==M->ZD5_CLI
 	x	gatilho para zerar campos de artista ao alterar o campo cod cliente.
-	x	criar campo ZD3_XCONT  para o relacionamento com música.
+	x	criar campo ZD3_XCONT  para o relacionamento com mï¿½sica.
 	x	atualizar relacionamento Musica com Contrato adicionando campo ZD3_XCONT
 	x	validar digitos do tempo , xTotDur().   
 	x	somar tempo formatado e atribuir ao totalizador e campos, IncTime('10:50:40',20,15,25 )
 13/09
-	x	otimizar soma do tempo na lista de musicas, ao alterar é atualizada.
+	x	otimizar soma do tempo na lista de musicas, ao alterar ï¿½ atualizada.
 	x	ponto de entrada FORMLINEPRE em "ZD3Detail", pegar valor da linha ativa, para decrementar ao editar
-	x	ao invalidar valor, faz cálculo mesmo assim, precisa impedir o cálculo.
+	x	ao invalidar valor, faz cï¿½lculo mesmo assim, precisa impedir o cï¿½lculo.
 14/09	
-	x	ao editar e confirmar com o mesmo número, deve decrementar para ser somado no Totalizador padrão.	
-	x	ao deletar linha na grid deve decrementar. Depois só precisa mudar de linha na grid que atualiza a view.
+	x	ao editar e confirmar com o mesmo nï¿½mero, deve decrementar para ser somado no Totalizador padrï¿½o.	
+	x	ao deletar linha na grid deve decrementar. Depois sï¿½ precisa mudar de linha na grid que atualiza a view.
 		
 16/09
-	x	2º cd não incrementa 1ª música.Corrigido.
-	x	recuperar linha na grid para incrementar, nao sincroniza totalizadores, só o XX_TotDur ---fazer Refresh()				
+	x	2ï¿½ cd nï¿½o incrementa 1ï¿½ mï¿½sica.Corrigido.
+	x	recuperar linha na grid para incrementar, nao sincroniza totalizadores, sï¿½ o XX_TotDur ---fazer Refresh()				
 	x	deletar musica, sincronizar ZD5_TEMPO---fazer Refresh(), decrementar musica ZD5_FAIXAS
-	x	ao clicar para baixo e inserir linha e voltar para cima, só incrementa total mas não decrementa automaticamente.
-	x	estava sendo chamado U_xTotMus(2) nos 2 eventos de 'Deletar' e 'seta apra cima' que também deleta,
+	x	ao clicar para baixo e inserir linha e voltar para cima, sï¿½ incrementa total mas nï¿½o decrementa automaticamente.
+	x	estava sendo chamado U_xTotMus(2) nos 2 eventos de 'Deletar' e 'seta apra cima' que tambï¿½m deleta,
 20/09  
-	x	adicionei na condição do ponto de entrada para verificar se campos estão vazios, assim não foi confirmada linha.
-	x	usar function xTotMus como genérica para servir para música e cd para c ontrolar totalizdor e frame
-	x	otimizar totalizador de música-duração, validar o tempo sem edição, seta para baixo.
+	x	adicionei na condiï¿½ï¿½o do ponto de entrada para verificar se campos estï¿½o vazios, assim nï¿½o foi confirmada linha.
+	x	usar function xTotMus como genï¿½rica para servir para mï¿½sica e cd para c ontrolar totalizdor e frame
+	x	otimizar totalizador de mï¿½sica-duraï¿½ï¿½o, validar o tempo sem ediï¿½ï¿½o, seta para baixo.
 21/09
-		Otimizar função xTotMus() para ser função genérica com parâmetros a ser reutilzada para outros totais, 
+		Otimizar funï¿½ï¿½o xTotMus() para ser funï¿½ï¿½o genï¿½rica com parï¿½metros a ser reutilzada para outros totais, 
 			xTotQtd(cModM,nOpt,nModulo) em xContr e xContrM
-27/09	Resolvendo o problema do evento Delete da linha de músicas,que totalizada duas vezes,
-			na função xDelL() chama  U_xTotQtd("ZD5Master",2,2,.T.)
+27/09	Resolvendo o problema do evento Delete da linha de mï¿½sicas,que totalizada duas vezes,
+			na funï¿½ï¿½o xDelL() chama  U_xTotQtd("ZD5Master",2,2,.T.)
 			parametro .T. para informar que foi do evento da tecla Delete, IIF( lDell, , nTot++ ),
 			se for pelo ponto de entrada, identificando seta para cima ou baixo, chama U_xTotQtd("ZD5Master",2,nModel)
 			para incrementar e decrementar totalizador.
 		Testar eventos na grid CD,INSERT UPDATE OK
-		x	ao deletar CD verificar se tem música relaciona para invalidar
+		x	ao deletar CD verificar se tem mï¿½sica relaciona para invalidar
 04/10 - xContrM 
-		x	Melhoria no ponto de entrada pré validador do campo ZD3-DURAC, se valor for 0 ou negativo		
+		x	Melhoria no ponto de entrada prï¿½ validador do campo ZD3-DURAC, se valor for 0 ou negativo		
 		x	Resolvido evento UnDelete CD, o evento oView:Refresh() mudava o foco, foi retirado.
 09/10 - 		
-		x   Alterar ZD3_DURAC da erro, foi corrigido, após decrementar tempo deve zerar o nOldT, que é utilizado no PE
+		x   Alterar ZD3_DURAC da erro, foi corrigido, apï¿½s decrementar tempo deve zerar o nOldT, que ï¿½ utilizado no PE
 						
 			cTempo = 300 
-			ao editar chama PE L59 e atribui o valor já existente no nOldT=200  
+			ao editar chama PE L59 e atribui o valor jï¿½ existente no nOldT=200  
 				L64 xRet := U_xTotDur(nOldT)//decrementa antes de adicionar				
 				xTotDur(200)
 				L310  DecTime(300,200)     //decrementa
 				   cTempo=100				  //atribui valor atual do tempo total sem o valor anterior
 				   
-				na grid, digitar novo valor de duração, 400
+				na grid, digitar novo valor de duraï¿½ï¿½o, 400
 				PE L64 novamente 
 				xTotDur(200)
 				L310  DecTime(100,200)     //decrementa
 				cTempo= -100
 				
-				através do validador do campo ZD3_DURAC chama a função xTotDur() //sem parâmetro e nOld é DEFAULT=0 , assim executa:
+				atravï¿½s do validador do campo ZD3_DURAC chama a funï¿½ï¿½o xTotDur() //sem parï¿½metro e nOld ï¿½ DEFAULT=0 , assim executa:
 				IncTime(cTempo,ZD3_DURAC)    -100 + 400 = 300  
 				-------------------
-				Solução, após decrementar tempo deve zerar o nOldT, que é utilizado no PE
-				No PE adicionar varipavel boleana para informar que está sendo editado
+				Soluï¿½ï¿½o, apï¿½s decrementar tempo deve zerar o nOldT, que ï¿½ utilizado no PE
+				No PE adicionar varipavel boleana para informar que estï¿½ sendo editado
 				Local xEdit :=.F.
 				
 				If nModel==2  .and. !Empty(M->ZD3_DURAC) .and. M->ZD3_DURAC > 0
@@ -143,81 +134,106 @@ sendo também fornecedor para a venda de seu produto gravado no mesmo ou em outro
 				DecTime(600,200)    400
 			evento DELETELINE do oView chama U_xDelL()
 			L395 oModelM:IsDeleted()//deletando
-				IF nGrid==2  			//executa se for grid música 
-				U_xTotDur(oModelM:GetValue('ZD3_DURAC'))   //tem parâmetro é para decrementar
+				IF nGrid==2  			//executa se for grid mï¿½sica 
+				U_xTotDur(oModelM:GetValue('ZD3_DURAC'))   //tem parï¿½metro ï¿½ para decrementar
 				DecTime(400,200)
 				xxxxxxx foi executada 2 vezes, no PE e DELETELINE
 				------------
-				Solucioando igual a Edição, com a variável xEdit
-				varipavel boleana para informar quando está sendo editado, ao deletar não executa.
+				Solucioando igual a Ediï¿½ï¿½o, com a variï¿½vel xEdit
+				varipavel boleana para informar quando estï¿½ sendo editado, ao deletar nï¿½o executa.
 				Local xEdit :=.F.
 				------------------
-10/10 - x	Ao deletar cd e músicas, navegando na grid CD em outro foco, exibe:
+10/10 - x	Ao deletar cd e mï¿½sicas, navegando na grid CD em outro foco, exibe:
 			Help: VLDDATA_FWGRIDNOLINES
 			------------
-			Solução: modelo com atributo padrão lDelAllLine:=.F.
+			Soluï¿½ï¿½o: modelo com atributo padrï¿½o lDelAllLine:=.F.
 			mudar para oModelG:lDelAllLine:=.T.
 			-------------	
 
 		x 	recuperar CD sem musica error
 			variable is not an object  on U_XTOTDUR(XCONTR.PRW) 09/10/2023 17:58:06 line : 327
 			-----------------
-			solução: retirado Refresh() da linha 413 da função xDelL
+			soluï¿½ï¿½o: retirado Refresh() da linha 413 da funï¿½ï¿½o xDelL
 			-----------------
 		
-		x   Com CD Deletado, com uma música inicial ou a final, na grid Musica ao editar, validar para bloquear inserção.
+17/10	x   Com CD Deletado, com uma mï¿½sica inicial ou a final, na grid Musica ao editar, validar para bloquear inserï¿½ï¿½o.
 			----------		
-			solução: No PE FORMLINEPRE, 
-				//verifica se a linha do CD proprietário da grid Música está deletada.
+			soluï¿½ï¿½o: No PE FORMLINEPRE, 
+				//verifica se a linha do CD proprietï¿½rio da grid Mï¿½sica estï¿½ deletada.
 				oModelG:OFORMMODELOWNER:isDeleted()     
-				//se a linha está sendo editada
+				//se a linha estï¿½ sendo editada
 				aparam[5]=="CANSETVALUE"
-				//se tem 1 música, a inicial e sem valor
+				//se tem 1 mï¿½sica, a inicial e sem valor
 				if oModelG:length()==1 .AND. (Empty(AllTrim(FWFldGet("ZD3_MUSICA"))) .and. FWFldGet("ZD3_DURAC")==0)
 				 //adquire o nome do cd para colocar no alerta
 				 oModelG:OFORMMODELOWNER:GoLine(oModelG:OFORMMODELOWNER:nLine)
 				 FWFldGet("B1_DESC")				
-				//retorna falso para não passar no validador 
+				//retorna falso para nï¿½o passar no validador 
 				xRet:=.F.
-				//se tem mais de 1 música preenchida, posiciona na ultima linha a saber se não está deletada.  
+				//se tem mais de 1 mï¿½sica preenchida, posiciona na ultima linha a saber se nï¿½o estï¿½ deletada.  
 				elseif oModelG:length()>1           
                 oModelG:GoLine(oModelG:length())
 				!oModelG:IsDeleted()
 				////adquire o nome do cd para colocar no alerta
 			--------------
-			
+18/10		Limitar tempo de CD para 74 minutos. 
+			Verificar necessidade de novos campos, gerar valor para o contrato.
+			--------------
+12/12   	O totalizador de duraÃ§Ã£o tem limite de 74min por CD;
+			Compara o totalizador atual com o limite.
+			Usa o total anterior para decrementÃ¡-lo do limite,
+			para informar o tempo que falta atÃ© o limite,
+			Totalizador retorna ao total anterior, para refazer o cenÃ¡rio.		
+		
+ ----Testar salvar registro
+
+
+
+-Cenario Ensaio:
+	Cliente solicita estudio e ï¿½ consultado a disponibilidade, 
+	Cliente nï¿½o existente ï¿½ cadastrado -SA1, 
+	com dia e hora disponivel ele agenda serviï¿½o com dia, horï¿½rio e tempo para serviï¿½o -ZD1, com status 1-ON
+	cliente recebe um documento do registro com os dados do agendamento,	 
+	O estudio local-ZD2 recebe agenda, cliente utiliza o estudio e finaliza sua agenda
+	recebendo nota fiscal do serviï¿½o com data de vencimento e valor.
+	atualiza status 2-OK
+
+
+
+
+	
 				
 		gerar documento do contrato
 		identificar formas de pagamento	
 		
 		
-----fluxo
-		*ao iniciar e *finalizar edição da linha chama ponto de entrada xContrM, para verificar se já havia valor no campo ZD3_DURAC
+----fluxo contrato
+		*ao iniciar e *finalizar ediï¿½ï¿½o da linha chama ponto de entrada xContrM, para verificar se jï¿½ havia valor no campo ZD3_DURAC
 			se tem valor na memoria, valida em xValTime(), 
 			
 				se campo digitado for diferente do valor anterior e valor anterior maior que 0, 
-				significa que está sendo editado e chama U_xTotDur(nOldT) decrementar antes de adicionar.
+				significa que estï¿½ sendo editado e chama U_xTotDur(nOldT) decrementar antes de adicionar.
 			
-				se campo digitado for igual ao anterior, só ao editar mas não alterar, atribui variável do valor anterior = o já existente,
+				se campo digitado for igual ao anterior, sï¿½ ao editar mas nï¿½o alterar, atribui variï¿½vel do valor anterior = o jï¿½ existente,
 				chama xTotDur(nOldT), deve decrementar para ser adicionado automaticamente pelo totalizador.
-			senão (antes de digitar) nOldT recebe 0 , sempre antes de digitar valor nOldT recebe valor existente no campo.			
+			senï¿½o (antes de digitar) nOldT recebe 0 , sempre antes de digitar valor nOldT recebe valor existente no campo.			
 			validador do campo ZD3_MUSICA chama xTotMus(), enviar total de Musica para o campo ZD5_FAIXAS
 			
-		inserir 1º registro:
+		inserir 1ï¿½ registro:
 			ponto de entrada xContrM valida o digitado
 			validador do campo ZD3_DURAC	chama xTotDur() 
 			incrementa tempo digitado na variavel cTempo, cria nNewT no formado numero sem :
 			seta em ZD5_TEMPO o valor nNewT		
 			
-		inserir 2º cd 1ª musica:
+		inserir 2ï¿½ cd 1ï¿½ musica:
 			No validador do campo ZD3_DURAC chama xTotDur(nOld=0),
 			incrementa tempo digitado na variavel cTempo, cria nNewT no formado numero sem :
 			seta em ZD5_TEMPO o valor nNewT
-			verifica se tem 2 Cds e 1 música, para chamar xTotMus(1) para incrementar musica.
-			se nOpt=1 é para incrementar, recebe o valor do totalizador e incrementa sentando o novo valor.
+			verifica se tem 2 Cds e 1 mï¿½sica, para chamar xTotMus(1) para incrementar musica.
+			se nOpt=1 ï¿½ para incrementar, recebe o valor do totalizador e incrementa sentando o novo valor.
 			seta novo valor para ZD5_FAIXAS
-		inserir mais músicas:
-			igual 1º registro
+		inserir mais mï¿½sicas:
+			igual 1ï¿½ registro
 			
 		alterar registro de tempo:
 			ponto de entrada xContrM valida o digitado, verifica se for diferente  e o anterior mairo que 0, 
@@ -230,7 +246,7 @@ sendo também fornecedor para a venda de seu produto gravado no mesmo ou em outro
 			incrementa tempo digitado na variavel cTempo, cria nNewT no formado numero sem :
 			seta em ZD5_TEMPO o valor nNewT		
 			
-		deletar música:
+		deletar mï¿½sica:
 			se for seta para cima com registro vazio: ponto de entrada xContrM, nOldT recebe valor existente
 			
 			evento DELETELINE chama xDelL()
@@ -238,27 +254,27 @@ sendo também fornecedor para a venda de seu produto gravado no mesmo ou em outro
 				xTotDur(ZD3_DURAC) //decrementar tempo
 					decrementa tempo digitado na variavel cTempo, cria nNewT no formado numero sem :
 					atribui nNewT para ZD5_TEMPO,
-				xTotMus(2) //decrementar música
-					nMus recebe o totalizador XX_TOTM, já decrentado
+				xTotMus(2) //decrementar mï¿½sica
+					nMus recebe o totalizador XX_TOTM, jï¿½ decrentado
 					atribui nMus para ZD5_FAIXAS,					
 			view.Refresh(), sincronizados campos.
 			
-		recuperar música:	
+		recuperar mï¿½sica:	
 			ponto de entrada xContrM, nOldT recebe valor existente
 			evento UNDELETELINE chama xDelL()
-			se oModelM:IsDeleted(),senão
-			M->ZD3_DURAC recebe model.ZD3_DURAC , atribui na variável de memória para incrementar
+			se oModelM:IsDeleted(),senï¿½o
+			M->ZD3_DURAC recebe model.ZD3_DURAC , atribui na variï¿½vel de memï¿½ria para incrementar
 			xTotDur()
 			incrementa tempo,atribui nNewT para ZD5_TEMPO,
 			xTotMus(1)
-			incrementa música em XX_TOTM,
+			incrementa mï¿½sica em XX_TOTM,
 			atribui nMus para ZD5_FAIXAS,
 			view.Refresh(), 
 			
 			
 4 anos no TOTVS Protheus em: Suporte N1 e N2. 
-atualizações de patch, LIB, UPDDISTR, e APO.
-Módulos: COM,EST,FAT,FIS,TMS,COM,GPE. Comunicação TSS.
+atualizaï¿½ï¿½es de patch, LIB, UPDDISTR, e APO.
+Mï¿½dulos: COM,EST,FAT,FIS,TMS,COM,GPE. Comunicaï¿½ï¿½o TSS.
 SIGACFG,APSDU, SqlServer.
 Desenvolvimento em ADVPL
 	

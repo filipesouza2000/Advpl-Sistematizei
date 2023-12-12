@@ -58,6 +58,8 @@
                                 para bloquear deleção de linha quando existe música com dados e não deletada na outra grid relacionada ao CD.
   09/10/2023  | Filipe Souza | Comentado oView:Refresh() para não dudar de foco o modelo em uso.
   17/10/2023  | Filipe Souza | Comentado oView:Refresh() das Grids para não dudar de foco o modelo em uso.
+  12/12/2023  | Filipe Souza | Otimizado FWFormStruct a exibir só os campos necessários de produto.
+                               O totalizador de duração ter limite de 74min por CD
                             
     Planejamento @see https://docs.google.com/document/d/1V0EWr04f5LLvjhhBhYQbz8MrneLWxDtVqTkCJIA9kTA/edit?usp=drive_link
     UML          @see https://drive.google.com/file/d/1wFO2CKqSrvzxg5RZDYTfGayHrAUcCcfL/view?usp=drive_link 
@@ -283,6 +285,7 @@ User Function xTotDur(nOld)
     Local cS   := ''
     Local cM   := ''    
     Local cH   := ''
+    Local cTemp,cTemp2:=''
     Local nNewT     
     
     // se ZD3_DURAC==Nil não digitou valor ainda e pega nOld do parâmetro para decrementar
@@ -306,15 +309,38 @@ User Function xTotDur(nOld)
                             cS := right( cDur ,2)                
                             cM := SubStr(cDur,3,2) //10 11 30            
                             cH := Left(cDur,2)                      
-        EndIf    
+        EndIf 
+        //recebe valor atual para depois ser retornado.
+        cTemp:=cTempo
         //se estiver correto, adiciona ou dubtrai
         cTempo  := IIF( nOld>0, DecTime(cTempo,val(cH),+val(cM),+val(cS)) , ;//se houver tempo anterior e diferente, decrementa no totalizador
                         IncTime(cTempo,val(cH),+val(cM),+val(cS)) ) 
         nNewT      := strtran(cTempo,':','')    
         nOldT :=0 
+
+        //O totalizador de duração tem limite de 74min por CD
+        //compara o totalizador com o limite
+        If val(nNewT) > 11400 //"000352"
+            //usa o total anterior para decrementá-lo do limite, para informar o tempo que falta até o limite
+            cTemp2:=strtran(cTemp,':','')// '001122'
+            cS := right( cTemp2 ,2)
+            cM := SubStr(cTemp2,3,2)
+            cH := Left(cTemp2,2)
+            cTemp2 := DecTime("01:14:00",val(cH),+val(cM),+val(cS))
+
+            Help(NIL, NIL, "Validação!", NIL, ;
+            "Não é possível inserir a duração:"+cDur+Chr(10)+Chr(13)+;
+            'O limite para o CD é de 74min(01:14:00)'+Chr(10)+Chr(13)+;
+            'Total duração gerada: '+cTempo, 1, 0, NIL, NIL, NIL, NIL, NIL, ;
+            {"Digite números para preencher até o limite, tempo que falta: "+cTemp2})                   
+            //cTempo retornar ao total anterior
+            cTempo:=cTemp
+            Return .F.   
+        EndIf
+
     else
     xRet := .F.    
-    EndIf
+    EndIf      
     
     //somahoras(28.55,5.10)          
     //IncTime('10:50:40',20,15,25 ) 
