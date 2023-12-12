@@ -103,7 +103,7 @@ return aRotina
 
 Static Function ModelDef()
     Local oStruCon      :=FWFormStruct(1,cCont)   //remover campo , pois já exibirá na strutura Pai
-    Local oStruCD       :=FWFormStruct(1,cCD)//, {|x| !AllTrim(x) $ "B1_XART"})
+    Local oStruCD       :=FWFormStruct(1,cCD, {|x| AllTrim(x) $ 'B1_COD;B1_DESC;B1_TIPO;B1_UM;B1_LOCPAD;B1_GRUPO;B1_FAIXAS;B1_BITMAP;B1_XSTUD;B1_XART;B1_ATIVO'})
     Local oStruMu       :=FWFormStruct(1,cMusica)
     Local aRelCD        :={}
     Local aRelMusic     :={}    
@@ -144,7 +144,7 @@ return oModel
 Static Function ViewDef()
     Local oModel    :=FwLoadModel("xContr")
     Local oStruCon  :=FWFormStruct(2,cCont)
-    Local oStruCD   :=FWFormStruct(2,cCD, {|x| !AllTrim(x) $ 'B1_AFAMAD'})
+    Local oStruCD   :=FWFormStruct(2,cCD, {|x| AllTrim(x) $ 'B1_COD;B1_DESC;B1_TIPO;B1_UM;B1_LOCPAD;B1_GRUPO;B1_FAIXAS;B1_BITMAP;B1_XSTUD;B1_XART;B1_ATIVO'})
     Local oStruMu   :=FWFormStruct(2,cMusica)
     Local oStruTotCd:=FWCalcStruct(oModel:GetModel('TotaisCd'))
     Local oStruTotM :=FWCalcStruct(oModel:GetModel('TotaisM'))
