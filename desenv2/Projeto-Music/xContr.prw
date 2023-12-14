@@ -350,7 +350,7 @@ User Function xTotDur(nOld)
         //nDur      := oModelDur:GetValue("XX_TOTDUR")
         oModelDur:SetValue("XX_TOTDUR",val(nNewT))
         oModel:= oModelTot:GetModel("ZD5Master")
-        oModel:SetValue("ZD5_TEMPO",val(nNewT)) 
+        oModel:SetValue("ZD5_TEMPO",Val( nNewT)) 
     EndIf
     oModelB1:=oModel:GetModel("SB1Detail")
     oModelB1:=oModelB1:GetModel("SB1Detail")

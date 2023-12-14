@@ -183,7 +183,10 @@ sendo tamb�m fornecedor para a venda de seu produto gravado no mesmo ou em out
 			Compara o totalizador atual com o limite.
 			Usa o total anterior para decrementá-lo do limite,
 			para informar o tempo que falta até o limite,
-			Totalizador retorna ao total anterior, para refazer o cenário.		
+			Totalizador retorna ao total anterior, para refazer o cenário.	
+13/12       Evento SALVAR ok, 
+			EDITAR: o totalizador do cálculo não recupera o valor, 
+			é preciso ao EDITAR passar valor do ZD5_TEMPO para variável cTempo.				
 		
  ----Testar salvar registro
 

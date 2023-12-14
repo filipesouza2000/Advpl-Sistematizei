@@ -11,10 +11,12 @@
                                 boleano para informar que editou valor    
                                 No PE adicionar varipavel boleana para informar que está sendo editado
 				                Local xEdit :=.F. 
-  10/10/2023  | Filipe Souza  | Ao deletar cd e músicas, navegando na grid CD em outro foco, exibe:
+  10/10/2023  | Filipe Souza | Ao deletar cd e músicas, navegando na grid CD em outro foco, exibe:
                                 Help: VLDDATA_FWGRIDNOLINES                                
                                 Solução: modelo com atributo padrão lDelAllLine:=.F.
-                                mudar para oModelG:lDelAllLine:=.T. ao instanciar.                                
+                                mudar para oModelG:lDelAllLine:=.T. ao instanciar. 
+  13/12/2023  | Filipe Souza  | EDITAR: o totalizador do cálculo não recupera o valor, 
+			                    é preciso ao EDITAR passar valor do ZD5_TEMPO para variável cTempo.                                                               
 
 @see https://tdn.totvs.com/display/public/framework/Pontos+de+Entrada+para+fontes+Advpl+desenvolvidos+utilizando+o+conceito+MVC
 @see https://tdn.totvs.com/display/public/PROT/DT+PE+MNTA080+Ponto+de+entrada+padrao+MVC
@@ -38,6 +40,13 @@ User Function xContrM()
     Local oModel, oModelG
     Local nModel    :=0
     Local aCampos   :={}
+
+    //
+    if ALTERA .and. cIdPonto=='FORMPRE' .and. cIdModel=='ZD5Master'
+        oModel  :=FwModelActive()
+        oModelG :=oModel:GetModel("ZD5Master")
+        cTempo  :=Transform( oModelG:GetValue("ZD5_TEMPO") ,"@R 99:99:99")
+    EndIf
     
     If aparam[2] <> Nil
         //nOpt, cTotalM, cXX_TOT
