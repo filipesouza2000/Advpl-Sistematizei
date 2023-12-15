@@ -187,8 +187,24 @@ sendo tamb�m fornecedor para a venda de seu produto gravado no mesmo ou em out
 13/12       Evento SALVAR ok, 
 			EDITAR: o totalizador do cálculo não recupera o valor, 
 			é preciso ao EDITAR passar valor do ZD5_TEMPO para variável cTempo.				
+			-------------
+14/12		Testes  ALTERAR
+			Ao entrar no evento ALTERAR, o totalizador ZD3 de tempo exibe errado, o já gravado ZD5_TEMPO ta certo.
+		nTot:=oModelTot:GetModel('SB1Detail'):Length()
+		oModel:GetModel("TotaisM"):Setvalue('XX_TOTDUR',oModelG:GetValue("ZD5_TEMPO"))
+			----------------
+15/12		Ao entrar no evento ALTERA, PE FORMPRE , boleano lPre para informar que iniciou o formulario
+			para setar em cTempo e XX_TOTDUR o valor do campo ZD5_TEMPO
+			Alterada variável xEdit para Private, a ser utilizada no xContr no evento Descrementar tempo			
+			Melhorias para atender o fluxo dos eventos, Cadastrar, Alterar
+		   Reiniciar lPre:=.T. nos eventos OK e CANCEL no View
+			para que ao FORMPRE as condições estejam refeitas.
+		   Otimizado fluxo no evento de Decremetnar e Incremetnar tempo, 
+			para favorecer condições, cTemp:=cTempo e xEdit   :=.F.,
+			No compara do totalizador com o limite,cTempo retornar ao total anterior
+			Tempo correto e incrementado, seta o tempo atual cTemp:=cTempo
+			Melhoria na exibiçao do tempo que foi digitado.
 		
- ----Testar salvar registro
 
 
 
@@ -238,9 +254,36 @@ sendo tamb�m fornecedor para a venda de seu produto gravado no mesmo ou em out
 		inserir mais m�sicas:
 			igual 1� registro
 			
+		alterar registro e iniciar o formulario:
+			ponto de entrada com id 'FORMPRE' e modelo 'ZD5Master'
+			variável cTempo recebe valor do campo ZD5_TEMPO, que já foi gravado
+			para ser utilizado na possível alteração de tempo e totalizador.
+			
 		alterar registro de tempo:
-			ponto de entrada xContrM valida o digitado, verifica se for diferente  e o anterior mairo que 0, 
-			antes de digitar nOldT recebe valor existente,
+			1- ao clicar duas vezes no campo tempo, antes da edição da linha,
+			ponto de entrada xContrM com modelo2 e id "FORMLINEPRE" 			
+			 nOldT recebe valor existente,antes de digitar, para ser comparado com futuro valor digitado.			 
+			
+			2-Habilita a digitação, onde ao preencher outro valor ou só teclar enter, 
+			ponto de entrada xContrM com modelo2 e id "FORMLINEPRE" 			
+			valida o tempo digitado, seta boleano .T. para informar que valor foi editado
+				Passar parâmetro nOldT>0 é para decrementar.
+				2.1- Valor editado e diferente do anterior
+					chama função xTotDur(nOldT) para decrementar antes de adicionar
+				2.2- Valor mantido igual ao anterior, nOldT recebe o valor do campo
+					chama função xTotDur(nOldT) para decrementar
+						
+			3- Na tabela ZD3, campo ZD3_DURAC tem em X3_VLDUSER, a função xTotDur()
+				Criado no xContr
+				Private lPre    :=.T.   para informar PE FORMPRE exec 1 x.
+			
+			ALTERA - cTemp:=cTempo dentro da cond de decrementar
+			
+			Inserir nos evetos de CANCELAR e SALVAR para reiniciar : lPre := .T.
+			para que ao reabrir o formulário, ALTERA, chama FORMPRE para setar cTempo com ZD5_TEMPO.
+			
+						
+			
 			chama xTotDur(nOldT) para decrementar aontes de adicionar,
 			seta nNewT no ZD5_TEMPO,
 			

@@ -16,7 +16,11 @@
                                 Solução: modelo com atributo padrão lDelAllLine:=.F.
                                 mudar para oModelG:lDelAllLine:=.T. ao instanciar. 
   13/12/2023  | Filipe Souza  | EDITAR: o totalizador do cálculo não recupera o valor, 
-			                    é preciso ao EDITAR passar valor do ZD5_TEMPO para variável cTempo.                                                               
+			                    é preciso ao EDITAR passar valor do ZD5_TEMPO para variável cTempo. 
+  15/12/2023  | Filipe Souza |  Ao entrar no evento ALTERA, PE FORMPRE , boleano lPre para informar que iniciou o formulario
+                                    para setar em cTempo e XX_TOTDUR o valor do campo ZD5_TEMPO
+                                Alterada variável xEdit para Private, a ser utilizada no xContr no evento Descrementar tempo
+                                
 
 @see https://tdn.totvs.com/display/public/framework/Pontos+de+Entrada+para+fontes+Advpl+desenvolvidos+utilizando+o+conceito+MVC
 @see https://tdn.totvs.com/display/public/PROT/DT+PE+MNTA080+Ponto+de+entrada+padrao+MVC
@@ -33,7 +37,6 @@ User Function xContrM()
 */
     Local aparam    := PARAMIXB
     Local xRet      :=.T.
-    Local xEdit     :=.F.
     //Local oObject   := aparam[1] //objeto do formulário ou do modelo
     Local cIdPonto  := aparam[2] // id do local de execução do ponto de entrada
     Local cIdModel  := aparam[3] //id do formulario
@@ -42,10 +45,12 @@ User Function xContrM()
     Local aCampos   :={}
 
     //
-    if ALTERA .and. cIdPonto=='FORMPRE' .and. cIdModel=='ZD5Master'
+    if ALTERA .and. cIdPonto=='FORMPRE' .and. cIdModel=='ZD5Master' .and. lPre
         oModel  :=FwModelActive()
         oModelG :=oModel:GetModel("ZD5Master")
         cTempo  :=Transform( oModelG:GetValue("ZD5_TEMPO") ,"@R 99:99:99")
+        oModel:GetModel("TotaisM"):Setvalue('XX_TOTDUR',oModelG:GetValue("ZD5_TEMPO"))           
+        lPre :=.F.
     EndIf
     
     If aparam[2] <> Nil
@@ -76,9 +81,10 @@ User Function xContrM()
                 xEdit :=.T.//boleano para informar que editou valor
             elseif nModel==2 .and.  M->ZD3_DURAC <= 0
                xRet:=.F.   
+               xEdit   :=.F.
             elseif nModel==2  // recebe valor duração anterior da edição
                 nOldT:= omodelg:GetValue(aCampos[2])   
-
+                xEdit   :=.F.
                  // Validação: se CD está deletado, grid de musica for editada  
                  If oModelG:OFORMMODELOWNER:isDeleted() .and. aparam[5]=="CANSETVALUE"
                     //se tem 1 música, a inicial e sem valor
@@ -96,7 +102,6 @@ User Function xContrM()
                         EndIf                     
                     EndIf
                 EndIf
-
             EndIf
 
             If xRet   //entrar somente para edição do campo
@@ -113,5 +118,5 @@ User Function xContrM()
         EndIf
     EndIf    
     aCampos   :={}
-    xEdit     :=.F.
+    //xEdit     :=.F.
 return xRet

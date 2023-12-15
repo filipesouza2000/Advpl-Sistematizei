@@ -60,6 +60,16 @@
   17/10/2023  | Filipe Souza | Comentado oView:Refresh() das Grids para não dudar de foco o modelo em uso.
   12/12/2023  | Filipe Souza | Otimizado FWFormStruct a exibir só os campos necessários de produto.
                                O totalizador de duração ter limite de 74min por CD
+  14/12/2023  | Filipe Souza | Otimizado relacionamento  ZD3-Musica com SB1-CD 
+  15/12/2023  | Filipe Souza | Melhorias para atender o fluxo dos eventos, Cadastrar, Alterar
+                               Reiniciar lPre:=.T. nos eventos OK e CANCEL no View
+                                para que ao FORMPRE as condições estejam refeitas.
+                               Otimizado fluxo no evento de Decremetnar e Incremetnar tempo, 
+                                para favorecer condições, cTemp:=cTempo e xEdit   :=.F.,
+                                No compara do totalizador com o limite,cTempo retornar ao total anterior
+                                Tempo correto e incrementado, seta o tempo atual cTemp:=cTempo
+                                Melhoria na exibiçao do tempo que foi digitado.
+
                             
     Planejamento @see https://docs.google.com/document/d/1V0EWr04f5LLvjhhBhYQbz8MrneLWxDtVqTkCJIA9kTA/edit?usp=drive_link
     UML          @see https://drive.google.com/file/d/1wFO2CKqSrvzxg5RZDYTfGayHrAUcCcfL/view?usp=drive_link 
@@ -79,6 +89,9 @@ User Function xContr()
     Private cRegCd  :=''
     Private cTempo  := '00:00:00'
     Private nOldT   :=0
+    Private lPre    :=.T.
+    Private xEdit   :=.F.      
+    Private cTemp:=''
 
     aRotina := MenuDef()
     oBrowse:= FwMBrowse():New()
@@ -133,6 +146,11 @@ Static Function ModelDef()
     aAdd(aRelMusic,{"ZD3_FILIAL","FWxFilial('ZD5')"})    
     AAdd(aRelMusic,{"ZD3_XCONT","ZD5_COD"})
     oModel:SetRelation("ZD3Detail", aRelMusic,ZD3->(IndexKey(3)))
+
+    //Musica- relacionamento ZD3-Musica com SB1-CD
+    aAdd(aRelMusic,{"ZD3_FILIAL","FWxFilial('ZD3')"})    
+    AAdd(aRelMusic,{"ZD3_CODCD","B1_COD"})
+    oModel:SetRelation("ZD3Detail", aRelMusic,ZD3->(IndexKey(2)))
 
     oModel:GetModel("SB1Detail"):SetUniqueLine({"B1_DESC"})
     oModel:GetModel("ZD3Detail"):SetUniqueLine({"ZD3_MUSICA"})
@@ -196,8 +214,8 @@ Static Function ViewDef()
         oView:SetViewAction('UNDELETELINE', {|| oView:Refresh()})
     */
     //para zerar o tempo ao sair da view
-    oView:SetViewAction('BUTTONOK',    {|| cTempo  := '00:00:00'})
-    oView:SetViewAction('BUTTONCANCEL',{|| cTempo  := '00:00:00'})
+    oView:SetViewAction('BUTTONOK',    {|| cTempo  := '00:00:00', lPre:=.T.})
+    oView:SetViewAction('BUTTONCANCEL',{|| cTempo  := '00:00:00', lPre:=.T.})
     //para decrementar o tempo ao deletar a linha
     oView:SetViewAction('DELETELINE',   {|| U_xDelL()})
     //para incrementar o tempo ao desdeletar a linha
@@ -285,8 +303,8 @@ User Function xTotDur(nOld)
     Local cS   := ''
     Local cM   := ''    
     Local cH   := ''
-    Local cTemp,cTemp2:=''
-    Local nNewT     
+    Local cTemp2:=''
+    Local nNewT   
     
     // se ZD3_DURAC==Nil não digitou valor ainda e pega nOld do parâmetro para decrementar
     //      ou está sendo deletada linha e passou nOld para decrementar
@@ -310,48 +328,57 @@ User Function xTotDur(nOld)
                             cM := SubStr(cDur,3,2) //10 11 30            
                             cH := Left(cDur,2)                      
         EndIf 
-        //recebe valor atual para depois ser retornado.
-        cTemp:=cTempo
-        //se estiver correto, adiciona ou dubtrai
-        cTempo  := IIF( nOld>0, DecTime(cTempo,val(cH),+val(cM),+val(cS)) , ;//se houver tempo anterior e diferente, decrementa no totalizador
-                        IncTime(cTempo,val(cH),+val(cM),+val(cS)) ) 
-        nNewT      := strtran(cTempo,':','')    
-        nOldT :=0 
+        
 
-        //O totalizador de duração tem limite de 74min por CD
-        //compara o totalizador com o limite
-        If val(nNewT) > 11400 //"000352"
-            //usa o total anterior para decrementá-lo do limite, para informar o tempo que falta até o limite
-            cTemp2:=strtran(cTemp,':','')// '001122'
-            cS := right( cTemp2 ,2)
-            cM := SubStr(cTemp2,3,2)
-            cH := Left(cTemp2,2)
-            cTemp2 := DecTime("01:14:00",val(cH),+val(cM),+val(cS))
+        oModelDur := oModelTot:GetModel("TotaisM")
+        oModel:= oModelTot:GetModel("ZD5Master")
+            //somahoras(28.55,5.10)          
+            //IncTime('10:50:40',20,15,25 ) 
+            //DecTime('10:50:40',20,15,25 )  
+        If nOld>0 //se houver tempo anterior e diferente, decrementa no totalizador
+            //recebe valor atual para depois ser retornado.
+            cTemp:=cTempo
+            xEdit   :=.F.
+            cTempo  :=DecTime(cTempo,val(cH),+val(cM),+val(cS))
+            nNewT   := strtran(cTempo,':','')    
+            nOldT   :=0 
+        else
+            cTempo  :=IncTime(cTempo,val(cH),+val(cM),+val(cS))
+            nNewT      := strtran(cTempo,':','') 
+            //O totalizador de duração tem limite de 74min por CD
+            //compara o totalizador com o limite
+            If val(nNewT) > 11400 //"000352"
+                //usa o total anterior para decrementá-lo do limite, para informar o tempo que falta até o limite
+                cTemp2:=strtran(cTemp,':','')// '001122'
+                cS := right( cTemp2 ,2)
+                cM := SubStr(cTemp2,3,2)
+                cH := Left(cTemp2,2)
+                cTemp2 := DecTime("01:14:00",val(cH),+val(cM),+val(cS))
 
-            Help(NIL, NIL, "Validação!", NIL, ;
-            "Não é possível inserir a duração:"+cDur+Chr(10)+Chr(13)+;
-            'O limite para o CD é de 74min(01:14:00)'+Chr(10)+Chr(13)+;
-            'Total duração gerada: '+cTempo, 1, 0, NIL, NIL, NIL, NIL, NIL, ;
-            {"Digite números para preencher até o limite, tempo que falta: "+cTemp2})                   
-            //cTempo retornar ao total anterior
-            cTempo:=cTemp
-            Return .F.   
-        EndIf
+                cDur:=IIF(len(cdur)==5, ;
+                    left(cdur,1)+':'+substr(cdur,2,2)+':'+right(cdur,2),;// 5 digitos
+                    left(cdur,2)+':'+substr(cdur,3,2)+':'+right(cdur,2))//6 digitos
+
+                Help(NIL, NIL, "Validação!", NIL, ;
+                "Não é possível inserir a duração:"+cDur+Chr(10)+Chr(13)+;
+                'O limite para o CD é de 74min(01:14:00)'+Chr(10)+Chr(13)+;
+                'Total duração gerada: '+cTempo, 1, 0, NIL, NIL, NIL, NIL, NIL, ;
+                {"Digite números para preencher até o limite, tempo que falta: "+cTemp2})                   
+                //cTempo retornar ao total anterior
+                cTempo:=cTemp
+                Return .F. 
+            else
+                 cTemp:=cTempo   
+            EndIf  
+            oModelDur:SetValue("XX_TOTDUR",val(nNewT))            
+            oModel:SetValue("ZD5_TEMPO",Val( nNewT))                          
+        EndIf    
 
     else
     xRet := .F.    
     EndIf      
     
-    //somahoras(28.55,5.10)          
-    //IncTime('10:50:40',20,15,25 ) 
-    //DecTime('10:50:40',20,15,25 )   
-    If xRet .and. oModelTot:Adependency[1][1] == "ZD5Master"
-        oModelDur := oModelTot:GetModel("TotaisM")
-        //nDur      := oModelDur:GetValue("XX_TOTDUR")
-        oModelDur:SetValue("XX_TOTDUR",val(nNewT))
-        oModel:= oModelTot:GetModel("ZD5Master")
-        oModel:SetValue("ZD5_TEMPO",Val( nNewT)) 
-    EndIf
+    
     oModelB1:=oModel:GetModel("SB1Detail")
     oModelB1:=oModelB1:GetModel("SB1Detail")
     oModelM:=oModel:GetModel("ZD3Detail")
