@@ -176,34 +176,44 @@ sendo tamb�m fornecedor para a venda de seu produto gravado no mesmo ou em out
 				!oModelG:IsDeleted()
 				////adquire o nome do cd para colocar no alerta
 			--------------
-18/10		Limitar tempo de CD para 74 minutos. 
+18/10	x	Limitar tempo de CD para 74 minutos. 
 			Verificar necessidade de novos campos, gerar valor para o contrato.
 			--------------
-12/12   	O totalizador de duração tem limite de 74min por CD;
+12/12   x	O totalizador de duração tem limite de 74min por CD;
 			Compara o totalizador atual com o limite.
 			Usa o total anterior para decrementá-lo do limite,
 			para informar o tempo que falta até o limite,
 			Totalizador retorna ao total anterior, para refazer o cenário.	
-13/12       Evento SALVAR ok, 
+13/12   x    Evento SALVAR ok, 
 			EDITAR: o totalizador do cálculo não recupera o valor, 
 			é preciso ao EDITAR passar valor do ZD5_TEMPO para variável cTempo.				
 			-------------
-14/12		Testes  ALTERAR
+14/12	x	Testes  ALTERAR
 			Ao entrar no evento ALTERAR, o totalizador ZD3 de tempo exibe errado, o já gravado ZD5_TEMPO ta certo.
 		nTot:=oModelTot:GetModel('SB1Detail'):Length()
 		oModel:GetModel("TotaisM"):Setvalue('XX_TOTDUR',oModelG:GetValue("ZD5_TEMPO"))
 			----------------
-15/12		Ao entrar no evento ALTERA, PE FORMPRE , boleano lPre para informar que iniciou o formulario
+15/12	x	Ao entrar no evento ALTERA, PE FORMPRE , boleano lPre para informar que iniciou o formulario
 			para setar em cTempo e XX_TOTDUR o valor do campo ZD5_TEMPO
+			
 			Alterada variável xEdit para Private, a ser utilizada no xContr no evento Descrementar tempo			
+			
 			Melhorias para atender o fluxo dos eventos, Cadastrar, Alterar
+		   
 		   Reiniciar lPre:=.T. nos eventos OK e CANCEL no View
 			para que ao FORMPRE as condições estejam refeitas.
+		   
 		   Otimizado fluxo no evento de Decremetnar e Incremetnar tempo, 
 			para favorecer condições, cTemp:=cTempo e xEdit   :=.F.,
 			No compara do totalizador com o limite,cTempo retornar ao total anterior
 			Tempo correto e incrementado, seta o tempo atual cTemp:=cTempo
 			Melhoria na exibiçao do tempo que foi digitado.
+			
+			No PE FORMPRE, dentro de condicional habilitando refresh, 
+			muda variável criada no xContr 
+			Private lRefresh .T.     para .F.  para não executar novamente, senão gera loop infinito.
+			busca view ativa e efetua refresh,
+			para atualizar totalizador de tempo que havia recebido o valor anteriormente no mesmo PE. 
 		
 
 
@@ -216,10 +226,6 @@ sendo tamb�m fornecedor para a venda de seu produto gravado no mesmo ou em out
 	O estudio local-ZD2 recebe agenda, cliente utiliza o estudio e finaliza sua agenda
 	recebendo nota fiscal do servi�o com data de vencimento e valor.
 	atualiza status 2-OK
-
-
-
-
 	
 				
 		gerar documento do contrato
@@ -318,11 +324,7 @@ sendo tamb�m fornecedor para a venda de seu produto gravado no mesmo ou em out
 			view.Refresh(), 
 			
 			
-4 anos no TOTVS Protheus em: Suporte N1 e N2. 
-atualiza��es de patch, LIB, UPDDISTR, e APO.
-M�dulos: COM,EST,FAT,FIS,TMS,COM,GPE. Comunica��o TSS.
-SIGACFG,APSDU, SqlServer.
-Desenvolvimento em ADVPL
+
 	
 	
 	

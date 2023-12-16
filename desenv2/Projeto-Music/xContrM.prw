@@ -18,9 +18,14 @@
   13/12/2023  | Filipe Souza  | EDITAR: o totalizador do cálculo não recupera o valor, 
 			                    é preciso ao EDITAR passar valor do ZD5_TEMPO para variável cTempo. 
   15/12/2023  | Filipe Souza |  Ao entrar no evento ALTERA, PE FORMPRE , boleano lPre para informar que iniciou o formulario
-                                    para setar em cTempo e XX_TOTDUR o valor do campo ZD5_TEMPO
+                                para setar em cTempo e XX_TOTDUR o valor do campo ZD5_TEMPO
+                                
                                 Alterada variável xEdit para Private, a ser utilizada no xContr no evento Descrementar tempo
                                 
+                                dentro de condicional habilita refresh,muda variável criada no xContr 
+                                Private lRefresh .T.     para .F.  para não executar novamente, senão gera loop infinito.
+                                busca view ativa e efetua refresh,
+                                para atualizar totalizador de tempo que havia recebido o valor anteriormente no mesmo PE.
 
 @see https://tdn.totvs.com/display/public/framework/Pontos+de+Entrada+para+fontes+Advpl+desenvolvidos+utilizando+o+conceito+MVC
 @see https://tdn.totvs.com/display/public/PROT/DT+PE+MNTA080+Ponto+de+entrada+padrao+MVC
@@ -40,7 +45,7 @@ User Function xContrM()
     //Local oObject   := aparam[1] //objeto do formulário ou do modelo
     Local cIdPonto  := aparam[2] // id do local de execução do ponto de entrada
     Local cIdModel  := aparam[3] //id do formulario
-    Local oModel, oModelG
+    Local oModel, oModelG,oView//,oViewM
     Local nModel    :=0
     Local aCampos   :={}
 
@@ -49,7 +54,12 @@ User Function xContrM()
         oModel  :=FwModelActive()
         oModelG :=oModel:GetModel("ZD5Master")
         cTempo  :=Transform( oModelG:GetValue("ZD5_TEMPO") ,"@R 99:99:99")
-        oModel:GetModel("TotaisM"):Setvalue('XX_TOTDUR',oModelG:GetValue("ZD5_TEMPO"))           
+        oModel:GetModel("TotaisM"):Setvalue('XX_TOTDUR',oModelG:GetValue("ZD5_TEMPO"))  
+            If  lRefresh            
+                lRefresh:=.F.
+                oView:=FwViewActive()
+                oView:Refresh()                    
+            EndIf        
         lPre :=.F.
     EndIf
     

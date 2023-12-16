@@ -92,6 +92,7 @@ User Function xContr()
     Private lPre    :=.T.
     Private xEdit   :=.F.      
     Private cTemp:=''
+    Private lRefresh:=.T.
 
     aRotina := MenuDef()
     oBrowse:= FwMBrowse():New()
