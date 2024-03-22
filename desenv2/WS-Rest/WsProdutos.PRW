@@ -4,59 +4,56 @@
 /*££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
 	Data	|	Autor		| Descricao
  20/03/2024 | Filipe Souza  | Exemplo de um fonte para ser usado com REST com paginação customizada. 
-                              Classe simples que lista as transportadoras cadastradas na tabela SA4.
-                              Poderia ser usado o FWAdapterBaseV2(), porém a paginação foi feita manualmente
+                              Classe simples que lista produtos da SB1
  @see https://terminaldeinformacao.com/2021/10/05/como-usar-a-autenticacao-com-oauth2-em-rest/
 
 £££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££*/   
 
    
-WSRESTFUL wTransporte DESCRIPTION "WS de Métodos de Transporte"
+WSRESTFUL WsProdutos DESCRIPTION "Api de Produtos com paginação"
     //Atributos usados
-    WSDATA limit AS INTEGER
-    WSDATA page AS INTEGER
+    WSDATA pageSize AS INTEGER
+    WSDATA page     AS INTEGER
     
     //Métodos usados
-    WSMETHOD GET ALL DESCRIPTION "Retorna todas as transportadoras" WSSYNTAX '/wTransporte?{limit, page}' PATH "all"       PRODUCES APPLICATION_JSON
+    WSMETHOD GET Prods DESCRIPTION "Retorna produtos" WSSYNTAX '/prods' PATH "Prods"       PRODUCES APPLICATION_JSON
 END WSRESTFUL
    
 //Poderia ser usado o FWAdapterBaseV2(), porém a paginação foi feita manualmente
-WSMETHOD GET ALL WSRECEIVE limit, page WSSERVICE wTransporte
+WSMETHOD GET Prods WSRECEIVE pageSize, page WSSERVICE WsProdutos
     Local lRet       := .T.
     Local oResponse  := JsonObject():New()
-    Local cQuerySA4  := ""
+    Local cQuery  := ""
     Local nTamanho   := 10
     Local nTotal     := 0
     Local nPags      := 0
     Local nPagina    := 0
     Local nAtual     := 0
    
-    //Efetua a busca dos transportadoras
-    cQuerySA4 := " SELECT " + CRLF
-    cQuerySA4 += "     SA4.R_E_C_N_O_ AS SA4REC " + CRLF
-    cQuerySA4 += " FROM " + CRLF
-    cQuerySA4 += "     " + RetSQLName("SA4") + " SA4 " + CRLF
-    cQuerySA4 += " WHERE " + CRLF
-    cQuerySA4 += "     A4_FILIAL = '" + FWxFilial("SA4") + "' " + CRLF
-    cQuerySA4 += "     AND SA4.D_E_L_E_T_ = '' " + CRLF
-    cQuerySA4 += " ORDER BY " + CRLF
-    cQuerySA4 += "     SA4REC " + CRLF
-    TCQuery cQuerySA4 New Alias "QRY_SA4"
+    //Efetua a busca dos Produtos
+    cQuery := " SELECT B1_COD CODE,B1_DESC DESCRICAO,B1_GRUPO COD_GRUPO,BM_DESC GRUPO" + CRLF    
+    cQuery +=   " FROM " + RetSqlName( 'SB1' ) + " SB1 "
+    cQuery +=   " LEFT JOIN " + RetSqlName( 'SBM' ) + " SBM"
+	cQuery +=       " ON B1_GRUPO = BM_GRUPO"
+	cQuery +=           " AND BM_FILIAL = '"+ FWxFilial( 'SBM' ) +"'"
+	cQuery +=           " AND SBM.D_E_L_E_T_ = ' '"
+    cQuery += " WHERE  B1_FILIAL = '"+ FWxFilial('SB1') +"' AND SB1.D_E_L_E_T_ = ' '"
+    TCQuery cQuery New Alias "B1BM"
    
-    //Se não encontrar a transportadora
-    If QRY_SA4->(EoF())
-        SetRestFault(500, "Falha ao consultar transportadoras - A consulta de transportadoras nao retornou nenhuma informacao, revise os filtros")
+    //Se não encontrar produto
+    If B1BM->(EoF())
+        SetRestFault(500, "Falha ao consultar Produtos - A consulta de Produtos nao retornou nenhuma informacao, revise os filtros")
     Else
    
         oResponse["objects"] := {}
    
         //Conta o total de registros
         Count To nTotal
-        QRY_SA4->(DbGoTop())
+        B1BM->(DbGoTop())
    
-        //O tamanho do retorno, será o limit, se ele estiver definido
-        If ! Empty(::limit)
-            nTamanho := ::limit
+        //O tamanho do retorno, será o pageSize, se ele estiver definido
+        If ! Empty(::pageSize)
+            nTamanho := ::pageSize
         EndIf
    
         //Pegando total de páginas
@@ -75,38 +72,41 @@ WSMETHOD GET ALL WSRECEIVE limit, page WSSERVICE wTransporte
    
         //Se a página for diferente de 1, pula os registros
         If nPagina != 1
-            QRY_SA4->(DbSkip((nPagina-1) * nTamanho))
+            B1BM->(DbSkip((nPagina-1) * nTamanho))
         EndIf
    
         //Adiciona os dados para a meta
         oJsonMeta := JsonObject():New()
         oJsonMeta["total"]         := nTotal
-        oJsonMeta["current_page"]  := nPagina
+        oJsonMeta["atual_page"]  := nPagina
         oJsonMeta["total_page"]    := nPags
         oJsonMeta["total_items"]   := nTamanho
         oResponse["meta"] := oJsonMeta
    
-        //Percorre os transportadoras
-        While ! QRY_SA4->(EoF())
+        //Percorre os Produtos
+        While ! B1BM->(EoF())
             nAtual++
                
-            //Se ultrapassar o limite, encerra o laço
+            //Se ultrapassar o pageSizee, encerra o laço
             If nAtual > nTamanho
                 Exit
             EndIf
    
-            //Posiciona a transportadora e adiciona no retorno
-            DbSelectArea("SA4")
-            SA4->(DbGoTo(QRY_SA4->SA4REC))
+            //Posiciona a produto e adiciona no retorno
+            DbSelectArea("B1BM")
+            B1BM->(DBGoTop())
             oJsonObj := JsonObject():New()
-            oJsonObj["id"]   := SA4->A4_COD
-            oJsonObj["name"] := SA4->A4_NOME
+            //B1_CODas CODE,B1_DESC DESCRICAO,B1_GRUPO COD_GRUPO,BM_DESC GRUPO
+            oJsonObj["CODE"]      := B1BM->CODE
+            oJsonObj["DESCRICAO"] := B1BM->DESCRICAO
+            oJsonObj["COD_GRUPO"] := B1BM->COD_GRUPO
+            oJsonObj["GRUPO"]     := B1BM->GRUPO
             aAdd(oResponse["objects"], oJsonObj)
    
-            QRY_SA4->(DbSkip())
+            B1BM->(DbSkip())
         EndDo
     EndIf
-    QRY_SA4->(DbCloseArea())
+    B1BM->(DbCloseArea())
    
     //Define o retorno
     Self:SetContentType("application/json")
