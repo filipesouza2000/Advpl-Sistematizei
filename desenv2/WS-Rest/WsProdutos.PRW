@@ -16,11 +16,12 @@ WSRESTFUL WsProdutos DESCRIPTION "Api de Produtos com paginação"
     WSDATA page     AS INTEGER
     
     //Métodos usados
-    WSMETHOD GET Prods DESCRIPTION "Retorna produtos" WSSYNTAX '/prods' PATH "Prods"       PRODUCES APPLICATION_JSON
+    WSMETHOD GET Prods DESCRIPTION "Retorno de produtos" WSSYNTAX '/prods' PATH "Prods"       PRODUCES APPLICATION_JSON
 END WSRESTFUL
    
 //Poderia ser usado o FWAdapterBaseV2(), porém a paginação foi feita manualmente
 WSMETHOD GET Prods WSRECEIVE pageSize, page WSSERVICE WsProdutos
+    Local aArea      := FwGetArea()
     Local lRet       := .T.
     Local oResponse  := JsonObject():New()
     Local cQuery  := ""
@@ -29,15 +30,16 @@ WSMETHOD GET Prods WSRECEIVE pageSize, page WSSERVICE WsProdutos
     Local nPags      := 0
     Local nPagina    := 0
     Local nAtual     := 0
-   
+    Local cJson      :=''
+    Local aJson      :={}
     //Efetua a busca dos Produtos
-    cQuery := " SELECT B1_COD CODE,B1_DESC DESCRICAO,B1_GRUPO COD_GRUPO,BM_DESC GRUPO" + CRLF    
-    cQuery +=   " FROM " + RetSqlName( 'SB1' ) + " SB1 "
-    cQuery +=   " LEFT JOIN " + RetSqlName( 'SBM' ) + " SBM"
-	cQuery +=       " ON B1_GRUPO = BM_GRUPO"
-	cQuery +=           " AND BM_FILIAL = '"+ FWxFilial( 'SBM' ) +"'"
-	cQuery +=           " AND SBM.D_E_L_E_T_ = ' '"
-    cQuery += " WHERE  B1_FILIAL = '"+ FWxFilial('SB1') +"' AND SB1.D_E_L_E_T_ = ' '"
+    cQuery := " SELECT SB1.B1_COD CODE,SB1.B1_DESC DESCRICAO,SB1.B1_GRUPO COD_GRUPO,SBM.BM_DESC GRUPO" + CRLF    
+    cQuery += " FROM " + RetSqlName( 'SB1' ) + " SB1 "
+    cQuery += " LEFT JOIN " + RetSqlName( 'SBM' ) + " SBM"
+	cQuery += " ON SB1.B1_GRUPO = SBM.BM_GRUPO"
+	cQuery += " AND SB1.B1_FILIAL = SBM.BM_FILIAL "
+	cQuery += " AND SB1.D_E_L_E_T_ = SBM.D_E_L_E_T_"
+    cQuery += " WHERE  SB1.B1_FILIAL = '"+ FWxFilial('SB1') +"' AND SB1.D_E_L_E_T_ = ' '"
     TCQuery cQuery New Alias "B1BM"
    
     //Se não encontrar produto
@@ -45,7 +47,7 @@ WSMETHOD GET Prods WSRECEIVE pageSize, page WSSERVICE WsProdutos
         SetRestFault(500, "Falha ao consultar Produtos - A consulta de Produtos nao retornou nenhuma informacao, revise os filtros")
     Else
    
-        oResponse["objects"] := {}
+        oResponse["Produto(s)"] := {}
    
         //Conta o total de registros
         Count To nTotal
@@ -75,39 +77,46 @@ WSMETHOD GET Prods WSRECEIVE pageSize, page WSSERVICE WsProdutos
             B1BM->(DbSkip((nPagina-1) * nTamanho))
         EndIf
    
-        //Adiciona os dados para a meta
+        //Adiciona os dados para resultado
         oJsonMeta := JsonObject():New()
-        oJsonMeta["total"]         := nTotal
+        oJsonMeta["total"]       := nTotal
         oJsonMeta["atual_page"]  := nPagina
-        oJsonMeta["total_page"]    := nPags
-        oJsonMeta["total_items"]   := nTamanho
-        oResponse["meta"] := oJsonMeta
-   
+        oJsonMeta["total_page"]  := nPags
+        oJsonMeta["total_items"] := nTamanho
+        oResponse["Resultado"]   := oJsonMeta
+
+        DbSelectArea("B1BM")
+        //B1BM->(DBGoTop())
         //Percorre os Produtos
         While ! B1BM->(EoF())
-            nAtual++
-               
+            nAtual++               
             //Se ultrapassar o pageSizee, encerra o laço
             If nAtual > nTamanho
                 Exit
-            EndIf
-   
-            //Posiciona a produto e adiciona no retorno
-            DbSelectArea("B1BM")
-            B1BM->(DBGoTop())
+            EndIf           
             oJsonObj := JsonObject():New()
-            //B1_CODas CODE,B1_DESC DESCRICAO,B1_GRUPO COD_GRUPO,BM_DESC GRUPO
-            oJsonObj["CODE"]      := B1BM->CODE
-            oJsonObj["DESCRICAO"] := B1BM->DESCRICAO
-            oJsonObj["COD_GRUPO"] := B1BM->COD_GRUPO
-            oJsonObj["GRUPO"]     := B1BM->GRUPO
-            aAdd(oResponse["objects"], oJsonObj)
-   
+            aAdd(aJson,{"CODE",     Alltrim(B1BM->CODE)})                  
+            aAdd(aJson,{"DESCRICAO",Alltrim(B1BM->DESCRICAO)})   
+            aAdd(aJson,{"COD_GRUPO",Alltrim(B1BM->COD_GRUPO)})
+            aAdd(aJson,{"GRUPO",    Alltrim(B1BM->GRUPO)})  
+            
+            
+            cJson:=ArrToJson(aJson)           
+            oJsonObj:FromJson(cJson)
+           
+            //oJsonObj["CODE"]      := B1BM->CODE
+            //oJsonObj["DESCRICAO"] := B1BM->DESCRICAO
+            //oJsonObj["COD_GRUPO"] := B1BM->COD_GRUPO
+            //oJsonObj["GRUPO"]     := B1BM->GRUPO
+            aAdd(oResponse["Produto(s)"], oJsonObj)
+            cJson:=''
+            aJson:={}
+            FreeObj(oJsonObj)
             B1BM->(DbSkip())
         EndDo
     EndIf
     B1BM->(DbCloseArea())
-   
+    FwrestArea(aArea)
     //Define o retorno
     Self:SetContentType("application/json")
     Self:SetResponse(oResponse:toJSON())
