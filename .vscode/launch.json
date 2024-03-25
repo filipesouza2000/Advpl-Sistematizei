@@ -9,19 +9,24 @@
 			"cwb": "${workspaceFolder}",
 			"smartclientBin": "C:/TOTVS12133/Protheus/Protheus/bin/smartclient/smartclient.exe",
 			"isMultiSession": true,
-			"enableTableSync": true
+			"enableTableSync": true,
+			"enableMultiThread": true,
+			"extendFeatures": {
+				"charDetails": false
+			}
 		}
 	],
 	"lastPrograms": [
 		{
-			"label": "U_zTDialog"
+			"label": "xxxxxx"
 		},
 		{
 			"label": "sigamdi"
 		},
 		{
-			"label": "U_ESP1NOME"
+			"label": "U_ProtheuzeiroExec"
 		}
 	],
-	"lastProgramExecuted": "sigamdi"
+	"lastProgramExecuted": "U_ProtheuzeiroExec",
+	"lastProgramArguments": []
 }
