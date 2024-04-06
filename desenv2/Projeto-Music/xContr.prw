@@ -187,12 +187,12 @@ Static Function ViewDef()
     oView:CreateHorizontalBox("CONT_BOX",50)
     
     oView:CreateHorizontalBox("MEIO_BOX",40)
-    oView:CreateVerticalBox("MEIOLEFT",50,"MEIO_BOX")// Vertical BOX
-    oView:CreateVerticalBox("MEIORIGHT",50,"MEIO_BOX")// Vertical BOX    
+    oView:CreateVerticalBox("MEIOLEFT",70,"MEIO_BOX")// Vertical BOX
+    oView:CreateVerticalBox("MEIORIGHT",30,"MEIO_BOX")// Vertical BOX    
     
     oView:CreateHorizontalBox("BARTOT",10)   
-    oView:CreateVerticalBox("TOTLEFT",50,"BARTOT")// Vertical BOX
-    oView:CreateVerticalBox("TOTRIGHT",50,"BARTOT")// Vertical BOX
+    oView:CreateVerticalBox("TOTLEFT",70,"BARTOT")// Vertical BOX
+    oView:CreateVerticalBox("TOTRIGHT",30,"BARTOT")// Vertical BOX
     
     oView:SetOwnerView("VIEW_SB1","MEIOLEFT")
     oView:SetOwnerView("VIEW_ZD3","MEIORIGHT")

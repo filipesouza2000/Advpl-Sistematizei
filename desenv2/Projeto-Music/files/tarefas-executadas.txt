@@ -1,6 +1,6 @@
 -projeto xCDModX()
--Artistas ser�o clientes a efetuar grava��o e criar CD, 
-sendo tamb�m fornecedor para a venda de seu produto gravado no mesmo ou em outro estudio.
+-Artistas ser�o clientes a efetuar gravação e criar CD, 
+sendo também fornecedor para a venda de seu produto gravado no mesmo ou em outro estudio.
 -Rever sobre novos campos e relacionamento entre:
 	SA1 - SB1
 	SB1 - ZD3
@@ -8,45 +8,49 @@ sendo tamb�m fornecedor para a venda de seu produto gravado no mesmo ou em out
 -Criar campo B1_XEST para receber codigo de estudio, podendo ser na X5 ou outra customizada.
 
 -Alterar Layout de horinzontal para vertical
--Remover campo B1_XART da estrutura a n�o exibir.
--Remover campo B1_AFAMAD da estrutura a n�o exibir.
+-Remover campo B1_XART da estrutura a não exibir.
+-Remover campo B1_AFAMAD da estrutura a não exibir.
 -Desabiliar campo A1_COD, iniciar com GETXENUM
 -Desabiliar campo A2_COD, iniciar com GETXENUM
 -Desabilitar e retirar autoincrement do B1_COD, utilizar gatilho a fun��o xCodProd 
-	-mudar gatilho para chamar s� B1_TIPO
+	-mudar gatilho para chamar sé B1_TIPO
 	-resolver a sequencia B1_COD que p�ra em �nico registro.
 	-no evento cancelar, zerar a vari�vel Private que pega o cod do registro.
 
 
--Cenario Contrato de Grava��o:
-	cliente fecha contrato de grava��o de CD ou solicita novo agendamento,
-	para agendamento inicial do projeto s�o especificados CDs -SB1 com suas musicas -ZD3,
-	Cliente n�o existente � cadastrado -SA1, tamb�m � registrado um Artista -ZD4 para este cliente e -ZD5 de Artista x Cliente,
-	com dia e hora disponivel ele agenda grava��o de seu instrumento , para cd e m�sica em andamento, na -ZD1 com status 1-ON
-	Em projeto em andamento, � gerado novo agendamento para cada instrumentista em cada m�sica na lista,
-	no produto tipo CD e sua m�sica em grava��o deve manter status de 'ON', 
-	indicando projeto em andamento e ainda n�o liberar para venda.
+-Cenario de Agengamento:
+	cliente fecha contrato de gravação de CD ou solicita novo agendamento,
+	para agendamento inicial do projeto são especificados CD -SB1 com suas musicas -ZD3,
+	Cliente não existente é cadastrado -SA1, também é registrado um Artista -ZD4 para este cliente e -ZD5 de Artista x Cliente,
+	com dia e hora disponivel ele agenda gravação de seu instrumento , para cd e m�sica em andamento, na -ZD1 com status 1-ON
+	Em projeto em andamento, é gerado novo agendamento para cada instrumentista em cada m�sica na lista,
+	no produto tipo CD e sua m�sica em gravação deve manter status de 'ON', 
+	indicando projeto em andamento e ainda não liberar para venda.
 	O estudio local-ZD2 recebe agenda desabilitando datas e hor�rios solicitados,
 	cliente utiliza o estudio e grava dentro do tempo especificado,
-	se necess�rio gerar� novo agendamento para mesma m�sica e instrumento ou pr�ximos.
-	Quando finaliza cada grava��o � atalizado seu status,
-	Concluindo m�sicas o estudio produz o CD e atualiza os Status do produto e m�sicas.
+	se necessário gerará novo agendamento para mesma m�sica e instrumento ou pr�ximos.
+	Quando finaliza cada gravação é atualizado seu status,
+	Concluindo musicas o estudio produz o CD e atualiza os Status do contrato e musicas.
+				
+		gerar documento do contrato
+		identificar formas de pagamento	
 	
--Cen�rio contrato grava��o
-	Cliente faz o contrato contendo os servi�os de grava��o, mixagem e masteriza��o, apresentando dados do CD
-	com suas respectivas m�sicas, determinando o total de tempo a ser gravado.
-	Contrato gera pedido de venda contendo o CD da grava��o, gera Documento de sa�da Nota Fiscal.
+-Cen�rio contrato gravação
+	Cliente faz o contrato contendo os servi�os de gravação, mixagem e masterização, apresentando dados do CD
+	com suas respectivas musicas, determinando o total de tempo a ser gravado.
+	Contrato gera pedido de venda contendo o CD da gravação, gera Documento de saída Nota Fiscal.
+	
 ----2023---------	
 05/08 - 
-	x	Gatilho via codigo para campo ZD1_SERV quando muda, para 1, apaga campos ZD1_INSTR ,ZD1_NINSTR , ZD1_CODA , ZD1_ART j� preenchidos
+	x	Gatilho via codigo para campo ZD1_SERV quando muda, para 1, apaga campos ZD1_INSTR ,ZD1_NINSTR , ZD1_CODA , ZD1_ART jé preenchidos
 	x	Gerar Browse de registro para tabela ZD4-ARTISTA, com rela��o com SA1-Cliente
-		  N�o foi poss�vel pelo protheus n�o ter relacionamentos integrados, formei somente ZD4
+		  não foi poss�vel pelo protheus não ter relacionamentos integrados, formei somente ZD4
 	x	Na View retirar da oStrArt o campo ZD4_CLI
 	x	GetSxEnum no ZD4_COD
 	x	Criar tabela gen�rica para G�nero Musical, consulta padr�o para campo ZD4_GENERO	
 	x	testados registros com integridade de dados
 
-11/08-	xContrato de grava��o
+11/08-	xContrato de gravação
 	x	gerar prot�tipo do layout- xContr modelo1 ZD5
 	x	criar gatilho no campo cod cliente, para filtrar somente os que existem em ZD4
 28/08- xContr
@@ -66,27 +70,27 @@ sendo tamb�m fornecedor para a venda de seu produto gravado no mesmo ou em out
 	x	validar digitos do tempo , xTotDur().   
 	x	somar tempo formatado e atribuir ao totalizador e campos, IncTime('10:50:40',20,15,25 )
 13/09
-	x	otimizar soma do tempo na lista de musicas, ao alterar � atualizada.
+	x	otimizar soma do tempo na lista de musicas, ao alterar é atualizada.
 	x	ponto de entrada FORMLINEPRE em "ZD3Detail", pegar valor da linha ativa, para decrementar ao editar
 	x	ao invalidar valor, faz c�lculo mesmo assim, precisa impedir o c�lculo.
 14/09	
 	x	ao editar e confirmar com o mesmo n�mero, deve decrementar para ser somado no Totalizador padr�o.	
-	x	ao deletar linha na grid deve decrementar. Depois s� precisa mudar de linha na grid que atualiza a view.
+	x	ao deletar linha na grid deve decrementar. Depois sé precisa mudar de linha na grid que atualiza a view.
 		
 16/09
-	x	2� cd n�o incrementa 1� m�sica.Corrigido.
-	x	recuperar linha na grid para incrementar, nao sincroniza totalizadores, s� o XX_TotDur ---fazer Refresh()				
+	x	2é cd não incrementa 1é m�sica.Corrigido.
+	x	recuperar linha na grid para incrementar, nao sincroniza totalizadores, sé o XX_TotDur ---fazer Refresh()				
 	x	deletar musica, sincronizar ZD5_TEMPO---fazer Refresh(), decrementar musica ZD5_FAIXAS
-	x	ao clicar para baixo e inserir linha e voltar para cima, s� incrementa total mas n�o decrementa automaticamente.
-	x	estava sendo chamado U_xTotMus(2) nos 2 eventos de 'Deletar' e 'seta apra cima' que tamb�m deleta,
+	x	ao clicar para baixo e inserir linha e voltar para cima, sé incrementa total mas não decrementa automaticamente.
+	x	estava sendo chamado U_xTotMus(2) nos 2 eventos de 'Deletar' e 'seta apra cima' que também deleta,
 20/09  
-	x	adicionei na condi��o do ponto de entrada para verificar se campos est�o vazios, assim n�o foi confirmada linha.
+	x	adicionei na condi��o do ponto de entrada para verificar se campos est�o vazios, assim não foi confirmada linha.
 	x	usar function xTotMus como gen�rica para servir para m�sica e cd para c ontrolar totalizdor e frame
 	x	otimizar totalizador de m�sica-dura��o, validar o tempo sem edi��o, seta para baixo.
 21/09
 		Otimizar fun��o xTotMus() para ser fun��o gen�rica com par�metros a ser reutilzada para outros totais, 
 			xTotQtd(cModM,nOpt,nModulo) em xContr e xContrM
-27/09	Resolvendo o problema do evento Delete da linha de m�sicas,que totalizada duas vezes,
+27/09	Resolvendo o problema do evento Delete da linha de musicas,que totalizada duas vezes,
 			na fun��o xDelL() chama  U_xTotQtd("ZD5Master",2,2,.T.)
 			parametro .T. para informar que foi do evento da tecla Delete, IIF( lDell, , nTot++ ),
 			se for pelo ponto de entrada, identificando seta para cima ou baixo, chama U_xTotQtd("ZD5Master",2,nModel)
@@ -94,13 +98,13 @@ sendo tamb�m fornecedor para a venda de seu produto gravado no mesmo ou em out
 		Testar eventos na grid CD,INSERT UPDATE OK
 		x	ao deletar CD verificar se tem m�sica relaciona para invalidar
 04/10 - xContrM 
-		x	Melhoria no ponto de entrada pr� validador do campo ZD3-DURAC, se valor for 0 ou negativo		
+		x	Melhoria no ponto de entrada pré validador do campo ZD3-DURAC, se valor for 0 ou negativo		
 		x	Resolvido evento UnDelete CD, o evento oView:Refresh() mudava o foco, foi retirado.
 09/10 - 		
-		x   Alterar ZD3_DURAC da erro, foi corrigido, ap�s decrementar tempo deve zerar o nOldT, que � utilizado no PE
+		x   Alterar ZD3_DURAC da erro, foi corrigido, ap�s decrementar tempo deve zerar o nOldT, que é utilizado no PE
 						
 			cTempo = 300 
-			ao editar chama PE L59 e atribui o valor j� existente no nOldT=200  
+			ao editar chama PE L59 e atribui o valor jé existente no nOldT=200  
 				L64 xRet := U_xTotDur(nOldT)//decrementa antes de adicionar				
 				xTotDur(200)
 				L310  DecTime(300,200)     //decrementa
@@ -112,11 +116,11 @@ sendo tamb�m fornecedor para a venda de seu produto gravado no mesmo ou em out
 				L310  DecTime(100,200)     //decrementa
 				cTempo= -100
 				
-				atrav�s do validador do campo ZD3_DURAC chama a fun��o xTotDur() //sem par�metro e nOld � DEFAULT=0 , assim executa:
+				atrav�s do validador do campo ZD3_DURAC chama a fun��o xTotDur() //sem par�metro e nOld é DEFAULT=0 , assim executa:
 				IncTime(cTempo,ZD3_DURAC)    -100 + 400 = 300  
 				-------------------
-				Solu��o, ap�s decrementar tempo deve zerar o nOldT, que � utilizado no PE
-				No PE adicionar varipavel boleana para informar que est� sendo editado
+				Solu��o, ap�s decrementar tempo deve zerar o nOldT, que é utilizado no PE
+				No PE adicionar varipavel boleana para informar que esté sendo editado
 				Local xEdit :=.F.
 				
 				If nModel==2  .and. !Empty(M->ZD3_DURAC) .and. M->ZD3_DURAC > 0
@@ -135,15 +139,15 @@ sendo tamb�m fornecedor para a venda de seu produto gravado no mesmo ou em out
 			evento DELETELINE do oView chama U_xDelL()
 			L395 oModelM:IsDeleted()//deletando
 				IF nGrid==2  			//executa se for grid m�sica 
-				U_xTotDur(oModelM:GetValue('ZD3_DURAC'))   //tem par�metro � para decrementar
+				U_xTotDur(oModelM:GetValue('ZD3_DURAC'))   //tem par�metro é para decrementar
 				DecTime(400,200)
 				xxxxxxx foi executada 2 vezes, no PE e DELETELINE
 				------------
 				Solucioando igual a Edi��o, com a vari�vel xEdit
-				varipavel boleana para informar quando est� sendo editado, ao deletar n�o executa.
+				varipavel boleana para informar quando esté sendo editado, ao deletar não executa.
 				Local xEdit :=.F.
 				------------------
-10/10 - x	Ao deletar cd e m�sicas, navegando na grid CD em outro foco, exibe:
+10/10 - x	Ao deletar cd e musicas, navegando na grid CD em outro foco, exibe:
 			Help: VLDDATA_FWGRIDNOLINES
 			------------
 			Solu��o: modelo com atributo padr�o lDelAllLine:=.F.
@@ -159,18 +163,18 @@ sendo tamb�m fornecedor para a venda de seu produto gravado no mesmo ou em out
 17/10	x   Com CD Deletado, com uma m�sica inicial ou a final, na grid Musica ao editar, validar para bloquear inser��o.
 			----------		
 			solu��o: No PE FORMLINEPRE, 
-				//verifica se a linha do CD propriet�rio da grid M�sica est� deletada.
+				//verifica se a linha do CD propriet�rio da grid M�sica esté deletada.
 				oModelG:OFORMMODELOWNER:isDeleted()     
-				//se a linha est� sendo editada
+				//se a linha esté sendo editada
 				aparam[5]=="CANSETVALUE"
 				//se tem 1 m�sica, a inicial e sem valor
 				if oModelG:length()==1 .AND. (Empty(AllTrim(FWFldGet("ZD3_MUSICA"))) .and. FWFldGet("ZD3_DURAC")==0)
 				 //adquire o nome do cd para colocar no alerta
 				 oModelG:OFORMMODELOWNER:GoLine(oModelG:OFORMMODELOWNER:nLine)
 				 FWFldGet("B1_DESC")				
-				//retorna falso para n�o passar no validador 
+				//retorna falso para não passar no validador 
 				xRet:=.F.
-				//se tem mais de 1 m�sica preenchida, posiciona na ultima linha a saber se n�o est� deletada.  
+				//se tem mais de 1 m�sica preenchida, posiciona na ultima linha a saber se não esté deletada.  
 				elseif oModelG:length()>1           
                 oModelG:GoLine(oModelG:length())
 				!oModelG:IsDeleted()
@@ -218,54 +222,42 @@ sendo tamb�m fornecedor para a venda de seu produto gravado no mesmo ou em out
 05/04   X	Para outros eventos diferente de INCLUI sincronizar o Totalizador ,
 			mudar o foco para grid músicas.Alterada a lógica para:
 			if !INCLUI .and. cIdPonto=='FORMPRE' .and. cIdModel=='ZD5Master' .and. lPre
-
+			----------------
 06/04	X	Criar legenda para Browse Contrato
 			oBrowse:AddLegend("ZD5->ZD5_STATUS=='1'","BR_CINZA","Não iniciado")
 			xLeg()
 
 
 
--Cenario Ensaio:
-	Cliente solicita estudio e � consultado a disponibilidade, 
-	Cliente n�o existente � cadastrado -SA1, 
-	com dia e hora disponivel ele agenda servi�o com dia, hor�rio e tempo para servi�o -ZD1, com status 1-ON
-	cliente recebe um documento do registro com os dados do agendamento,	 
-	O estudio local-ZD2 recebe agenda, cliente utiliza o estudio e finaliza sua agenda
-	recebendo nota fiscal do servi�o com data de vencimento e valor.
-	atualiza status 2-OK
 	
-				
-		gerar documento do contrato
-		identificar formas de pagamento	
-		
 		
 ----fluxo contrato
-		*ao iniciar e *finalizar edi��o da linha chama ponto de entrada xContrM, para verificar se j� havia valor no campo ZD3_DURAC
+		*ao iniciar e *finalizar edi��o da linha chama ponto de entrada xContrM, para verificar se jé havia valor no campo ZD3_DURAC
 			se tem valor na memoria, valida em xValTime(), 
 			
 				se campo digitado for diferente do valor anterior e valor anterior maior que 0, 
-				significa que est� sendo editado e chama U_xTotDur(nOldT) decrementar antes de adicionar.
+				significa que esté sendo editado e chama U_xTotDur(nOldT) decrementar antes de adicionar.
 			
-				se campo digitado for igual ao anterior, s� ao editar mas n�o alterar, atribui vari�vel do valor anterior = o j� existente,
+				se campo digitado for igual ao anterior, sé ao editar mas não alterar, atribui vari�vel do valor anterior = o jé existente,
 				chama xTotDur(nOldT), deve decrementar para ser adicionado automaticamente pelo totalizador.
-			sen�o (antes de digitar) nOldT recebe 0 , sempre antes de digitar valor nOldT recebe valor existente no campo.			
+			senão (antes de digitar) nOldT recebe 0 , sempre antes de digitar valor nOldT recebe valor existente no campo.			
 			validador do campo ZD3_MUSICA chama xTotMus(), enviar total de Musica para o campo ZD5_FAIXAS
 			
-		inserir 1� registro:
+		inserir 1é registro:
 			ponto de entrada xContrM valida o digitado
 			validador do campo ZD3_DURAC	chama xTotDur() 
 			incrementa tempo digitado na variavel cTempo, cria nNewT no formado numero sem :
 			seta em ZD5_TEMPO o valor nNewT		
 			
-		inserir 2� cd 1� musica:
+		inserir 2é cd 1é musica:
 			No validador do campo ZD3_DURAC chama xTotDur(nOld=0),
 			incrementa tempo digitado na variavel cTempo, cria nNewT no formado numero sem :
 			seta em ZD5_TEMPO o valor nNewT
 			verifica se tem 2 Cds e 1 m�sica, para chamar xTotMus(1) para incrementar musica.
-			se nOpt=1 � para incrementar, recebe o valor do totalizador e incrementa sentando o novo valor.
+			se nOpt=1 é para incrementar, recebe o valor do totalizador e incrementa sentando o novo valor.
 			seta novo valor para ZD5_FAIXAS
-		inserir mais m�sicas:
-			igual 1� registro
+		inserir mais musicas:
+			igual 1é registro
 			
 		alterar registro e iniciar o formulario:
 			ponto de entrada com id 'FORMPRE' e modelo 'ZD5Master'
@@ -314,14 +306,14 @@ sendo tamb�m fornecedor para a venda de seu produto gravado no mesmo ou em out
 					decrementa tempo digitado na variavel cTempo, cria nNewT no formado numero sem :
 					atribui nNewT para ZD5_TEMPO,
 				xTotMus(2) //decrementar m�sica
-					nMus recebe o totalizador XX_TOTM, j� decrentado
+					nMus recebe o totalizador XX_TOTM, jé decrentado
 					atribui nMus para ZD5_FAIXAS,					
 			view.Refresh(), sincronizados campos.
 			
 		recuperar m�sica:	
 			ponto de entrada xContrM, nOldT recebe valor existente
 			evento UNDELETELINE chama xDelL()
-			se oModelM:IsDeleted(),sen�o
+			se oModelM:IsDeleted(),senão
 			M->ZD3_DURAC recebe model.ZD3_DURAC , atribui na vari�vel de mem�ria para incrementar
 			xTotDur()
 			incrementa tempo,atribui nNewT para ZD5_TEMPO,
