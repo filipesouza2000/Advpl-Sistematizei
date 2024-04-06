@@ -36,7 +36,7 @@ sendo tamb�m fornecedor para a venda de seu produto gravado no mesmo ou em out
 	Cliente faz o contrato contendo os servi�os de grava��o, mixagem e masteriza��o, apresentando dados do CD
 	com suas respectivas m�sicas, determinando o total de tempo a ser gravado.
 	Contrato gera pedido de venda contendo o CD da grava��o, gera Documento de sa�da Nota Fiscal.
-	
+----2023---------	
 05/08 - 
 	x	Gatilho via codigo para campo ZD1_SERV quando muda, para 1, apaga campos ZD1_INSTR ,ZD1_NINSTR , ZD1_CODA , ZD1_ART j� preenchidos
 	x	Gerar Browse de registro para tabela ZD4-ARTISTA, com rela��o com SA1-Cliente
@@ -214,11 +214,16 @@ sendo tamb�m fornecedor para a venda de seu produto gravado no mesmo ou em out
 			Private lRefresh .T.     para .F.  para não executar novamente, senão gera loop infinito.
 			busca view ativa e efetua refresh,
 			para atualizar totalizador de tempo que havia recebido o valor anteriormente no mesmo PE. 
-
-05/04/24	Para outros eventos diferente de INCLUI sincronizar o Totalizador ,
+----2024---------
+05/04   X	Para outros eventos diferente de INCLUI sincronizar o Totalizador ,
 			mudar o foco para grid músicas.Alterada a lógica para:
 			if !INCLUI .and. cIdPonto=='FORMPRE' .and. cIdModel=='ZD5Master' .and. lPre
-	
+
+06/04	X	Criar legenda para Browse Contrato
+			oBrowse:AddLegend("ZD5->ZD5_STATUS=='1'","BR_CINZA","Não iniciado")
+			xLeg()
+
+
 
 -Cenario Ensaio:
 	Cliente solicita estudio e � consultado a disponibilidade, 

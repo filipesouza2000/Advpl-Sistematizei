@@ -101,6 +101,9 @@ User Function xContr()
     oBrowse:DisableDetails()
     //recebe filtro da lista de artistas a serem listados no bowse
     //oBrowse:SetFilterDefault(cCli+"->A1_COD $"+"'"+cArtist+"'")
+    oBrowse:AddLegend("ZD5->ZD5_STATUS=='1'","BR_CINZA","Não iniciado")
+    oBrowse:AddLegend("ZD5->ZD5_STATUS=='2'","BR_VERDE","Em Andamentp")
+    oBrowse:AddLegend("ZD5->ZD5_STATUS=='3'","BR_VERMELHO","Finalizado")
     oBrowse:ACTIVATE()
     RestArea(aArea)
 return NIL
@@ -109,10 +112,11 @@ Static Function MenuDef()
     //Local aRotina   := FwMvcmenu("xContr")
     Local aRotina:={}
 
-    ADD OPTION aRotina TITLE "Visualizar" ACTION "VIEWDEF.xContr" OPERATION MODEL_OPERATION_VIEW ACCESS 0
-    ADD Option aRotina TITLE "Incluir"    ACTION "VIEWDEF.xContr" OPERATION MODEL_OPERATION_INSERT ACCESS 0
-    ADD Option aRotina TITLE "Alterar"    ACTION "VIEWDEF.xContr" OPERATION MODEL_OPERATION_UPDATE ACCESS 0
-    ADD Option aRotina TITLE "Excluir"    ACTION "VIEWDEF.xContr" OPERATION MODEL_OPERATION_DELETE ACCESS 0
+    ADD OPTION aRotina TITLE "Visualizar" ACTION "VIEWDEF.xContr" OPERATION 2 ACCESS 0
+    ADD Option aRotina TITLE "Incluir"    ACTION "VIEWDEF.xContr" OPERATION 3 ACCESS 0
+    ADD Option aRotina TITLE "Alterar"    ACTION "VIEWDEF.xContr" OPERATION 4 ACCESS 0
+    ADD Option aRotina TITLE "Excluir"    ACTION "VIEWDEF.xContr" OPERATION 5 ACCESS 0
+    ADD Option aRotina TITLE "Legenda"    ACTION "u_xLeg"         OPERATION 6 ACCESS 0
     
 return aRotina
 
@@ -499,3 +503,20 @@ Static Function xLinePre(oModel,nLine,cAction)
     EndIf
 return lRet
 
+/*
+Função para determinar Legenda
+    ZD5_STATUS    Status do serviço
+    1=Não iniciado
+    2=Em andamento
+    3=Finalizado
+*/
+User Function xLeg()
+    Local aLeg      :={}
+
+    aadd(aLeg,{"BR_CINZA"   ,"OFF-Não Iniciado"})
+    aadd(aLeg,{"BR_VERDE"   ,"ON-Em Andamento"})
+    aadd(aLeg,{"BR_VERMELHO","OK-Finalizado"})    
+
+    BrwLegenda("Status do Contrato da Gravação","Não Iniciado/Em Andamento/Finalizado",aLeg)
+
+return aLeg
