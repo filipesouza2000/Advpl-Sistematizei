@@ -15,7 +15,7 @@
                                 Help: VLDDATA_FWGRIDNOLINES                                
                                 Solução: modelo com atributo padrão lDelAllLine:=.F.
                                 mudar para oModelG:lDelAllLine:=.T. ao instanciar. 
-  13/12/2023  | Filipe Souza  | EDITAR: o totalizador do cálculo não recupera o valor, 
+  13/12/2023  | Filipe Souza | EDITAR: o totalizador do cálculo não recupera o valor, 
 			                    é preciso ao EDITAR passar valor do ZD5_TEMPO para variável cTempo. 
   15/12/2023  | Filipe Souza |  Ao entrar no evento ALTERA, PE FORMPRE , boleano lPre para informar que iniciou o formulario
                                 para setar em cTempo e XX_TOTDUR o valor do campo ZD5_TEMPO
@@ -26,7 +26,9 @@
                                 Private lRefresh .T.     para .F.  para não executar novamente, senão gera loop infinito.
                                 busca view ativa e efetua refresh,
                                 para atualizar totalizador de tempo que havia recebido o valor anteriormente no mesmo PE.
-
+  15/12/2023  | Filipe Souza |  Alterada a lógica acima para !INCLUI, pois para outros eventos sincroniza o Totalizador 
+                                XX_TOTDUR o valor do campo ZD5_TEMPO
+                                
 @see https://tdn.totvs.com/display/public/framework/Pontos+de+Entrada+para+fontes+Advpl+desenvolvidos+utilizando+o+conceito+MVC
 @see https://tdn.totvs.com/display/public/PROT/DT+PE+MNTA080+Ponto+de+entrada+padrao+MVC
 */  
@@ -45,22 +47,33 @@ User Function xContrM()
     //Local oObject   := aparam[1] //objeto do formulário ou do modelo
     Local cIdPonto  := aparam[2] // id do local de execução do ponto de entrada
     Local cIdModel  := aparam[3] //id do formulario
-    Local oModel, oModelG,oView//,oViewM
+    Local oModel, oModelGM, oModelG,oView//,oViewM
     Local nModel    :=0
     Local aCampos   :={}
-
-    //
-    if ALTERA .and. cIdPonto=='FORMPRE' .and. cIdModel=='ZD5Master' .and. lPre
+    /*Local nOp       :=0
+    
+    IF FwModelActive()<>Ni
         oModel  :=FwModelActive()
+        nOp     :=oModel:GetOperation()
+    Endif
+    //(nOp==1 .or. ALTERA) .and. */
+    if !INCLUI .and. cIdPonto=='FORMPRE' .and. cIdModel=='ZD5Master' .and. lPre  
+        oModel  :=FwModelActive()  
         oModelG :=oModel:GetModel("ZD5Master")
         cTempo  :=Transform( oModelG:GetValue("ZD5_TEMPO") ,"@R 99:99:99")
         oModel:GetModel("TotaisM"):Setvalue('XX_TOTDUR',oModelG:GetValue("ZD5_TEMPO"))  
+        oModelGM:=oModel:GetModel("ZD3Detail")
+        oModelGM:GoLine(1)
+        oView:=FwViewActive()
+        oView:GetViewObject('VIEW_ZD3')
+        
             If  lRefresh            
-                lRefresh:=.F.
-                oView:=FwViewActive()
-                oView:Refresh()                    
+                lRefresh:=.F.               
+            //    oView:=FwViewActive()
+            //    oView:Refresh() 
             EndIf        
         lPre :=.F.
+        oView:Refresh()
     EndIf
     
     If aparam[2] <> Nil

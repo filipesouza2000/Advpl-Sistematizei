@@ -214,9 +214,11 @@ sendo tamb�m fornecedor para a venda de seu produto gravado no mesmo ou em out
 			Private lRefresh .T.     para .F.  para não executar novamente, senão gera loop infinito.
 			busca view ativa e efetua refresh,
 			para atualizar totalizador de tempo que havia recebido o valor anteriormente no mesmo PE. 
-		
 
-
+05/04/24	Para outros eventos diferente de INCLUI sincronizar o Totalizador ,
+			mudar o foco para grid músicas.Alterada a lógica para:
+			if !INCLUI .and. cIdPonto=='FORMPRE' .and. cIdModel=='ZD5Master' .and. lPre
+	
 
 -Cenario Ensaio:
 	Cliente solicita estudio e � consultado a disponibilidade, 
