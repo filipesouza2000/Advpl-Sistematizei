@@ -226,12 +226,15 @@ sendo também fornecedor para a venda de seu produto gravado no mesmo ou em outr
 			oBrowse:AddLegend("ZD5->ZD5_STATUS=='1'","BR_CINZA","Não iniciado")
 			xLeg()
 			----------------
-08/04		Reanalisado cenário de gravação, criada tabela ZD7-Itens de Músicas, ZD7_CHAVE    com pesquisa padrão SX5IM
-			para indicar no contrato, os instrumentos utilizados na música, para definir partes a serem agendadas antes da mixagem.
-			
+08/04	X	Reanalisado cenário de gravação, criada tabela ZD7-Itens de Músicas, ZD7_CHAVE    com pesquisa padrão SX5IM
+			para indicar no contrato, os instrumentos utilizados na música, para definir partes a serem agendadas antes da mixagem.			
 			Definir novo layout com ZD7 relacionando com ZD3, para Box 40,30,30
-			xxxxxxxxxxxxxxxxxxxxx
-			Otimizar totalizador de instrumentos, igual de músicas, mas separar total por musica relacionada, não o geral.
+			
+09/04	x	Otimizar totalizador de instrumentos, igual de músicas, 
+			
+			separar total por musica relacionada, não o geral.
+			rever processo de excluir Cd e reuperar Cd referenciando o totalizador e da ZD5_FAIXAS, está errado.
+			
 			
 
 

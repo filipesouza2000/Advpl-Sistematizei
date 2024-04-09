@@ -28,7 +28,8 @@
                                 para atualizar totalizador de tempo que havia recebido o valor anteriormente no mesmo PE.
   15/12/2023  | Filipe Souza |  Alterada a lógica acima para !INCLUI, pois para outros eventos sincroniza o Totalizador 
                                 XX_TOTDUR o valor do campo ZD5_TEMPO
-                                
+  09/04/2024  | Filipe Souza |  Otimizar totalizador de instrumentos, igual de músicas, mas separar total por musica relacionada, não o geral.                                                              
+                                Evento de atualizar totalizador excluindo e recuperando pela seta.
 @see https://tdn.totvs.com/display/public/framework/Pontos+de+Entrada+para+fontes+Advpl+desenvolvidos+utilizando+o+conceito+MVC
 @see https://tdn.totvs.com/display/public/PROT/DT+PE+MNTA080+Ponto+de+entrada+padrao+MVC
 */  
@@ -87,15 +88,20 @@ User Function xContrM()
             nModel:=2            
             aAdd(aCampos,'ZD3_MUSICA')            
             aAdd(aCampos,'ZD3_DURAC')
+        elseif cIdModel=='ZD7Detail'
+            nModel:=3            
+            aAdd(aCampos,'ZD7_CHAVE')            
+            aAdd(aCampos,'ZD7_DESC')    
         EndIf
         
-        If (nModel==1 .or. nModel==2) .and. cIdPonto == "FORMLINEPRE"
+        If (nModel<=3) .and. cIdPonto == "FORMLINEPRE"
             oModel  :=FwModelActive()
             oModelG :=oModel:GetModel(cIdModel)
             oModelG:lDelAllLine:=.T.   //habilita deletar todas linhas da Grid
+
             //evento de seta para cima                          campos vazios
             If  Len(aparam) >4 .and. aparam[5]=="DELETE" .and. Empty(AllTrim(oModelG:GetValue(aCampos[1]))) .and. Empty(AllTrim(oModelG:GetValue(aCampos[2])))
-                //xTotQtd(modulo master,2=decrementar qtd,1=cd 2=musica,)
+                //xTotQtd(modulo master,2=decrementar qtd,1=cd 2=musica,3=instrumentos)
                 U_xTotQtd("ZD5Master",2,nModel)                
             EndIf
             //tratar duração da música e totalizador
@@ -125,6 +131,14 @@ User Function xContrM()
                         EndIf                     
                     EndIf
                 EndIf
+            elseif (nModel==3 .AND. ;                   
+                    aparam[5]=="SETVALUE" .AND. ;
+                    aparam[6]=="ZD7_CHAVE" .AND.;
+                    oModel:AALLSUBMODELS[3]:CID=="ZD3Detail" .and. ;
+                    oModel:AALLSUBMODELS[3]:NLINE > 1 .and.;
+                    oModel:AALLSUBMODELS[4]:NLINE == 1)
+                        U_xTotQtd("ZD5Master",1,nModel)
+                Endif 
             EndIf
 
             If xRet   //entrar somente para edição do campo
@@ -137,8 +151,10 @@ User Function xContrM()
             else
                 Help(NIL, NIL, "Validação!", NIL, "Número incoreto para o campo de duração", 1, 0, NIL, NIL, NIL, NIL, NIL, {"Digite números dentro do formato da hora."})
                 
-            EndIf   
-        EndIf
+            EndIf  
+                     
+
+        
     EndIf    
     aCampos   :={}
     //xEdit     :=.F.

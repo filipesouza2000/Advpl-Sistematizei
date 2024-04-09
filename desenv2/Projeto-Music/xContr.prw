@@ -73,7 +73,9 @@
                                 para indicar no contrato, os instrumentos utilizados na música, 
                                 para definir partes a serem agendadas antes da mixagem. 
                                 Definir novo layout com ZD7 relacionando com ZD3, para Box 40,30,30
-                                 
+ 09/04/2024  | Filipe Souza |  Gerado novo modelo de layout.
+                               Otimizar totalizador de instrumentos, igual de músicas, mas separar total por musica relacionada, não o geral.                              
+                               Evento de atualizar totalizador excluindo e recuperando pela seta.  
                             
     Planejamento @see https://docs.google.com/document/d/1V0EWr04f5LLvjhhBhYQbz8MrneLWxDtVqTkCJIA9kTA/edit?usp=drive_link
     UML          @see https://drive.google.com/file/d/1wFO2CKqSrvzxg5RZDYTfGayHrAUcCcfL/view?usp=drive_link 
@@ -209,31 +211,34 @@ Static Function ViewDef()
     oView:addField("VIEW_TOTM",oStruTotM,"TotaisM")
     oView:addField("VIEW_TOTIM",oStruTotIM,"TotaisIM")
 
-    oView:CreateHorizontalBox("CONT_BOX",50)
-    
-    oView:CreateHorizontalBox("MEIO_BOX",40)
-    oView:CreateVerticalBox("MEIOLEFT",40,"MEIO_BOX")// Vertical BOX
-    oView:CreateVerticalBox("MEIOCENTER",30,"MEIO_BOX")// Vertical BOX    
-    oView:CreateVerticalBox("MEIORIGHT",30,"MEIO_BOX")// Vertical BOX    
-    
-    oView:CreateHorizontalBox("BARTOT",10)   
-    oView:CreateVerticalBox("TOTLEFT",40,"BARTOT")// Vertical BOX
-    oView:CreateVerticalBox("TOTCENTER",30,"BARTOT")// Vertical BOX
-    oView:CreateVerticalBox("TOTRIGHT",30,"BARTOT")// Vertical BOX
-    
-    oView:SetOwnerView("VIEW_SB1","MEIOLEFT")
-    oView:SetOwnerView("VIEW_ZD3","MEIOCENTER")
-    oView:SetOwnerView("VIEW_ZD7","MEIORIGHT")
+    oView:CreateHorizontalBox("HEADER_BOX",30)
 
-    oView:SetOwnerView("VIEW_TOTCD","TOTLEFT")
-    oView:SetOwnerView("VIEW_TOTM","TOTCENTER")
+    oView:CreateHorizontalBox("MIDLE_BOX",20)
+    oView:CreateVerticalBox("CD_BOX",100,"MIDLE_BOX")// Horizontal BOX
+    oView:CreateHorizontalBox("TOTCD_BOX",10)
+    oView:CreateVerticalBox("TOTCD",40,"TOTCD_BOX")// Vertical BOX
+    
+    oView:CreateHorizontalBox("BASE_BOX",30)    
+    oView:CreateVerticalBox("BASERIGHT",50,"BASE_BOX")// Vertical BOX    
+    oView:CreateVerticalBox("BASELEFT",50,"BASE_BOX")// Vertical BOX    
+    
+    oView:CreateHorizontalBox("BARTOT",10)       
+    oView:CreateVerticalBox("TOTLEFT",50,"BARTOT")// Vertical BOX
+    oView:CreateVerticalBox("TOTRIGHT",50,"BARTOT")// Vertical BOX
+    
+    oView:SetOwnerView("VIEW_SB1","CD_BOX")
+    oView:SetOwnerView("VIEW_ZD3","BASERIGHT")
+    oView:SetOwnerView("VIEW_ZD7","BASELEFT")
+
+    oView:SetOwnerView("VIEW_TOTCD","TOTCD")
+    oView:SetOwnerView("VIEW_TOTM","TOTLEFT")
     oView:SetOwnerView("VIEW_TOTIM","TOTRIGHT")
 
     oView:EnableTitleView("VIEW_SB1", "CDs")
     oView:EnableTitleView("VIEW_ZD3", "Músicas")
     oView:EnableTitleView("VIEW_ZD7", "Instrumentos")
 
-    oView:SetOwnerView("VIEW_ZD5","CONT_BOX")
+    oView:SetOwnerView("VIEW_ZD5","HEADER_BOX")
     oView:EnableTitleView("VIEW_ZD5", "Contrato")
     
 
@@ -286,12 +291,12 @@ return .T.
 //chamdo no validador do usuario no campo B1_TIPO, ZD3_MUSICA      U_xTotQtd('ZD5Master',0,2)
 //enviar total de CD, Musica para o campo do Form na view
 //no 2º CD não incrementa a 1ª música, chamar U_xTotQtd() para incrementar.
-//Deletar ou recuperando música deletada.
+//Deletar ou recuperando linha deletada.
 User Function xTotQtd(cModM,nOpt,nModulo,lDell)//xTotMus(nOpt)
     DEFAULT cModM   :=''
     DEFAULT nOpt    :=0
     DEFAULT nModulo :=0
-    DEFAULT lDell   :=.F.   //para tratar do evento DELETE, diferenciar ao de seta para cima
+    DEFAULT lDell   :=.F.   //para tratar do evento DELETE, diferenciar o de seta para cima
     Local oModel
     Local oModelTot := FwModelActive()
     Local oModelG 
@@ -306,21 +311,29 @@ User Function xTotQtd(cModM,nOpt,nModulo,lDell)//xTotMus(nOpt)
             aAdd(aTot,'TotaisM')            
             aAdd(aTot,'XX_TOTM')
             aAdd(aTot,'ZD5_FAIXAS')
+    elseif nModulo==3//'ZD7Detail'            
+            aAdd(aTot,'TotaisIM')            
+            aAdd(aTot,'XX_TOTITEM')       
     EndIf
 
     If oModelTot:Adependency[1][1] == cModM
         oModelG  := oModelTot:GetModel(aTot[1])//TotaisM
         nTot     := oModelG:GetValue(aTot[2])//XX_TOTM
-        //no 2º CD não incrementa a 1ª música, chamar XX_TOTM para incrementar. Ou recuperando música deletada.
+        //no 2º CD não incrementa a 1ª música, chamar XX_TOT para incrementar. Ou recuperando linha deletada.
         If nOpt==1 
             IIF( lDell, , nTot++ )
             oModelG:SetValue(aTot[2],nTot)  //"XX_TOTM",nMus          
-        elseIf nOpt==2 // DELETE, seta para cima, decrementar música 
-                IIF( lDell, , nTot-- )//se DELETE não decremetna pois totalizador ao ser chamado ln 237 o executa, senão é seta para cima é preciso decremetnar. 
+        elseIf nOpt==2 // DELETE, seta para cima, decrementar total 
+                IIF( lDell, , nTot-- )//se DELETE não decrementa pois totalizador ao ser chamado ln 237 o executa, senão é seta para cima é preciso decremetnar. 
                 oModelG:SetValue(aTot[2],nTot)         
         EndIf
-        oModel:= oModelTot:GetModel(cModM)//ZD5Master
-        oModel:SetValue(aTot[3],nTot)    //"ZD5_FAIXAS",nMus
+        If nModulo<>3//passar total para o modelo master
+            oModel:= oModelTot:GetModel(cModM)//ZD5Master
+            oModel:SetValue(aTot[3],nTot)    //"ZD5_FAIXAS",nMus
+        EndIf
+        
+        
+
     EndIf
     cModM   :=''
     nOpt    :=0   
@@ -484,6 +497,9 @@ User Function xDelL()
     elseif  oView:ACURRENTSELECT[1]=="VIEW_ZD3" .or. oView:ACURRENTSELECT[1]=="ZD3Detail"
         nGrid:=2
         oModelM:=oModel:GetModel("ZD3Detail")
+    elseif  oView:ACURRENTSELECT[1]=="VIEW_ZD7" .or. oView:ACURRENTSELECT[1]=="ZD7Detail"
+        nGrid:=3
+        oModelM:=oModel:GetModel("ZD7Detail")    
     EndIf    
     //aSaveLines := FWSaveRows()
     //se linha já está deletada, recupera e adiciona valor no totalizador
