@@ -19,26 +19,25 @@ sendo também fornecedor para a venda de seu produto gravado no mesmo ou em outr
 
 
 -Cenario de Agengamento:
-	cliente fecha contrato de gravação de CD ou solicita novo agendamento,
-	para agendamento inicial do projeto são especificados CD -SB1 com suas musicas -ZD3,
-	Cliente não existente é cadastrado -SA1, também é registrado um Artista -ZD4 para este cliente e -ZD5 de Artista x Cliente,
-	com dia e hora disponivel ele agenda gravação de seu instrumento , para cd e m�sica em andamento, na -ZD1 com status 1-ON
-	Em projeto em andamento, é gerado novo agendamento para cada instrumentista em cada m�sica na lista,
-	no produto tipo CD e sua m�sica em gravação deve manter status de 'ON', 
-	indicando projeto em andamento e ainda não liberar para venda.
-	O estudio local-ZD2 recebe agenda desabilitando datas e hor�rios solicitados,
+	1-Cliente com contrato de gravação de CD efetuado solicita novo agendamento,
+	para agendamento inicial do projeto são especificados o Contrato, CD , Musica e instrumento 
+	com dia e hora disponivel do solicitado.
+	Com projeto em andamento, no produto tipo CD e sua musica em gravação deve manter status de 'ON', 
+	indicando projeto em andamento e ainda não liberar para próxima etapa.	
 	cliente utiliza o estudio e grava dentro do tempo especificado,
-	se necessário gerará novo agendamento para mesma m�sica e instrumento ou pr�ximos.
-	Quando finaliza cada gravação é atualizado seu status,
-	Concluindo musicas o estudio produz o CD e atualiza os Status do contrato e musicas.
-				
-		gerar documento do contrato
-		identificar formas de pagamento	
+	se necessário gerará novo agendamento para mesma musica e instrumento ou proximos.
 	
--Cen�rio contrato gravação
-	Cliente faz o contrato contendo os servi�os de gravação, mixagem e masterização, apresentando dados do CD
-	com suas respectivas musicas, determinando o total de tempo a ser gravado.
-	Contrato gera pedido de venda contendo o CD da gravação, gera Documento de saída Nota Fiscal.
+			
+-Cenario contrato gravação
+	Cliente faz o contrato contendo os serviços de gravação, mixagem e masterização, 
+	informando dados do CD com suas respectivas musicas e instrumentos para cada.
+	É identificado a pré definição de tempo esperado por cada faixa, o que pode ser alterado nas próximas etapas de produção.
+	Cada musica iniciando com Status 'OFF-Não Iniciado',  o que pode ser alterado nas próximas etapas de produção.
+	Finalizando é possível gerar Documento do Contrato sobre os serviços que serão aplicados.
+	Após a cinência do Contrato e assinalado pelo cliente e artista, é gerado pedido de venda contendo os serviços de gravação, mixagem e masterização, 
+	concluindo com Nota Fiscal de Saida.
+	A patir do pagamento de certa porcentagem do valor do contrato, será habilitado inicio dos agendamentos e produção.
+	
 	
 ----2023---------	
 05/08 - 
@@ -226,7 +225,14 @@ sendo também fornecedor para a venda de seu produto gravado no mesmo ou em outr
 06/04	X	Criar legenda para Browse Contrato
 			oBrowse:AddLegend("ZD5->ZD5_STATUS=='1'","BR_CINZA","Não iniciado")
 			xLeg()
-
+			----------------
+08/04		Reanalisado cenário de gravação, criada tabela ZD7-Itens de Músicas, ZD7_CHAVE    com pesquisa padrão SX5IM
+			para indicar no contrato, os instrumentos utilizados na música, para definir partes a serem agendadas antes da mixagem.
+			
+			Definir novo layout com ZD7 relacionando com ZD3, para Box 40,30,30
+			xxxxxxxxxxxxxxxxxxxxx
+			Otimizar totalizador de instrumentos, igual de músicas, mas separar total por musica relacionada, não o geral.
+			
 
 
 	

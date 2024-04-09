@@ -69,7 +69,11 @@
                                 No compara do totalizador com o limite,cTempo retornar ao total anterior
                                 Tempo correto e incrementado, seta o tempo atual cTemp:=cTempo
                                 Melhoria na exibiçao do tempo que foi digitado.
-
+ 08/04/2024  | Filipe Souza |  Reanalisado cenário de gravação, criada tabela ZD7-Itens de Músicas, ZD7_CHAVE com pesquisa padrão SX5IM
+                                para indicar no contrato, os instrumentos utilizados na música, 
+                                para definir partes a serem agendadas antes da mixagem. 
+                                Definir novo layout com ZD7 relacionando com ZD3, para Box 40,30,30
+                                 
                             
     Planejamento @see https://docs.google.com/document/d/1V0EWr04f5LLvjhhBhYQbz8MrneLWxDtVqTkCJIA9kTA/edit?usp=drive_link
     UML          @see https://drive.google.com/file/d/1wFO2CKqSrvzxg5RZDYTfGayHrAUcCcfL/view?usp=drive_link 
@@ -81,6 +85,7 @@ Static cCont     := "ZD5"
 //Static cCli     := "SA1"
 Static cCD      := "SB1"
 Static cMusica  := "ZD3"
+Static cItemM  := "ZD7"
 
 User Function xContr()
     Local aArea     := GetArea()
@@ -102,7 +107,7 @@ User Function xContr()
     //recebe filtro da lista de artistas a serem listados no bowse
     //oBrowse:SetFilterDefault(cCli+"->A1_COD $"+"'"+cArtist+"'")
     oBrowse:AddLegend("ZD5->ZD5_STATUS=='1'","BR_CINZA","Não iniciado")
-    oBrowse:AddLegend("ZD5->ZD5_STATUS=='2'","BR_VERDE","Em Andamentp")
+    oBrowse:AddLegend("ZD5->ZD5_STATUS=='2'","BR_VERDE","Em Andamento")
     oBrowse:AddLegend("ZD5->ZD5_STATUS=='3'","BR_VERMELHO","Finalizado")
     oBrowse:ACTIVATE()
     RestArea(aArea)
@@ -125,8 +130,10 @@ Static Function ModelDef()
     Local oStruCon      :=FWFormStruct(1,cCont)   //remover campo , pois já exibirá na strutura Pai
     Local oStruCD       :=FWFormStruct(1,cCD, {|x| AllTrim(x) $ 'B1_COD;B1_DESC;B1_TIPO;B1_UM;B1_LOCPAD;B1_GRUPO;B1_FAIXAS;B1_BITMAP;B1_XSTUD;B1_XART;B1_ATIVO'})
     Local oStruMu       :=FWFormStruct(1,cMusica)
+    Local oStruItemM    :=FWFormStruct(1,cItemM)
     Local aRelCD        :={}
-    Local aRelMusic     :={}    
+    Local aRelMusic     :={}  
+    Local aRelItemM     :={}   
     Local oModel
     Local bPre          :=NIL
     Local bPos          :=NIL
@@ -137,6 +144,7 @@ Static Function ModelDef()
     oModel:addFields("ZD5Master",/*cOwner*/,oStruCon)
     oModel:AddGrid("SB1Detail","ZD5Master",oStruCD,/*bLinePre*/,/*bLinePos*/,bPreGrid,/*bLoad-Carga do modelo manual*/,)
     oModel:AddGrid("ZD3Detail","SB1Detail",oStruMu,/*bLinePre*/,/*bLinePos*/,/*bPre-Grid Full*/,/*bLoad-Carga do modelo manual*/,)
+    oModel:AddGrid("ZD7Detail","ZD3Detail",oStruItemM,/*bLinePre*/,/*bLinePos*/,/*bPre-Grid Full*/,/*bLoad-Carga do modelo manual*/,)
     oModel:SetPrimaryKey({"ZD5_FILIAL","ZD5_COD"})//,"A1_CGC"
     
     //CD- relacionamento B1-CD com ZD5-Contrato 
@@ -146,23 +154,36 @@ Static Function ModelDef()
     aAdd(aRelCD, {"B1_FILIAL","FWxFilial('SB1')"})
     aAdd(aRelCD, {"B1_XCONTR","ZD5_COD"})
     oModel:SetRelation("SB1Detail", aRelCD, SB1->(IndexKey(1)))
-    
+    //-------------------------------------------------------------------------------------------
     //Musica- relacionamento ZD3-Musica com ZD5-Contrato
     aAdd(aRelMusic,{"ZD3_FILIAL","FWxFilial('ZD5')"})    
-    AAdd(aRelMusic,{"ZD3_XCONT","ZD5_COD"})
+    aAdd(aRelMusic,{"ZD3_XCONT","ZD5_COD"})
     oModel:SetRelation("ZD3Detail", aRelMusic,ZD3->(IndexKey(3)))
-
     //Musica- relacionamento ZD3-Musica com SB1-CD
     aAdd(aRelMusic,{"ZD3_FILIAL","FWxFilial('ZD3')"})    
-    AAdd(aRelMusic,{"ZD3_CODCD","B1_COD"})
+    aAdd(aRelMusic,{"ZD3_CODCD","B1_COD"})
     oModel:SetRelation("ZD3Detail", aRelMusic,ZD3->(IndexKey(2)))
+    //-------------------------------------------------------------------------------------------
+    //Item Musica- relacionamento ZD7-Musica com ZD3-Musica
+    aAdd(aRelItemM,{"ZD7_FILIAL","FWxFilial('ZD7')"})    
+    aAdd(aRelItemM,{"ZD7_CODM","ZD3_COD"})
+    oModel:SetRelation("ZD7Detail", aRelItemM,ZD7->(IndexKey(3)))
+    //Item Musica- relacionamento ZD7-Musica com SB1-CD
+    aAdd(aRelItemM,{"ZD7_FILIAL","FWxFilial('ZD7')"})    
+    aAdd(aRelItemM,{"ZD7_CODCD","B1_COD"})
+    oModel:SetRelation("ZD7Detail", aRelItemM,ZD7->(IndexKey(4)))
+    //Item Musica- relacionamento ZD7-Musica com ZD5-Contrato
+    aAdd(aRelItemM,{"ZD7_FILIAL","FWxFilial('ZD7')"})    
+    aAdd(aRelItemM,{"ZD7_XCONT ","ZD5_COD"})
+    oModel:SetRelation("ZD7Detail", aRelItemM,ZD7->(IndexKey(4)))
 
     oModel:GetModel("SB1Detail"):SetUniqueLine({"B1_DESC"})
-    oModel:GetModel("ZD3Detail"):SetUniqueLine({"ZD3_MUSICA"})
+    oModel:GetModel("ZD3Detail"):SetUniqueLine({"ZD3_MUSICA"})    
     //totalizador-  titulo,     relacionamento, campo a calcular,virtual,operação,,,display    
     oModel:AddCalc('TotaisCd','ZD5Master','SB1Detail','B1_COD'    ,'XX_TOTCD' ,'COUNT',,,'Total CDs')
     oModel:AddCalc('TotaisM','ZD5Master','ZD3Detail','ZD3_MUSICA','XX_TOTM'  ,'COUNT',,,'Total Musicas')
     oModel:AddCalc('TotaisM','ZD5Master','ZD3Detail','ZD3_DURAC' ,'XX_TOTDUR','SUM',,,'Total Duração')
+    oModel:AddCalc('TotaisIM','ZD5Master','ZD7Detail','ZD7_ITEM' ,'XX_TOTITEM','COUNT',,,'Instrumentos')
     
 return oModel
 
@@ -171,8 +192,10 @@ Static Function ViewDef()
     Local oStruCon  :=FWFormStruct(2,cCont)
     Local oStruCD   :=FWFormStruct(2,cCD, {|x| AllTrim(x) $ 'B1_COD;B1_DESC;B1_TIPO;B1_UM;B1_LOCPAD;B1_GRUPO;B1_FAIXAS;B1_BITMAP;B1_XSTUD;B1_XART;B1_ATIVO'})
     Local oStruMu   :=FWFormStruct(2,cMusica)
+    Local oStruItemM:=FWFormStruct(2,cItemM)
     Local oStruTotCd:=FWCalcStruct(oModel:GetModel('TotaisCd'))
     Local oStruTotM :=FWCalcStruct(oModel:GetModel('TotaisM'))
+    Local oStruTotIM:=FWCalcStruct(oModel:GetModel('TotaisIM'))
     Local oView
     
     oView:= FwFormView():New()
@@ -181,26 +204,34 @@ Static Function ViewDef()
     oView:addField("VIEW_ZD5",oStruCon  ,"ZD5Master")
     oView:addGrid("VIEW_SB1",oStruCD,"SB1Detail")
     oView:addGrid("VIEW_ZD3",oStruMu ,"ZD3Detail")
+    oView:addGrid("VIEW_ZD7",oStruItemM ,"ZD7Detail")
     oView:addField("VIEW_TOTCD",oStruTotCd,"TotaisCd")
     oView:addField("VIEW_TOTM",oStruTotM,"TotaisM")
+    oView:addField("VIEW_TOTIM",oStruTotIM,"TotaisIM")
 
     oView:CreateHorizontalBox("CONT_BOX",50)
     
     oView:CreateHorizontalBox("MEIO_BOX",40)
-    oView:CreateVerticalBox("MEIOLEFT",70,"MEIO_BOX")// Vertical BOX
+    oView:CreateVerticalBox("MEIOLEFT",40,"MEIO_BOX")// Vertical BOX
+    oView:CreateVerticalBox("MEIOCENTER",30,"MEIO_BOX")// Vertical BOX    
     oView:CreateVerticalBox("MEIORIGHT",30,"MEIO_BOX")// Vertical BOX    
     
     oView:CreateHorizontalBox("BARTOT",10)   
-    oView:CreateVerticalBox("TOTLEFT",70,"BARTOT")// Vertical BOX
+    oView:CreateVerticalBox("TOTLEFT",40,"BARTOT")// Vertical BOX
+    oView:CreateVerticalBox("TOTCENTER",30,"BARTOT")// Vertical BOX
     oView:CreateVerticalBox("TOTRIGHT",30,"BARTOT")// Vertical BOX
     
     oView:SetOwnerView("VIEW_SB1","MEIOLEFT")
-    oView:SetOwnerView("VIEW_ZD3","MEIORIGHT")
+    oView:SetOwnerView("VIEW_ZD3","MEIOCENTER")
+    oView:SetOwnerView("VIEW_ZD7","MEIORIGHT")
+
     oView:SetOwnerView("VIEW_TOTCD","TOTLEFT")
-    oView:SetOwnerView("VIEW_TOTM","TOTRIGHT")
+    oView:SetOwnerView("VIEW_TOTM","TOTCENTER")
+    oView:SetOwnerView("VIEW_TOTIM","TOTRIGHT")
 
     oView:EnableTitleView("VIEW_SB1", "CDs")
     oView:EnableTitleView("VIEW_ZD3", "Músicas")
+    oView:EnableTitleView("VIEW_ZD7", "Instrumentos")
 
     oView:SetOwnerView("VIEW_ZD5","CONT_BOX")
     oView:EnableTitleView("VIEW_ZD5", "Contrato")
@@ -211,6 +242,10 @@ Static Function ViewDef()
     oStruMu:RemoveField("ZD3_COD")
     oStruMu:RemoveField("ZD3_XCONT")
     oStruCD:RemoveField("B1_XART")
+    oStruItemM:RemoveField("ZD7_CODCD")
+    oStruItemM:RemoveField("ZD7_COD")
+    oStruItemM:RemoveField("ZD7_CODM")
+    oStruItemM:RemoveField("ZD7_XCONT")
    
     //refresh para tentar atualziar Totalizadores
     /*    oView:AddUserButton('Refresh','MAGIC.BMP',{|| oView:Refresh()},,,,.T.)
@@ -229,6 +264,7 @@ Static Function ViewDef()
     //oView:AddIncrementField("SB1Detail","B1_COD")// gatilho xCodProd()
     oView:AddIncrementField("ZD3Detail","ZD3_COD")
     oView:AddIncrementField("ZD3Detail","ZD3_ITEM")
+    oView:AddIncrementField("ZD7Detail","ZD7_ITEM")
     oView:SetCloseOnOk({||.T.})
 return oView
 
@@ -513,9 +549,9 @@ Função para determinar Legenda
 User Function xLeg()
     Local aLeg      :={}
 
-    aadd(aLeg,{"BR_CINZA"   ,"OFF-Não Iniciado"})
-    aadd(aLeg,{"BR_VERDE"   ,"ON-Em Andamento"})
-    aadd(aLeg,{"BR_VERMELHO","OK-Finalizado"})    
+    aAdd(aLeg,{"BR_CINZA"   ,"OFF-Não Iniciado"})
+    aAdd(aLeg,{"BR_VERDE"   ,"ON-Em Andamento"})
+    aAdd(aLeg,{"BR_VERMELHO","OK-Finalizado"})    
 
     BrwLegenda("Status do Contrato da Gravação","Não Iniciado/Em Andamento/Finalizado",aLeg)
 
