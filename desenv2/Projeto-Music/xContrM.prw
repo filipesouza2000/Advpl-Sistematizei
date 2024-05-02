@@ -135,10 +135,11 @@ User Function xContrM()
                     aparam[5]=="SETVALUE" .AND. ;
                     aparam[6]=="ZD7_CHAVE" .AND.;
                     oModel:AALLSUBMODELS[3]:CID=="ZD3Detail" .and. ;
-                    oModel:AALLSUBMODELS[3]:NLINE > 1 .and.;
-                    oModel:AALLSUBMODELS[4]:NLINE == 1)
-                        U_xTotQtd("ZD5Master",1,nModel)
-                Endif 
+                    oModel:AALLSUBMODELS[3]:NLINE > 1 .and.;//ZD3Detail mais de 1 linha
+                    oModel:AALLSUBMODELS[4]:NLINE == 1)     //ZD7Detail 1 linha
+                        U_xTotQtd("ZD5Master",1,nModel)     //incrementar qtd
+            elseif nModel==3     
+                   U_xTotQtd("ZD5Master",3,nModel)     //incrementar qtd
             EndIf
 
             If xRet   //entrar somente para edição do campo
@@ -152,7 +153,7 @@ User Function xContrM()
                 Help(NIL, NIL, "Validação!", NIL, "Número incoreto para o campo de duração", 1, 0, NIL, NIL, NIL, NIL, NIL, {"Digite números dentro do formato da hora."})
                 
             EndIf  
-                     
+        EndIf             
 
         
     EndIf    

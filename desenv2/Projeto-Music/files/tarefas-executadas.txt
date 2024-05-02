@@ -231,8 +231,24 @@ sendo também fornecedor para a venda de seu produto gravado no mesmo ou em outr
 			Definir novo layout com ZD7 relacionando com ZD3, para Box 40,30,30
 			
 09/04	x	Otimizar totalizador de instrumentos, igual de músicas, 
+			Evento de atualizar totalizador excluindo e recuperando pela seta.
 			
-			separar total por musica relacionada, não o geral.
+		x	separar total por musica relacionada, não o geral.
+				xContr()      bBlocoAtu := {|| xUpInstr()}
+				//RETIRADO----Bloco de código invocado no momento que o grid ganha o foco, para ao selecionar a primeira linha aciona o bloco
+				oView:addGrid("VIEW_ZD3",oStruMu ,"ZD3Detail",,/*bBlocoAtu*/,)
+				//evento ChangeLine, para cada mudança de linha aciona o bloco
+				oView:SetViewProperty("VIEW_ZD3", "CHANGELINE", aChangeLine)							
+02/05	x	Ao Refresh() no VIEW_TOTIM tira o foco da ZD3, a cada clique atualiza VIEW_TOTIM mas não habilita editar.
+			clica mas não seleciona linha e não gera cursor do registro.
+			RETIRADO-----bGotFocus do AddGrid, pois chamava a mesma função que atualiza e Refresh().
+		x	passa 1ª linha correto, mas depois não, usar oView:Refresh()
+			Analisado no evento ALTERAR 
+			
+			Usar Css na linha selecionada da grid ZD3-Musica e ZD7-Instrumento
+			
+			alterar visualização de Duração para formato 00:00:00, não 00.00
+			
 			rever processo de excluir Cd e reuperar Cd referenciando o totalizador e da ZD5_FAIXAS, está errado.
 			
 			
@@ -252,13 +268,13 @@ sendo também fornecedor para a venda de seu produto gravado no mesmo ou em outr
 			senão (antes de digitar) nOldT recebe 0 , sempre antes de digitar valor nOldT recebe valor existente no campo.			
 			validador do campo ZD3_MUSICA chama xTotMus(), enviar total de Musica para o campo ZD5_FAIXAS
 			
-		inserir 1é registro:
+		inserir 1 registro:
 			ponto de entrada xContrM valida o digitado
 			validador do campo ZD3_DURAC	chama xTotDur() 
 			incrementa tempo digitado na variavel cTempo, cria nNewT no formado numero sem :
 			seta em ZD5_TEMPO o valor nNewT		
 			
-		inserir 2é cd 1é musica:
+		inserir 2 cd 1é musica:
 			No validador do campo ZD3_DURAC chama xTotDur(nOld=0),
 			incrementa tempo digitado na variavel cTempo, cria nNewT no formado numero sem :
 			seta em ZD5_TEMPO o valor nNewT

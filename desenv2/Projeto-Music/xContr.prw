@@ -69,14 +69,20 @@
                                 No compara do totalizador com o limite,cTempo retornar ao total anterior
                                 Tempo correto e incrementado, seta o tempo atual cTemp:=cTempo
                                 Melhoria na exibiçao do tempo que foi digitado.
- 08/04/2024  | Filipe Souza |  Reanalisado cenário de gravação, criada tabela ZD7-Itens de Músicas, ZD7_CHAVE com pesquisa padrão SX5IM
+  08/04/2024  | Filipe Souza |  Reanalisado cenário de gravação, criada tabela ZD7-Itens de Músicas, ZD7_CHAVE com pesquisa padrão SX5IM
                                 para indicar no contrato, os instrumentos utilizados na música, 
                                 para definir partes a serem agendadas antes da mixagem. 
                                 Definir novo layout com ZD7 relacionando com ZD3, para Box 40,30,30
- 09/04/2024  | Filipe Souza |  Gerado novo modelo de layout.
+  09/04/2024  | Filipe Souza |  Gerado novo modelo de layout.
                                Otimizar totalizador de instrumentos, igual de músicas, mas separar total por musica relacionada, não o geral.                              
                                Evento de atualizar totalizador excluindo e recuperando pela seta.  
-                            
+  10/04/2024  | Filipe Souza |  Separar total por musica relacionada, não o geral.
+  02/05/2024  | Filipe Souza | Totalizador de Instrumentos, no evento ALTERAR Contrato, incluir instrumento está totalizando certo,
+                                enviando valor para ZD3_INSTR na function xTotQtd, para formar o total de cada musica.
+                                Na Grid de Músicas, adicionado propriedade na estrutura, CHANGELINE, para enviar valor de ZD3_INSTR para VIEW_TOTIM.
+                                Resolvido erro retirando bGotFocus  da VIEW_ZD3 que chamava mais Refresh()
+
+
     Planejamento @see https://docs.google.com/document/d/1V0EWr04f5LLvjhhBhYQbz8MrneLWxDtVqTkCJIA9kTA/edit?usp=drive_link
     UML          @see https://drive.google.com/file/d/1wFO2CKqSrvzxg5RZDYTfGayHrAUcCcfL/view?usp=drive_link 
     Scrum-kanban @see https://trello.com/w/protheusadvplmusicbusiness       
@@ -100,6 +106,8 @@ User Function xContr()
     Private xEdit   :=.F.      
     Private cTemp:=''
     Private lRefresh:=.T.
+    Private bBlocoAtu := {|| xUpInstr()}
+    Private nTotInst :=0
 
     aRotina := MenuDef()
     oBrowse:= FwMBrowse():New()
@@ -136,11 +144,12 @@ Static Function ModelDef()
     Local aRelCD        :={}
     Local aRelMusic     :={}  
     Local aRelItemM     :={}   
-    Local oModel
+    Local oModel    
     Local bPre          :=NIL
     Local bPos          :=NIL
     Local bCommit       :=NIL
     Local bCancel       :={|| FWFORMCANCEL(SELF)}
+    //Local bPreG          :=bBlocoAtu
     Local bPreGrid      :={|oModel,nLine,cAction| xLinePre(oModel,nLine,cAction)}
     oModel:=MPFormModel():New("xContrM",bPre,bPos,bCommit,bCancel)
     oModel:addFields("ZD5Master",/*cOwner*/,oStruCon)
@@ -199,17 +208,24 @@ Static Function ViewDef()
     Local oStruTotM :=FWCalcStruct(oModel:GetModel('TotaisM'))
     Local oStruTotIM:=FWCalcStruct(oModel:GetModel('TotaisIM'))
     Local oView
+    Local aChangeLine   := {}    
+
+    aAdd(aChangeLine, bBlocoAtu)
     
     oView:= FwFormView():New()
     oView:SetModel(oModel)
     
     oView:addField("VIEW_ZD5",oStruCon  ,"ZD5Master")
+    //AddGrid(<cViewID >, <oStruct >, [ cSubModelID ], <uParam4 >, [ bGotFocus ], [ bLostFocus ])
+    //bGotFocus= Bloco de código invocado no momento que o grid ganha o foco
     oView:addGrid("VIEW_SB1",oStruCD,"SB1Detail")
-    oView:addGrid("VIEW_ZD3",oStruMu ,"ZD3Detail")
+    oView:addGrid("VIEW_ZD3",oStruMu ,"ZD3Detail",,/*bBlocoAtu*/,)
     oView:addGrid("VIEW_ZD7",oStruItemM ,"ZD7Detail")
     oView:addField("VIEW_TOTCD",oStruTotCd,"TotaisCd")
     oView:addField("VIEW_TOTM",oStruTotM,"TotaisM")
     oView:addField("VIEW_TOTIM",oStruTotIM,"TotaisIM")
+
+    oView:SetViewProperty("VIEW_ZD3", "CHANGELINE", aChangeLine)
 
     oView:CreateHorizontalBox("HEADER_BOX",30)
 
@@ -244,12 +260,12 @@ Static Function ViewDef()
 
     //oStruCD:RemoveField("B1_NOME")
     oStruMu:RemoveField("ZD3_CODCD")
-    oStruMu:RemoveField("ZD3_COD")
+    //oStruMu:RemoveField("ZD3_COD")
     oStruMu:RemoveField("ZD3_XCONT")
     oStruCD:RemoveField("B1_XART")
     oStruItemM:RemoveField("ZD7_CODCD")
     oStruItemM:RemoveField("ZD7_COD")
-    oStruItemM:RemoveField("ZD7_CODM")
+    //oStruItemM:RemoveField("ZD7_CODM")
     oStruItemM:RemoveField("ZD7_XCONT")
    
     //refresh para tentar atualziar Totalizadores
@@ -272,6 +288,20 @@ Static Function ViewDef()
     oView:AddIncrementField("ZD7Detail","ZD7_ITEM")
     oView:SetCloseOnOk({||.T.})
 return oView
+
+
+Static Function xUpInstr()    
+    Local oView    :=FwViewActive()
+    Local oModel   := FWModelActive()
+    Local oModelZD3:= oModel:GetModel('ZD3Detail')
+    Local oModelZD7:= oModel:GetModel('TotaisIM')
+    Local nIntr    :=oModelZD3:GetValue('ZD3_INSTR')    
+
+    oModelZD7:SetValue("XX_TOTITEM",nIntr)            
+    oView:GetViewObject('VIEW_TOTIM')
+    oView:Refresh()   
+   
+return
 
 //enviar total de CD para o campo ZD5_QCD na view
 User Function xTotCd()
@@ -302,6 +332,7 @@ User Function xTotQtd(cModM,nOpt,nModulo,lDell)//xTotMus(nOpt)
     Local oModelG 
     Local nTot      :=0 
     Local aTot      :={}   
+    Local oView:=FwViewActive()
 
     If nModulo==1//'SB1Detail'             
             aAdd(aTot,'TotaisCd')//modulo
@@ -313,9 +344,10 @@ User Function xTotQtd(cModM,nOpt,nModulo,lDell)//xTotMus(nOpt)
             aAdd(aTot,'ZD5_FAIXAS')
     elseif nModulo==3//'ZD7Detail'            
             aAdd(aTot,'TotaisIM')            
-            aAdd(aTot,'XX_TOTITEM')       
+            aAdd(aTot,'XX_TOTITEM')
+            aAdd(aTot,'ZD3_INSTR')       
     EndIf
-
+    
     If oModelTot:Adependency[1][1] == cModM
         oModelG  := oModelTot:GetModel(aTot[1])//TotaisM
         nTot     := oModelG:GetValue(aTot[2])//XX_TOTM
@@ -330,6 +362,11 @@ User Function xTotQtd(cModM,nOpt,nModulo,lDell)//xTotMus(nOpt)
         If nModulo<>3//passar total para o modelo master
             oModel:= oModelTot:GetModel(cModM)//ZD5Master
             oModel:SetValue(aTot[3],nTot)    //"ZD5_FAIXAS",nMus
+        elseif nModulo==3
+            oModel:= oModelTot:GetModel("ZD3Detail")
+            oModel:SetValue(aTot[3],nTot)            
+            oView:GetViewObject('VIEW_ZD3')
+            oView:Refresh()
         EndIf
         
         
@@ -572,3 +609,5 @@ User Function xLeg()
     BrwLegenda("Status do Contrato da Gravação","Não Iniciado/Em Andamento/Finalizado",aLeg)
 
 return aLeg
+
+
