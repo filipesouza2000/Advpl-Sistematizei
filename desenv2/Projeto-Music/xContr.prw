@@ -81,7 +81,7 @@
                                 enviando valor para ZD3_INSTR na function xTotQtd, para formar o total de cada musica.
                                 Na Grid de Músicas, adicionado propriedade na estrutura, CHANGELINE, para enviar valor de ZD3_INSTR para VIEW_TOTIM.
                                 Resolvido erro retirando bGotFocus  da VIEW_ZD3 que chamava mais Refresh()
-
+  02/05/2024  | Filipe Souza | Configurada propriedade da View Grid para linha selecionada cor CSS 0A728C
 
     Planejamento @see https://docs.google.com/document/d/1V0EWr04f5LLvjhhBhYQbz8MrneLWxDtVqTkCJIA9kTA/edit?usp=drive_link
     UML          @see https://drive.google.com/file/d/1wFO2CKqSrvzxg5RZDYTfGayHrAUcCcfL/view?usp=drive_link 
@@ -225,6 +225,10 @@ Static Function ViewDef()
     oView:addField("VIEW_TOTM",oStruTotM,"TotaisM")
     oView:addField("VIEW_TOTIM",oStruTotIM,"TotaisIM")
 
+    //Agora define o CSS da grid    1C9DB0
+    oView:SetViewProperty("VIEW_ZD3", "SETCSS", {"QTableView { selection-background-color: #0A728C; selection-color: #FFFFFF; }"} )
+    oView:SetViewProperty("VIEW_ZD7", "SETCSS", {"QTableView { selection-background-color: #0A728C; selection-color: #FFFFFF; }"} )
+
     oView:SetViewProperty("VIEW_ZD3", "CHANGELINE", aChangeLine)
 
     oView:CreateHorizontalBox("HEADER_BOX",30)
@@ -260,12 +264,12 @@ Static Function ViewDef()
 
     //oStruCD:RemoveField("B1_NOME")
     oStruMu:RemoveField("ZD3_CODCD")
-    //oStruMu:RemoveField("ZD3_COD")
+    oStruMu:RemoveField("ZD3_COD")
     oStruMu:RemoveField("ZD3_XCONT")
     oStruCD:RemoveField("B1_XART")
     oStruItemM:RemoveField("ZD7_CODCD")
     oStruItemM:RemoveField("ZD7_COD")
-    //oStruItemM:RemoveField("ZD7_CODM")
+    oStruItemM:RemoveField("ZD7_CODM")
     oStruItemM:RemoveField("ZD7_XCONT")
    
     //refresh para tentar atualziar Totalizadores
