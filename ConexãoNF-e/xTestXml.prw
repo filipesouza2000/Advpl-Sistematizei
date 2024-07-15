@@ -66,127 +66,127 @@ Return
 
 
 STATIC Function DoPArser(oDlg,oListResult,oXml,cXml)
-Local lOk
-Local nTimer 
-Local cMsg
+	Local lOk
+	Local nTimer 
+	Local cMsg
 
-If Empty(cXml)
-	MsgInfo('Infome um XML para executar o Parser')
-	Return
-Endif
+	If Empty(cXml)
+		MsgInfo('Infome um XML para executar o Parser')
+		Return
+	Endif
 
-// remove quebras de linha e tabulações
-cXml := Strtran(cXml,chr(13),'')
-cXml := Strtran(cXml,chr(10),'')
-cXml := Strtran(cXml,chr(9),'')
+	// remove quebras de linha e tabulações
+	cXml := Strtran(cXml,chr(13),'')
+	cXml := Strtran(cXml,chr(10),'')
+	cXml := Strtran(cXml,chr(9),'')
 
-nTimer := seconds()
-lOk := oXml:Parse(cXml)	
-nTimer := seconds()-nTimer
+	nTimer := seconds()
+	lOk := oXml:Parse(cXml)	
+	nTimer := seconds()-nTimer
 
-If !lOk
-	cMsg := oXml:Error()
-	oListResult:SetArray({' '})
-	MsgStop(cMsg,"Parse Error")     
-Else
-	cMsg := "Parser executado em "+str(nTimer,12,2)+' s.'
-	BuildResult(oXml,oListResult)
-	MsgInfo(cMsg,"Parse OK")     
-Endif
+	If !lOk
+		cMsg := oXml:Error()
+		oListResult:SetArray({' '})
+		MsgStop(cMsg,"Parse Error")     
+	Else
+		cMsg := "Parser executado em "+str(nTimer,12,2)+' s.'
+		BuildResult(oXml,oListResult)
+		MsgInfo(cMsg,"Parse OK")     
+	Endif
 	
 Return
 
 // Faz parser de um XML lido do disco a partir do RootPAth
 
 STATIC Function DoParserFile(oDlg,oListResult,oXml,cXmlFile)
-Local lOk
-Local nTimer 
-Local cMsg
-                                       
-cXmlFile := alltrim(cXmlFile)
+	Local lOk
+	Local nTimer 
+	Local cMsg
+										
+	cXmlFile := alltrim(cXmlFile)
 
-If Empty(cXmlFile)
-	MsgStop('Infome um arquivo XML para executar o Parser')
-	Return
-Endif
+	If Empty(cXmlFile)
+		MsgStop('Infome um arquivo XML para executar o Parser')
+		Return
+	Endif
 
-If !file(cXmlFile)
-	MsgStop('Arquivo ['+cXmlFile+'] não encontrado.')
-	Return
-Endif
+	If !file(cXmlFile)
+		MsgStop('Arquivo ['+cXmlFile+'] não encontrado.')
+		Return
+	Endif
 
-nTimer := seconds()
-//£££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
-// só funciona com oXml:Parse(MemoRead(cXmlFile))
-lOk := oXml:Parse(MemoRead(cXmlFile))
-//lOk := oXml:ParseFile(cXmlFile)	
-nTimer := seconds()-nTimer
+	nTimer := seconds()
+	//£££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
+	// só funciona com oXml:Parse(MemoRead(cXmlFile))
+	lOk := oXml:Parse(MemoRead(cXmlFile))
+	//lOk := oXml:ParseFile(cXmlFile)	
+	nTimer := seconds()-nTimer
 
-If !lOk
-	cMsg := oXml:Error()
-	oListResult:SetArray({' '})
-	MsgStop(cMsg,"Parse Error")     
-Else
-	cMsg := "Parser executado em "+str(nTimer,12,2)+' s.'
-	BuildResult(oXml,oListResult)
-	MsgInfo(cMsg,"Parse OK")     
-Endif
-	
+	If !lOk
+		cMsg := oXml:Error()
+		oListResult:SetArray({' '})
+		MsgStop(cMsg,"Parse Error")     
+	Else
+		cMsg := "Parser executado em "+str(nTimer,12,2)+' s.'
+		BuildResult(oXml,oListResult)
+		MsgInfo(cMsg,"Parse OK")     
+	Endif
+		
 Return
                                  
 // Monta os dados para um ListBox com os resultados obtidos 
 
 STATIC Function BuildResult(oXml,oListResult,aResult,nStack)
-Local cRow          
-Local nI 
+	Local cRow          
+	Local nI 
 
-DEFAULT aResult := {}
-DEFAULT nStack := 1
- 
-While .T.
-
-	// Se o nó atual tem um dado, armazena
-	If !XMLempty(oXML:cText)
-		cRow := 'Path ['+oXML:cPath+'] Value ['+oXML:cText+']'
-		aadd(aResult,cRow)
-	Endif
+	DEFAULT aResult := {}
+	DEFAULT nStack := 1
 	
-	IF oXml:DOMHASATT()
-		// Se o nó atual tem atrubitos, lê todos
-		aAtt := oXml:DOMGETATTARRAY()
-		For nI := 1 to len(aAtt)
-			cRow := 'Path ['+oXML:cPath+'] Att ['+aAtt[nI][1]+'] Value ['+aAtt[nI][2]+']'
+	While .T.
+
+		// Se o nó atual tem um dado, armazena
+		If !XMLempty(oXML:cText)
+			cRow := 'Path ['+oXML:cPath+'] Value ['+oXML:cText+']'
 			aadd(aResult,cRow)
-		Next
-	Endif
-	
-	If oXml:DOMHasChildNode()
-		// Se o nó atual tem um filho, entra nele para avaliar o conteudo
-		oxml:DOMChildNode()
-		BuildResult(oXml,oListResult,aResult,nStack+1)
-		oxml:DOMParentNode()
-	Endif
-	
-	IF oXml:DOMHasNextNode()
-		// Se existe um próximo nó neste nivel, 
-		// vai pra ele e continua analizando 
-		oxml:DOMNextNode()
-		LOOP
-	Endif
+		Endif
+		
+		IF oXml:DOMHASATT()
+			// Se o nó atual tem atrubitos, lê todos
+			aAtt := oXml:DOMGETATTARRAY()
+			For nI := 1 to len(aAtt)
+				cRow := 'Path ['+oXML:cPath+'] Att ['+aAtt[nI][1]+'] Value ['+aAtt[nI][2]+']'
+				aadd(aResult,cRow)
+			Next
+		Endif
+		
+		If oXml:DOMHasChildNode()
+			// Se o nó atual tem um filho, entra nele para avaliar o conteudo
+			oxml:DOMChildNode()
+			BuildResult(oXml,oListResult,aResult,nStack+1)
+			oxml:DOMParentNode()
+		Endif
+		
+		IF oXml:DOMHasNextNode()
+			// Se existe um próximo nó neste nivel, 
+			// vai pra ele e continua analizando 
+			oxml:DOMNextNode()
+			LOOP
+		Endif
 
-	// Este nó já foi analizado inteiro, sai do loop 
-	EXIT
-	
-Enddo
+		// Este nó já foi analizado inteiro, sai do loop 
+		EXIT
+		
+	Enddo
 
-If nStack == 1
-	// Seta o array de resultado para o ListBox
-	If len(aResult) > 0
-		oListResult:SetArray(aResult)
-	Else
-		oListResult:SetArray({' *** NO RESULT *** '})
+	If nStack == 1
+		// Seta o array de resultado para o ListBox
+		If len(aResult) > 0
+			oListResult:SetArray(aResult)
+		Else
+			oListResult:SetArray({' *** NO RESULT *** '})
+		Endif
 	Endif
-Endif
 
 Return
 
@@ -195,10 +195,10 @@ Return
 
 Static Function XMLempty(cNodeValue)
 
-cNodeValue := strtran(cNodeValue,chr(13),'')
-cNodeValue := strtran(cNodeValue,chr(10),'')
-cNodeValue := strtran(cNodeValue,chr(9),'')
-cNodeValue := strtran(cNodeValue,' ','')
+	cNodeValue := strtran(cNodeValue,chr(13),'')
+	cNodeValue := strtran(cNodeValue,chr(10),'')
+	cNodeValue := strtran(cNodeValue,chr(9),'')
+	cNodeValue := strtran(cNodeValue,' ','')
 
 Return empty(cNodeValue)
 

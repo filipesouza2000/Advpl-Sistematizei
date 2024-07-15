@@ -1,6 +1,5 @@
 #INCLUDE 'protheus.ch'
 #INCLUDE "TopConn.ch"
-#INCLUDE "XMLXFUN.CH"
 #INCLUDE 'totvs.ch'
 
 /*++++DATA++++|++++AUTOR+++++|++++++++++++++++DESCRIÇÂO+++++++++++++
@@ -14,19 +13,17 @@
     -Utilizar o CNPJ para procurar o cadastro do fornecedor (SA2). 
     -Com o código e loja do fornecedor, procurar no documento de entrada (SF1) se existe um registro com o mesmo número, série, fornecedor e loja (utilizar TCGenQry ou BeginSql nas buscas de fornecedor e documento de entrada). 
     -No final, apresentar um alerta indicando se foi ou não encontrado o documento de entrada.
-  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  22/06/2023  | Filipe Souza |  Nova estrutura de leitura do xml, formando json
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 User Function procXML()
-    Local oXml,oJson
+    Local oXml
     Local lRead     :=.F.
-    Local lNode     :=.F.
     Local cL        :=Chr(10)+Chr(13)
     Local aIde      :={}
     Local aEmit     :={}
+    Local nX
     Local aArea     := GetArea()
-    Local cXMl,cCodF, cLojaF,cCNPJ,cNota ,cSerie ,ckey, cQuery,cWhere,cTp,cJson,cError,cMessage
+    Local cXMl,cCodF, cLojaF,cCNPJ,cNota ,cSerie ,ckey, cQuery,cWhere,cTp
 
     cXMl := cGetFile('*.xml','Buscar arquivo XML',0,'C:\TOTVS12133\Protheus\protheus_data\xmlnfe\new',.F.,GETF_LOCALHARD + GETF_NOCHANGEDIR,.T.)
     If cXMl == '' .OR. cXMl == nil
@@ -42,41 +39,8 @@ User Function procXML()
         oXML :DOMChildNode()//<infNFe
         ckey := oXml:DOMGetAtt('Id')//chave da nfe
         oXML :DOMChildNode()//<ide
-        //verifica se existe o nó
-        If oXml:CNAME == "ide"            
-            aIde    := oXML:DOMGetChildArray()
-            cJson   :=arrToJson(aIde)
-            oJson   := JsonObject():New()
-            cError  := oJson:FromJson(cJson)
-            lNode   :=.T.
-        else 
-            cMessage:="-Estrutura XML incompleta, <ide> inexistente."+cL
-            lNode     :=.F.
-        endif 
-        
-        IF lNode .and. Empty(cError)
-            if oJson:hasProperty('serie')
-                cSerie := oJson:GetJsonObject('serie')
-            else
-                cMessage:="-Estrutura XML incompleta, <serie> inexistente."+cL
-                lNode     :=.F.
-            endif 
-            if lNode .and.  oJson:hasProperty('nnf')
-                cNota := oJson:GetJsonObject('nnf')
-            else
-                cMessage:="-Estrutura XML incompleta, <nnf> inexistente."+cL
-                lNode     :=.F.
-            endif     
-            if lNode .and.  oJson:hasProperty('nnf')
-                cTp := oJson:GetJsonObject('tpnf')
-            else
-                cMessage:="-Estrutura XML incompleta, <tpnf> inexistente."+cL
-                lNode     :=.F.
-            endif           
-        else
-            FWAlertError(cError)
-        endif
-    /*
+        aIde := oXML:DOMGetChildArray()
+       
         For nX:= 1 to Len(aIde)
             If UPPER(aIde[nX][1])=='SERIE'
                 cSerie := aIde[nX][2]
@@ -86,28 +50,17 @@ User Function procXML()
                 cTp    := aIde[nX][2]
             EndIf            
         Next
-    */
 
         oXML:DOMPrevNode()
         oXML:DOMNextNode()//<emit
         aEmit := oXML:DOMGetChildArray()
-
-        cJson:=arrToJson(aEmit)
-        oJson:= JsonObject():New()
-        cError  := oJson:FromJson(cJson)
-
-        IF Empty(cError)
-            cCNPJ := oJson:GetJsonObject('CNPJ')
-        else
-            FWAlertError(cError)
-        endif
-    /*
+       
         For nX:= 1 to Len(aEmit)
             If UPPER(aEmit[nX][1])=='CNPJ'
                 cCNPJ := aEmit[nX][2]            
             EndIf            
         Next
-    */
+
         //-Utilizar o CNPJ para procurar o cadastro do fornecedor (SA2). A2_CGC 14   A2_COD  6    
         /*DBSelectArea("SA2")
         SA2->(DbSetOrder(3))// A2_FILIAL + A2_CGC
@@ -157,6 +110,5 @@ User Function procXML()
         (cF1)->(DBCloseArea())
          
     EndIf  
-    FreeObj(oJson)
     RestArea(aArea)
 return 
