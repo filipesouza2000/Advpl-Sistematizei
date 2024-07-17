@@ -14,23 +14,31 @@
     -Utilizar o CNPJ para procurar o cadastro do fornecedor (SA2). 
     -Com o código e loja do fornecedor, procurar no documento de entrada (SF1) se existe um registro com o mesmo número, série, fornecedor e loja (utilizar TCGenQry ou BeginSql nas buscas de fornecedor e documento de entrada). 
     -No final, apresentar um alerta indicando se foi ou não encontrado o documento de entrada.
-  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  22/06/2023  | Filipe Souza |  Nova estrutura de leitura do xml, formando json
+  __________________________________________________________________________
+  15/07/2024  | Filipe Souza |  Nova estrutura de leitura do xml, formando json
+                                Identificar existencia do Nó, por oXml:CNAME
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 User Function procXML()
+    RpcSetEnv("99","01",,,"COM")
     Local oXml,oJson
     Local lRead     :=.F.
-    Local lNode     :=.F.
     Local cL        :=Chr(10)+Chr(13)
     Local aIde      :={}
     Local aEmit     :={}
+    Local aForn     :={}
     Local aArea     := GetArea()
-    Local cXMl,cCodF, cLojaF,cCNPJ,cNota ,cSerie ,ckey, cQuery,cWhere,cTp,cJson,cError,cMessage
+    Local cXMl,cCodF, cLojaF,cCNPJ,cNota ,cSerie ,ckey,cTp,cDoc,cWhere
+    Local cJson     :=''
+    Local cError    :=''
+    Local nX        :=0
+    Local lIde      :=.F.
+    Local lEmit     :=.F.
 
     cXMl := cGetFile('*.xml','Buscar arquivo XML',0,'C:\TOTVS12133\Protheus\protheus_data\xmlnfe\new',.F.,GETF_LOCALHARD + GETF_NOCHANGEDIR,.T.)
     If cXMl == '' .OR. cXMl == nil
         FWAlertError("Xml não selecionado ","XMl Info erro")
+        return
     else
         oXml := TXmlManager():New()
         lRead := oXml:Parse(MemoRead(cXml))
@@ -38,83 +46,127 @@ User Function procXML()
             FWAlertError('Erro na leitura'+cL+oXML:Error(),'Error')
             return
         EndIf
-        oXML :DOMChildNode()//<NFe
-        oXML :DOMChildNode()//<infNFe
-        ckey := oXml:DOMGetAtt('Id')//chave da nfe
-        oXML :DOMChildNode()//<ide
-        //verifica se existe o nó
-        If oXml:CNAME == "ide"            
-            aIde    := oXML:DOMGetChildArray()
-            cJson   :=arrToJson(aIde)
-            oJson   := JsonObject():New()
-            cError  := oJson:FromJson(cJson)
-            lNode   :=.T.
-        else 
-            cMessage:="-Estrutura XML incompleta, <ide> inexistente."+cL
-            lNode     :=.F.
-        endif 
-        
-        IF lNode .and. Empty(cError)
-            if oJson:hasProperty('serie')
-                cSerie := oJson:GetJsonObject('serie')
+         //nfeProc
+        for nX := 1 to oXML:DOMChildCount()// para cada nó filho
+            iif(nX==1, oXML:DOMChildNode(),)          
+            If oXml:CNAME == "NFe"
+                exit 
             else
-                cMessage:="-Estrutura XML incompleta, <serie> inexistente."+cL
-                lNode     :=.F.
-            endif 
-            if lNode .and.  oJson:hasProperty('nnf')
-                cNota := oJson:GetJsonObject('nnf')
-            else
-                cMessage:="-Estrutura XML incompleta, <nnf> inexistente."+cL
-                lNode     :=.F.
-            endif     
-            if lNode .and.  oJson:hasProperty('nnf')
-                cTp := oJson:GetJsonObject('tpnf')
-            else
-                cMessage:="-Estrutura XML incompleta, <tpnf> inexistente."+cL
-                lNode     :=.F.
-            endif           
-        else
-            FWAlertError(cError)
-        endif
-    /*
-        For nX:= 1 to Len(aIde)
-            If UPPER(aIde[nX][1])=='SERIE'
-                cSerie := aIde[nX][2]
-            ELSEIF UPPER(aIde[nX][1])=='NNF'
-                cNota  := aIde[nX][2]
-            ELSEIF UPPER(aIde[nX][1])=='TPNF'
-                cTp    := aIde[nX][2]
+                if oXML:DOMHasNextNode()
+                    oXML:DOMNextNode()
+                else
+                    FWAlertError("-Estrutura XML incompleta, <NFe> inexistente")
+                    return
+                endif                            
             EndIf            
-        Next
-    */
-
-        oXML:DOMPrevNode()
-        oXML:DOMNextNode()//<emit
-        aEmit := oXML:DOMGetChildArray()
-
-        cJson:=arrToJson(aEmit)
-        oJson:= JsonObject():New()
-        cError  := oJson:FromJson(cJson)
-
-        IF Empty(cError)
-            cCNPJ := oJson:GetJsonObject('CNPJ')
-        else
-            FWAlertError(cError)
-        endif
-    /*
-        For nX:= 1 to Len(aEmit)
-            If UPPER(aEmit[nX][1])=='CNPJ'
-                cCNPJ := aEmit[nX][2]            
+        next nX
+        //NFe
+        for nX := 1 to oXML:DOMChildCount()// para cada nó filho
+            iif(nX==1, oXML:DOMChildNode(),)          
+            If oXml:CNAME == "infNFe"
+                ckey := oXml:DOMGetAtt('Id')//chave da nfe
+                exit 
+            else
+                if oXML:DOMHasNextNode()
+                    oXML:DOMNextNode()
+                else
+                    FWAlertError("-Estrutura XML incompleta, <infNFe> inexistente")
+                    return
+                endif                            
             EndIf            
-        Next
-    */
-        //-Utilizar o CNPJ para procurar o cadastro do fornecedor (SA2). A2_CGC 14   A2_COD  6    
-        /*DBSelectArea("SA2")
-        SA2->(DbSetOrder(3))// A2_FILIAL + A2_CGC
-        If !SA2->(DBSEEK(xFilial('SA2')+cCNPJ))
-            MSGALERT( "Fornecedor não econtrado com CGC:"+cCNPJ +cL+;
-                    "Será preciso efetuar seu registro.", "Erro na importação XML" )
-        EndIf*/
+        next nX
+        //infNFe
+        for nX := 1 to oXML:DOMChildCount()// para cada nó filho
+            iif(nX==1, oXML:DOMChildNode(),)          
+            If oXml:CNAME == "ide"
+                cError:=''
+                cJson :=''
+                FreeObj(oJson)
+                aIde    := oXML:DOMGetChildArray()
+                cJson   :=arrToJson(aIde)
+                oJson   := JsonObject():New()
+                cError  := oJson:FromJson(cJson)
+                lIde:=.T. 
+                 //ide
+                IF Empty(cError)
+                    if oJson:hasProperty('serie')
+                        cSerie := oJson:GetJsonObject('serie')
+                    else
+                        FWAlertError("-Estrutura XML incompleta, <serie> inexistente")
+                        return
+                    endif 
+                    if  oJson:hasProperty('nnf')
+                        cNota := oJson:GetJsonObject('nnf')
+                    else
+                        FWAlertError("-Estrutura XML incompleta, <nnf> inexistente")
+                        return
+                    endif     
+                    if  oJson:hasProperty('tpnf')
+                        cTp := oJson:GetJsonObject('tpnf')
+                    else
+                        FWAlertError("-Estrutura XML incompleta, <tpnf> inexistente")
+                        return
+                    endif  
+                            
+                else
+                    FWAlertError(cError)
+                    return
+                endif 
+                if oXML:DOMHasNextNode()
+                    oXML:DOMNextNode() 
+                else 
+                    exit
+                endif    
+            elseif oXml:CNAME == "emit"
+                cError:=''
+                cJson :=''
+                FreeObj(oJson)
+                aEmit   := oXML:DOMGetChildArray()
+                cJson   :=arrToJson(aEmit)
+                oJson   := JsonObject():New()
+                cError  := oJson:FromJson(cJson)
+                lEmit:=.T.
+                IF Empty(cError)
+                    if oJson:hasProperty('cnpj')
+                        cCNPJ := oJson:GetJsonObject('cnpj')
+                    else
+                        FWAlertError("-Estrutura XML incompleta, <cnpj> inexistente")
+                        return
+                    endif            
+                else
+                    FWAlertError(cError)
+                    return
+                endif 
+                if oXML:DOMHasNextNode()
+                    oXML:DOMNextNode() 
+                else 
+                    exit
+                endif 
+            else
+                if oXML:DOMHasNextNode()
+                    oXML:DOMNextNode()
+                else
+                    If !lIde
+                        FWAlertError("-Estrutura XML incompleta, <ide> inexistente") 
+                        return   
+                    EndIf                    
+                    If !lEmit
+                        FWAlertError("-Estrutura XML incompleta, <emit> inexistente") 
+                        return   
+                    EndIf
+                    
+                endif                            
+            EndIf            
+        next nX
+        /*
+            aForn := GetAdvFVal("SA2", {"A2_COD","A2_LOJA"}, xFilial('SA2')+cCNPJ, 3, {"",""})
+            cCodF :=''
+            cLojaF:=''        
+            If Len(aForn)>0
+                cCodF := aForn[1]
+                cLojaF:= aForn[2]
+            EndIf
+        */
         cQuery := "SELECT A2_COD,A2_LOJA "
         cQuery += " FROM "+RetSqlName("SA2")
         cQuery += " WHERE D_E_L_E_T_ = '' AND A2_FILIAl ='"+ FwXFilial('SA2')+ "' AND A2_CGC = '"+cCNPJ+"'"
@@ -131,12 +183,12 @@ User Function procXML()
         If Alltrim(cCodF)=='' .AND. Alltrim(cLojaF)==''
             FWAlertWarning( "Fornecedor não econtrado com CGC:"+cCNPJ +cL+;
                     "Será preciso efetuar seu registro.", "Erro na importação XML" )
-            A2->(DBCloseArea())
             return
         EndIf    
-        A2->(DBCloseArea())
         //procurar no documento de entrada (SF1)
         //F1 order 1 Filial+Doc+Serie+Fornece+Loja+Tipo
+        //cDoc :=Posicione("SF1", 1, xFilial("SF1")+cNota+cSerie+cCodF+cLojaF+cTp, "F1_DOC")
+       
         cWhere :=" AND F1_FILIAL = '"+ FwXFilial("SF1")+"' AND F1_DOC='"+cNota+"' AND F1_SERIE = '"+cSerie+"'"+cL+;
                 " AND F1_FORNECE = '"+cCodF+"' AND F1_LOJA='"+cLojaF+"' AND F1_TIPO='"+cTp+"' "
         cWhere := "%"+cWhere+"%"
@@ -147,14 +199,14 @@ User Function procXML()
             FROM	%table:SF1%  F1
             WHERE   F1.%NOTDEL%
             %exp:cwhere%
-        EndSql 
+        EndSql         
+        cDoc:=F1_DOC
 
-        IF Alltrim(F1_DOC) != ''
+        IF !Empty(Alltrim(cDoc))
             FWAlertWarning( "Já existe documento de entrada com o número "+cNota, "Importação de XML" )
         else
             FWAlertSuccess( "Documento de entrada "+cNota+cL+"registrado com sucesso.", "Importação de XML" )
         endif    
-        (cF1)->(DBCloseArea())
          
     EndIf  
     FreeObj(oJson)
