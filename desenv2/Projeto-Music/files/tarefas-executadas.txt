@@ -245,8 +245,24 @@ sendo também fornecedor para a venda de seu produto gravado no mesmo ou em outr
 		x	passa 1ª linha correto, mas depois não, usar oView:Refresh()
 			Analisado no evento ALTERAR 
 			
-			Usar Css na linha selecionada da grid ZD3-Musica e ZD7-Instrumento
+		x	Configurada propriedade da View Grid para linha selecionada cor CSS #0A728C
+		
+04/05	x	Analisar eventos de controle DEL,ALT,INC em ZD7 e ZD3
+31/07		-INC: com PE ao editar campo ZD7_CHAVE chama xTotQtd(), para enviar valor total para campo ZD3_INSTR
+			mas assim gerava impactos: na segunda linha o gatilho preenche DESC a primeira,
+			REFRESH e SetFocus ok, mas não funciona GoLine, REFAZER DIFERENTE.
+			Esse método funciona no evento ChangeLine, para cada mudança de linha aciona o bloco xUpInstr 
+			para enviar valor do ZD3_INSTR para XX_TOTITEM (totalizador)
 			
+26/08		Na função xTotQtd, no evento INC na grid ZD7,
+			Retirada função Refresh(), sustituido SetValue para LoadValue para enviar valor ZD7 para ZD3
+			
+				
+			
+			
+			Del: Musica só com Instrumento zerado, definir abstração da function para ser utilizada em outros fluxos.
+			Analisar xDell para Instrumento
+				linha 550 não é objeto
 			alterar visualização de Duração para formato 00:00:00, não 00.00
 			
 			rever processo de excluir Cd e reuperar Cd referenciando o totalizador e da ZD5_FAIXAS, está errado.

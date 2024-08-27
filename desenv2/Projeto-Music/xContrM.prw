@@ -50,10 +50,9 @@ User Function xContrM()
     Local cIdModel  := aparam[3] //id do formulario
     Local oModel, oModelGM, oModelG,oView//,oViewM
     Local nModel    :=0
-    Local aCampos   :={}
-    /*Local nOp       :=0
+    Local aCampos   :={}    
     
-    IF FwModelActive()<>Ni
+    IF FwModelActive()<>NIL
         oModel  :=FwModelActive()
         nOp     :=oModel:GetOperation()
     Endif
@@ -98,7 +97,7 @@ User Function xContrM()
             oModel  :=FwModelActive()
             oModelG :=oModel:GetModel(cIdModel)
             oModelG:lDelAllLine:=.T.   //habilita deletar todas linhas da Grid
-
+            
             //evento de seta para cima                          campos vazios
             If  Len(aparam) >4 .and. aparam[5]=="DELETE" .and. Empty(AllTrim(oModelG:GetValue(aCampos[1]))) .and. Empty(AllTrim(oModelG:GetValue(aCampos[2])))
                 //xTotQtd(modulo master,2=decrementar qtd,1=cd 2=musica,3=instrumentos)
@@ -130,18 +129,21 @@ User Function xContrM()
                             xRet:=.F.                            
                         EndIf                     
                     EndIf
-                EndIf
-            elseif (nModel==3 .AND. ;                   
-                    aparam[5]=="SETVALUE" .AND. ;
-                    aparam[6]=="ZD7_CHAVE" .AND.;
-                    oModel:AALLSUBMODELS[3]:CID=="ZD3Detail" .and. ;
-                    oModel:AALLSUBMODELS[3]:NLINE > 1 .and.;//ZD3Detail mais de 1 linha
-                    oModel:AALLSUBMODELS[4]:NLINE == 1)     //ZD7Detail 1 linha
-                        U_xTotQtd("ZD5Master",1,nModel)     //incrementar qtd
-            elseif nModel==3     
-                   U_xTotQtd("ZD5Master",3,nModel)     //incrementar qtd
+                EndIf               
+            //condição para incrementar Total de instrumentos após a 1ª linha    
+            elseif (nModel==3 .AND. ;                   //grid ZD7 instrumento
+                    aparam[5]=="SETVALUE" .AND. ;       //evento set valor
+                    aparam[6]=="ZD7_CHAVE" .AND.;       //posicionado no campo chave                     //Empty(Alltrim(M->ZD7_CHAVE)) .and. ;
+                    oModel:AALLSUBMODELS[3]:CID=="ZD3Detail" .and. ; //submodelo é Música
+                    oModel:AALLSUBMODELS[3]:NLINE > 1 .and.;         //submodelo música posicionado na linha >1
+                    oModel:AALLSUBMODELS[4]:NLINE == 1)              //submodelo instrumento posicionado na linha 1
+                        U_xTotQtd("ZD5Master",1,nModel)              //incrementar qtd
+                        
+            elseif nModel==3 
+                   U_xTotQtd("ZD5Master",3,nModel)     //setar qtd para ZD3_INSTR
+                                    
             EndIf
-
+    
             If xRet   //entrar somente para edição do campo
                 If M->ZD3_DURAC <> nOldT .and. nOldT >0 .and. xEdit//valor editado
                     xRet := U_xTotDur(nOldT)//decrementa antes de adicionar
