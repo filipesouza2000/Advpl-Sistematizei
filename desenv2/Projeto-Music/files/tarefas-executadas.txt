@@ -258,6 +258,11 @@ sendo também fornecedor para a venda de seu produto gravado no mesmo ou em outr
 			Retirada função Refresh(), sustituido SetValue para LoadValue para enviar valor ZD7 para ZD3
 			
 				
+18/02/25x   Ao alterar o primeiro instrumento, incrementa qtd para mais 1
+			No ponto de entrada, add condição para não incrementar Total de instrumentos,pulando os ifs.
+			Sequencia de IF alterada, esse acima adicionado volta uma posição.
+			Atualizadas as condições, aparam[6] ==("ZD7_CHAVE") .OR. aparam[6] ==("ZD7_DESC") .AND.
+			
 			
 			
 			Del: Musica só com Instrumento zerado, definir abstração da function para ser utilizada em outros fluxos.

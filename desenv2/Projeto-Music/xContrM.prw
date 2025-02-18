@@ -30,6 +30,11 @@
                                 XX_TOTDUR o valor do campo ZD5_TEMPO
   09/04/2024  | Filipe Souza |  Otimizar totalizador de instrumentos, igual de músicas, mas separar total por musica relacionada, não o geral.                                                              
                                 Evento de atualizar totalizador excluindo e recuperando pela seta.
+                                Ao alterar o primeiro instrumento, incrementa qtd para mais 1
+  18/02/2025  | Filipe Souza |  No ponto de entrada, add condição para não incrementar Total de instrumentos,pulando os ifs.
+                                Sequencia de IF alterada, esse acima adicionado volta uma posição.
+                                Atualizadas as condições, aparam[6] ==("ZD7_CHAVE") .OR. aparam[6] ==("ZD7_DESC") .AND.
+                                
 @see https://tdn.totvs.com/display/public/framework/Pontos+de+Entrada+para+fontes+Advpl+desenvolvidos+utilizando+o+conceito+MVC
 @see https://tdn.totvs.com/display/public/PROT/DT+PE+MNTA080+Ponto+de+entrada+padrao+MVC
 */  
@@ -103,6 +108,7 @@ User Function xContrM()
                 //xTotQtd(modulo master,2=decrementar qtd,1=cd 2=musica,3=instrumentos)
                 U_xTotQtd("ZD5Master",2,nModel)                
             EndIf
+            
             //tratar duração da música e totalizador
             If nModel==2  .and. !Empty(M->ZD3_DURAC) .and. M->ZD3_DURAC > 0
                 xRet := U_xValTime(M->ZD3_DURAC)//valida tempo digitado                 
@@ -130,15 +136,22 @@ User Function xContrM()
                         EndIf                     
                     EndIf
                 EndIf               
+            
+            //condição para não incrementar Total de instrumentos ao editar
+            elseif (nModel==3 .AND. ;                   //grid ZD7 instrumento
+                    aparam[5]=="SETVALUE" .AND. ;       //evento set valor    
+                    aparam[6] ==("ZD7_CHAVE") .OR. aparam[6] ==("ZD7_DESC") .AND. ; //posicionado no campo chave ou desc chamado pelo gatilho                    
+                    !Empty(Alltrim(M->ZD7_CHAVE)) .and. ;       // não está vazio campo, pois está em edição
+                    oModel:AALLSUBMODELS[3]:CID=="ZD3Detail" )  //submodelo é Música                    
+                    //-----------//
             //condição para incrementar Total de instrumentos após a 1ª linha    
             elseif (nModel==3 .AND. ;                   //grid ZD7 instrumento
                     aparam[5]=="SETVALUE" .AND. ;       //evento set valor
-                    aparam[6]=="ZD7_CHAVE" .AND.;       //posicionado no campo chave                     //Empty(Alltrim(M->ZD7_CHAVE)) .and. ;
+                    aparam[6] ==("ZD7_CHAVE") .OR. aparam[6] ==("ZD7_DESC") .AND. ; //posicionado no campo chave ou desc chamado pelo gatilho                    
                     oModel:AALLSUBMODELS[3]:CID=="ZD3Detail" .and. ; //submodelo é Música
                     oModel:AALLSUBMODELS[3]:NLINE > 1 .and.;         //submodelo música posicionado na linha >1
                     oModel:AALLSUBMODELS[4]:NLINE == 1)              //submodelo instrumento posicionado na linha 1
-                        U_xTotQtd("ZD5Master",1,nModel)              //incrementar qtd
-                        
+                        U_xTotQtd("ZD5Master",1,nModel)              //incrementar qtd                      
             elseif nModel==3 
                    U_xTotQtd("ZD5Master",3,nModel)     //setar qtd para ZD3_INSTR
                                     
