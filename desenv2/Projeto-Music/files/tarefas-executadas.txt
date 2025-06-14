@@ -248,6 +248,8 @@ sendo também fornecedor para a venda de seu produto gravado no mesmo ou em outr
 		x	Configurada propriedade da View Grid para linha selecionada cor CSS #0A728C
 		
 04/05	x	Analisar eventos de controle DEL,ALT,INC em ZD7 e ZD3
+			Del: Musica só com Instrumento zerado, definir abstração da function para ser utilizada em outros fluxos.
+			
 31/07		-INC: com PE ao editar campo ZD7_CHAVE chama xTotQtd(), para enviar valor total para campo ZD3_INSTR
 			mas assim gerava impactos: na segunda linha o gatilho preenche DESC a primeira,
 			REFRESH e SetFocus ok, mas não funciona GoLine, REFAZER DIFERENTE.
@@ -258,16 +260,40 @@ sendo também fornecedor para a venda de seu produto gravado no mesmo ou em outr
 			Retirada função Refresh(), sustituido SetValue para LoadValue para enviar valor ZD7 para ZD3
 			
 				
-18/02/25x   Ao alterar o primeiro instrumento, incrementa qtd para mais 1
+18/02/25    Ao alterar o primeiro instrumento, incrementa qtd para mais 1
 			No ponto de entrada, add condição para não incrementar Total de instrumentos,pulando os ifs.
 			Sequencia de IF alterada, esse acima adicionado volta uma posição.
 			Atualizadas as condições, aparam[6] ==("ZD7_CHAVE") .OR. aparam[6] ==("ZD7_DESC") .AND.
+						
 			
+19/02/25	x Analisar xDell para Instrumento, deletar e recuperar para atualizar totalizador e coluna instrumentos.
+20/02/25	x Atribuido com ShellExecute para executar comando dentro do windows simulado seta Down e Up.
+			No evento recuperar instrumento, não atualiza coluna na grid Musica,
+				pois só atualiza se alterar ultima linha, onde Down e Up gera atualização, 
+				
+21/02/25	x Para atualização integrada na grid de instrumento, apliquei navegação na grid 
+			x  verificando se não está deletada linha para add nTot para depois setar para campos.
+			x	se campo chave não está vazio e é evento Deletar, 
+			foram utilizados Refresh antes e depois de posicionar na linha editada, buscada pelo SaveLine nas duas grids.
+				oView:Refresh('VIEW_ZD7')
+                oModelZD7:GoLine(aSaveLines[3][2] )
+                oModelZD3:GoLine(aSaveLines[2][2] )
+                oView:Refresh('VIEW_ZD7')
+
+22/02/25    xLinePre, validar mudança de linha de Musica com 0 instrumento,
+			linha ativa e mesmo com instrumentos deletados informar Help para deletar também a música.       
+			!omodel:isdeleted() .and. FWFldGet('ZD3_INSTR')==0 	
+
+30/03/25    Após deletar instrumento(s), ficando vazia a grid intrumentos, 
+				não habilitar mudar de linha na grid músicas. 
+				Com Help EmptyForm. O Formulário de intens de Música não foi preenchido
+			------tentei com PE, evento no addGrid nLinePos, sem sucesso.
+				valida só na segunda vez de mudança e o retorno da linha não funciona, nem RestRows
+				e se for na primeira linha não funciona.
+				utilizei retorno .F. na função. Funcionou mas com outro Help vazio.
+				A função FWSetLastError() não existe na sua versão (12.1.033 / Lib 20211004).
+
 			
-			
-			Del: Musica só com Instrumento zerado, definir abstração da function para ser utilizada em outros fluxos.
-			Analisar xDell para Instrumento
-				linha 550 não é objeto
 			alterar visualização de Duração para formato 00:00:00, não 00.00
 			
 			rever processo de excluir Cd e reuperar Cd referenciando o totalizador e da ZD5_FAIXAS, está errado.

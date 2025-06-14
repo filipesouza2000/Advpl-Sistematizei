@@ -153,10 +153,12 @@ Static Function ModelDef()
     Local bCancel       :={|| FWFORMCANCEL(SELF)}
     //Local bPreG          :=bBlocoAtu
     Local bPreGrid      :={|oModel,nLine,cAction| xLinePre(oModel,nLine,cAction)}
+    Local bLinePos      :={|oModel,nLine,cAction| xLinePos(oModel,nLine,cAction)}
+    
     oModel:=MPFormModel():New("xContrM",bPre,bPos,bCommit,bCancel)
     oModel:addFields("ZD5Master",/*cOwner*/,oStruCon)
     oModel:AddGrid("SB1Detail","ZD5Master",oStruCD,/*bLinePre*/,/*bLinePos*/,bPreGrid,/*bLoad-Carga do modelo manual*/,)
-    oModel:AddGrid("ZD3Detail","SB1Detail",oStruMu,/*bLinePre*/,/*bLinePos*/,bPreGrid,/*bLoad-Carga do modelo manual*/,)
+    oModel:AddGrid("ZD3Detail","SB1Detail",oStruMu,/*bLinePre*/,bLinePos,bPreGrid,/*bLoad-Carga do modelo manual*/,)
     oModel:AddGrid("ZD7Detail","ZD3Detail",oStruItemM,/*bLinePre*/,/*bLinePos*/,/*bPre-Grid Full*/,/*bLoad-Carga do modelo manual*/,)
     oModel:SetPrimaryKey({"ZD5_FILIAL","ZD5_COD"})//,"A1_CGC"
     
@@ -294,16 +296,19 @@ Static Function xUpInstr()
     Local oView    := FwViewActive()
     Local oModel   := FWModelActive()
     Local oModelZD3:= oModel:GetModel('ZD3Detail')
-    Local oModelZD7:= oModel:GetModel('TotaisIM')
+    Local oModelZD7:= oModel:GetModel('ZD7Detail')
+    Local oModelIM := oModel:GetModel('TotaisIM')
     Local nIntr    := oModelZD3:GetValue('ZD3_INSTR')    
     Local nLine    := oModelZD3:NLINE
     Local oGrid    := oView:GetViewObject('VIEW_ZD3')[3]
-    oModelZD7:SetValue("XX_TOTITEM",nIntr)            
-    oView:GetViewObject('VIEW_TOTIM')
-    oView:Refresh('VIEW_TOTIM')  
+    Local nDel,nL
 
+    oModelIM:SetValue("XX_TOTITEM",nIntr)            
+    oView:GetViewObject('VIEW_TOTIM')
+    oView:Refresh('VIEW_TOTIM')      
     oGrid:SetFocus()
     oModelZD3:GoLine(nLine) 
+
 return
 
 //enviar total de CD para o campo ZD5_QCD na view
@@ -330,12 +335,18 @@ User Function xTotQtd(cModM,nOpt,nModulo,lDell)//xTotMus(nOpt)
     DEFAULT nOpt    :=0
     DEFAULT nModulo :=0
     DEFAULT lDell   :=.F.   //para tratar do evento DELETE, diferenciar o de seta para cima
+    Local aArea     :=FWGetArea()
     Local oModel,oModelZD3,oModelG,oGrid
     Local oModelTot := FwModelActive()
     Local nTot      :=0 
-    Local nLine     :=0
+    Local nLine,nL  :=0
     Local aTot      :={}   
     Local oView     :=FwViewActive()
+    Local cKeyDir   :="C:\TOTVS12133\Protheus\protheus_data\"
+    Local cKey      :="key.vbs"//arquivo que simula tecla de setas Down e Up
+    Local aSaveLines:= {}
+
+    aSaveLines := FWSaveRows()
 
     If nModulo==1//'SB1Detail'             
             aAdd(aTot,'TotaisCd')//modulo
@@ -354,36 +365,45 @@ User Function xTotQtd(cModM,nOpt,nModulo,lDell)//xTotMus(nOpt)
     If oModelTot:Adependency[1][1] == cModM
         oModelG  := oModelTot:GetModel(aTot[1])//TotaisM
         nTot     := oModelG:GetValue(aTot[2])//XX_TOTM
-        //no 2º CD não incrementa a 1ª música, chamar XX_TOT para incrementar. Ou recuperando linha deletada.
-        If nOpt==1 
+        
+        If nOpt==1 //recuperação
             IIF( lDell, , nTot++ )
             oModelG:SetValue(aTot[2],nTot)  //"XX_TOTM",nMus          
         elseIf nOpt==2 // DELETE, seta para cima, decrementar total 
-                IIF( lDell, , nTot-- )//se DELETE não decrementa pois totalizador ao ser chamado ln 237 o executa, senão é seta para cima é preciso decremetnar. 
+                IIF( lDell, , nTot-- )//se DELETE, não decrementa, senão, é seta para cima será preciso decrementar. 
                 oModelG:SetValue(aTot[2],nTot)         
         EndIf
         If nModulo<>3//passar total para o modelo master
             oModel:= oModelTot:GetModel(cModM)//ZD5Master
             oModel:SetValue(aTot[3],nTot)    //"ZD5_FAIXAS",nMus
-        elseif nModulo==3 .AND. nTot >0
-            oModelZD3:= oModelTot:GetModel('ZD3Detail')
-            nLine:=oModelZD3:NLINE          //numero da linha ativa
-            oModelZD3:LoadValue(aTot[3],nTot)//seta valor total na grid 
-           
-            //oGrid:= oView:GetViewObject('VIEW_ZD3')[3]
-            //oView:GetViewObject('VIEW_ZD3')            
-            //oView:Refresh('VIEW_ZD3')            
-            //oModelZD3:GoLine(nLine)
-            //oGrid:SetFocus()
-            //oGrid:=FwViewActive()
-            //oView:ApplyModifyToViewByModel()
-//na segunda linha o gatilho preenche a primeira
+        elseif nModulo==3
+            oModelZD3:= oModelTot:GetModel('ZD3Detail')//musica
+            oModelZD7:= oModelTot:GetModel('ZD7Detail')//instrumento
+            if lDell
+                nTot:=0//para recontar
+                //contar itens não deletados
+                for nL:=1 to oModelZD7:Length()
+                    oModelZD7:GoLine(nL)
+                    IIF(oModelZD7:IsDeleted(),,nTot++)                
+                next
+            Endif    
+            oModelG:SetValue(aTot[2],nTot)//totalizador instrumento
+            oModelZD3:LoadValue(aTot[3],nTot)//setar valor total na grid musica
+            // se campo chave não está vazio e é evento Deletar
+            If !Empty(oModelZD7:GetValue("ZD7_CHAVE")) .AND. lDell                               
+                oView:Refresh('VIEW_ZD7')
+                oModelZD7:GoLine(aSaveLines[3][2] )
+                oModelZD3:GoLine(aSaveLines[2][2] )
+                oView:Refresh('VIEW_ZD7')                
+            EndIf
         EndIf
-
     EndIf
     cModM   :=''
     nOpt    :=0   
     nModulo :=0
+    nTot    :=0
+    //FWRestRows(aSaveLines)    
+    FWRestArea(aArea)
 return .T.
 
 
@@ -606,7 +626,7 @@ Static Function xLinePre(oModel,nLine,cAction)
             if !oModelM:IsDeleted() 
                 If (cModel2 == "Musica" .and.(!Empty(AllTrim(FWFldGet(cField1))) .and. FWFldGet(cField2)>0)) .OR.;
                    (cModel1 == "Musica" .and.(!Empty(AllTrim(FWFldGet(cField1)))))//ZD7_CHAVE    
-                        lRet :=.F.                 
+                        lRet :=.F.    
                 EndIf               
             EndIf
         next
@@ -615,8 +635,37 @@ Static Function xLinePre(oModel,nLine,cAction)
             "Não é possível excluir "+cModel1+Chr(10)+Chr(13)+;            
             "Contém registro de "+cModel2+" relacionado a este(a) "+cModel1, 1, 0, NIL, NIL, NIL, NIL, NIL,;
              {"Delete registro(s) de "+cModel2+" deste(a) "+cModel1})
-        EndIf                
+        EndIf               
     EndIf
+return lRet
+
+//validar mudança de linha de Musica com 0 instrumento,
+//linha ativa e mesmo com instrumentos deletados informar Help para preencher instrumento ou deletar também a música.       
+        // !omodel:isdeleted() .and. FWFldGet('ZD3_INSTR')==0  
+Static Function xLinePos(oModel,nLine,cAction)
+    Local aArea:=FWGetArea()
+    Local lRet:=.T.
+
+    oModel :=FwModelActive()
+    oModelZD3 :=oModel:GetModel("ZD3Detail") 
+    oModelZD7 :=oModel:GetModel("ZD7Detail") 
+
+    //Força salvar dados da grid de itens no modelo,
+    //O modelo não está sincronizado no momento da tentativa de sair da linha.
+    oModelZD7:SaveRows()
+
+    If oModelZD3:GetValue('ZD3_INSTR') == 0
+        //Com .T. retorna quantidade linhas não apagadas        
+        if oModelZD7:Length(.T.) == 0   
+        //A função FWSetLastError() não existe na sua versão (12.1.033 / Lib 20211004). 
+        //FWSetLastError seta a mensagem de erro, para o help vazio.
+            FWAlertHelp("Não é possível mudar de linha !",;
+                        "O instrumento de Música não foi preenchido ou só possui item deletado. "+;
+                        "Por favor preencha novo instrumento  ou recupere o instrumento deletado. ")
+            lRet:=.F.                      
+        EndIf
+    Endif     
+    FWRestArea(aArea)  
 return lRet
 
 /*
