@@ -12,7 +12,7 @@
 ---Data---|-----Autor-------|-------Descrição------------
 10/06/2023| Filipe Souza    | Aula 12 - FWMSPrinter - Imprimindo texto com SayAlign
                               Aula 13 - FWMSPrinter - Imprimindo texto na vertical com Say
-
+                              Aula 14 - FWMSPrinter - Imprimindo imagens com SayBitmap 
 @see Terminal da Informação
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 */
@@ -36,6 +36,9 @@ return
 Static Function fMontaRel()
     Local       cCaminho,cArquivo :=""
     Local       cTexto      :=xMkText()
+    Local       cLogo       :="\x_imagens\ti_logo.png"
+    Local       nLarg       :=120
+    Local       nAlt        :=120
     Private     nLinAtu     :=000
     Private     nTamLin     :=010
     Private     nLinFin     :=820
@@ -127,10 +130,13 @@ Static Function fMontaRel()
     nLinAtu:=40
     oPrintPvt:SayAlign(nLinAtu,nColIni +200,"Dados: ",                          oFontDetN,200,    015,,PAD_LEFT, )
     nLinAtu+=nEspLin
+    //imprimir logo
+    oPrintPvt:SayBitMap(nLinAtu-15,nColIni+10,cLogo, nLarg,nAlt)
+
     oPrintPvt:SayAlign(nLinAtu,nColIni +200,"Terminal de Informação:",          oFontCabN,200,    015,,PAD_LEFT, )
     nLinAtu+=nEspLin+5
     oPrintPvt:SayAlign(nLinAtu,nColIni +200,"Site: ",                           oFontDetN,200,    015,,PAD_LEFT, )
-    oPrintPvt:SayAlign(nLinAtu,nColIni +270,"https://terminaldeinformacao ",    oFontDet ,200,    015,,PAD_LEFT, )
+    oPrintPvt:SayAlign(nLinAtu,nColIni +270,"https://terminaldeinformacao.com ",    oFontDet ,200,    015,,PAD_LEFT, )
     nLinAtu+=nEspLin
     oPrintPvt:SayAlign(nLinAtu,nColIni +200,"E-mail: ",                         oFontDetN,200,    015,,PAD_LEFT, )
     oPrintPvt:SayAlign(nLinAtu,nColIni +270,"suporte@terminaldeinformacao.com ",oFontDet ,200,    015,,PAD_LEFT, )
