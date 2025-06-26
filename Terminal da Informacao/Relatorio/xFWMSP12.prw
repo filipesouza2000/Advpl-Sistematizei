@@ -14,6 +14,7 @@
                               Aula 13 - FWMSPrinter - Imprimindo texto na vertical com Say
                               Aula 14 - FWMSPrinter - Imprimindo imagens com SayBitmap 
                               Aula 15 - FWMSPrinter - Imprimindo QRCode
+                              Aula 16 - FWMSPrinter - Imprimindo linhas e quadros com os métodos Line e Box
 @see Terminal da Informação
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 */
@@ -39,8 +40,11 @@ Static Function fMontaRel()
     Local       cTexto      :=xMkText()
     Local       cLogo       :="\x_imagens\ti_logo.png"
     Local       cUrl        :="http://terminaldeinformacao.com"
-    Local       nLarg       :=120
-    Local       nAlt        :=120
+    Local       cMail       :="suporte@terminaldeinformacao.com "
+    Local       cTel        :="(14)997385495 "
+    Local       cAdm        :="Atílio Sistemas"
+    Local       nLarg       :=90
+    Local       nAlt        :=90
     Private     nLinAtu     :=000
     Private     nTamLin     :=010
     Private     nLinFin     :=820
@@ -48,6 +52,7 @@ Static Function fMontaRel()
     Private     nColFin     :=550
     Private     nColMeio    := (nColFin-nColIni)/2
     Private     nEspLin     :=015
+    Private     nFimQdr     :=0
     Private     dDataGer    :=Date()
     Private     cHoraGer    :=Time()
     Private     oPrintPvt   
@@ -130,26 +135,33 @@ Static Function fMontaRel()
     oPrintPvt:StartPage()
     
     nLinAtu:=40
-    oPrintPvt:SayAlign(nLinAtu,nColIni +200,"Dados: ",                          oFontDetN,200,    015,,PAD_LEFT, )
+    nFimQdr:=nLinAtu + ((nEspLin*6)+5)
+    oPrintPvt:Box( nLinAtu,          nColIni,    nFimQdr,nColFin, )
+    oPrintPvt:Line(nLinAtu+nEspLin+2,nColIni+95, nLinAtu+nEspLin,nColFin-105, )
+    oPrintPvt:Line(nLinAtu,          nColIni+95, nFimQdr,        nColIni+95, )
+    oPrintPvt:Line(nLinAtu,          nColFin-105,nFimQdr,        nColFin-105, )
+    oPrintPvt:Line(nLinAtu+33,       nColIni +100,nLinAtu+33,  nColIni +250, )
+    
     nLinAtu+=nEspLin
     //imprimir logo
-    oPrintPvt:SayBitMap(nLinAtu-15,nColIni+10,cLogo, nLarg,nAlt)
+    oPrintPvt:SayBitMap(nLinAtu-12,nColIni+2,cLogo, nLarg,nAlt)
 
     //Imprimindo QRCode                       //proporcional de lagura e altura
-    oPrintPvt:QRCode(nLinAtu+70,nColFin-100,cUrl,90)
+    oPrintPvt:QRCode(nLinAtu+75,nColFin-100,cUrl,90)
 
-    oPrintPvt:SayAlign(nLinAtu,nColIni +200,"Terminal de Informação:",          oFontCabN,200,    015,,PAD_LEFT, )
+    oPrintPvt:SayAlign(nLinAtu-15,nColIni +100,"Dados",                         oFontCabN,200,    015,,PAD_LEFT, )
+    oPrintPvt:SayAlign(nLinAtu,nColIni +100,"Terminal de Informação:",          oFontCabN,200,    015,,PAD_LEFT, )
     nLinAtu+=nEspLin+5
-    oPrintPvt:SayAlign(nLinAtu,nColIni +200,"Site: ",                           oFontDetN,200,    015,,PAD_LEFT, )
-    oPrintPvt:SayAlign(nLinAtu,nColIni +270,cUrl,                               oFontDet ,200,    015,,PAD_LEFT, )
+    oPrintPvt:SayAlign(nLinAtu,nColIni +100,"Site: ",                           oFontDetN,200,    015,,PAD_LEFT, )
+    oPrintPvt:SayAlign(nLinAtu,nColIni +170,cUrl,                               oFontDet ,200,    015,,PAD_LEFT, )
     nLinAtu+=nEspLin
-    oPrintPvt:SayAlign(nLinAtu,nColIni +200,"E-mail: ",                         oFontDetN,200,    015,,PAD_LEFT, )
-    oPrintPvt:SayAlign(nLinAtu,nColIni +270,"suporte@terminaldeinformacao.com ",oFontDet ,200,    015,,PAD_LEFT, )
+    oPrintPvt:SayAlign(nLinAtu,nColIni +100,"E-mail: ",                         oFontDetN,200,    015,,PAD_LEFT, )
+    oPrintPvt:SayAlign(nLinAtu,nColIni +170,cMail,oFontDet ,200,    015,,PAD_LEFT, )
     nLinAtu+=nEspLin
-    oPrintPvt:SayAlign(nLinAtu,nColIni +200,"Whats App: ",                       oFontDetN,200,    015,,PAD_LEFT, )
-    oPrintPvt:SayAlign(nLinAtu,nColIni +270,"(14)997385495 ",                    oFontDet ,200,    015,,PAD_LEFT, )
+    oPrintPvt:SayAlign(nLinAtu,nColIni +100,"Whats App: ",                       oFontDetN,200,    015,,PAD_LEFT, )
+    oPrintPvt:SayAlign(nLinAtu,nColIni +170,cTel,                               oFontDet ,200,    015,,PAD_LEFT, )
     nLinAtu+=nEspLin
-    oPrintPvt:SayAlign(nLinAtu,nColIni +200,"Atílio Sistemas",                   oFontDetI,200,    015,,PAD_LEFT, )
+    oPrintPvt:SayAlign(nLinAtu,nColIni +100,cAdm,                              oFontDetI,200,    015,,PAD_LEFT, )
     nLinAtu+=nEspLin
     nLinAtu+=30
     oPrintPvt:SayAlign(nLinAtu,nColIni,cTexto,               oFontDet,(nColFin-nColIni),    300,,PAD_JUSTIFY, )
