@@ -15,7 +15,10 @@
                               Aula 14 - FWMSPrinter - Imprimindo imagens com SayBitmap 
                               Aula 15 - FWMSPrinter - Imprimindo QRCode
                               Aula 16 - FWMSPrinter - Imprimindo linhas e quadros com os métodos Line e Box
+                              Aula 17 - FWMSPrinter - Utilizando cores nos textos
+                              Aula 18 - FWMSPrinter - Pintando uma cor de fundo com FillRect
 @see Terminal da Informação
+@see https://tdn.totvs.com/display/public/framework/FWMsPrinter
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 */
 
@@ -55,14 +58,17 @@ Static Function fMontaRel()
     Private     nFimQdr     :=0
     Private     dDataGer    :=Date()
     Private     cHoraGer    :=Time()
+    Private     nCorFraca   :=RGB(198,239,206)
+    Private     nCorForte   :=RGB(003,101,002)
+    Private     oBrush      :=TBrush():New(,nCorFraca)
     Private     oPrintPvt   
     Private     cNomeFont   :="Arial"
                                         //font     ,,tam,negr,,,,subl,ital        
-    Private     oFontDet    :=TFont():New(cNomeFont,,-11,,.F.,,,,.F.,.F.)       
-    Private     oFontCabN   :=TFont():New(cNomeFont,,-15,,.T.,,,,.F.,.F.)   
-    Private     oFontDetN   :=TFont():New(cNomeFont,,-13,,.T.,,,,.F.,.F.) 
-    Private     oFontDetI   :=TFont():New(cNomeFont,,-11,,.F.,,,,.F.,.T.)  
-    Private     oFontMin    :=TFont():New(cNomeFont,,-09,,.F.,,,,.F.,.F.) 
+    Private     oFontDet    :=TFont():New(cNomeFont,,-11,,.F.,,,,,.F.,.F.)       
+    Private     oFontCabN   :=TFont():New(cNomeFont,,-15,,.T.,,,,,.F.,.F.)   
+    Private     oFontDetN   :=TFont():New(cNomeFont,,-13,,.T.,,,,,.F.,.F.) 
+    Private     oFontDetI   :=TFont():New(cNomeFont,,-11,,.F.,,,,,.F.,.T.)  
+    Private     oFontMin    :=TFont():New(cNomeFont,,-09,,.F.,,,,,.F.,.F.) 
     Private     cTextV      :="Assinatura Premium do Terminal de Informação, veja https://terminaldeinformacao.com/hotmart"
 
     If lJob
@@ -137,10 +143,11 @@ Static Function fMontaRel()
     nLinAtu:=40
     nFimQdr:=nLinAtu + ((nEspLin*6)+5)
     oPrintPvt:Box( nLinAtu,          nColIni,    nFimQdr,nColFin, )
-    oPrintPvt:Line(nLinAtu+nEspLin+2,nColIni+95, nLinAtu+nEspLin,nColFin-105, )
+    oPrintPvt:FillRect({nLinAtu+1,   nColIni+95, nLinAtu+nEspLin,nColFin-105},oBrush)
+    oPrintPvt:Line(nLinAtu+nEspLin,  nColIni+95, nLinAtu+nEspLin,nColFin-105, )
     oPrintPvt:Line(nLinAtu,          nColIni+95, nFimQdr,        nColIni+95, )
     oPrintPvt:Line(nLinAtu,          nColFin-105,nFimQdr,        nColFin-105, )
-    oPrintPvt:Line(nLinAtu+33,       nColIni +100,nLinAtu+33,  nColIni +250, )
+    oPrintPvt:Line(nLinAtu+33,       nColIni +100,nLinAtu+33,  nColIni +250, nCorFraca)
     
     nLinAtu+=nEspLin
     //imprimir logo
@@ -149,8 +156,8 @@ Static Function fMontaRel()
     //Imprimindo QRCode                       //proporcional de lagura e altura
     oPrintPvt:QRCode(nLinAtu+75,nColFin-100,cUrl,90)
 
-    oPrintPvt:SayAlign(nLinAtu-15,nColIni +100,"Dados",                         oFontCabN,200,    015,,PAD_LEFT, )
-    oPrintPvt:SayAlign(nLinAtu,nColIni +100,"Terminal de Informação:",          oFontCabN,200,    015,,PAD_LEFT, )
+    oPrintPvt:SayAlign(nLinAtu-15,nColIni +100,"Dados",                         oFontCabN,200,    015,nCorForte,PAD_LEFT, )
+    oPrintPvt:SayAlign(nLinAtu,nColIni +100,"Terminal de Informação:",          oFontCabN,200,    015,nCorForte,PAD_LEFT, )
     nLinAtu+=nEspLin+5
     oPrintPvt:SayAlign(nLinAtu,nColIni +100,"Site: ",                           oFontDetN,200,    015,,PAD_LEFT, )
     oPrintPvt:SayAlign(nLinAtu,nColIni +170,cUrl,                               oFontDet ,200,    015,,PAD_LEFT, )
