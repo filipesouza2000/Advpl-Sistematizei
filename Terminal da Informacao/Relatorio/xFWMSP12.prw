@@ -19,6 +19,7 @@
                               Aula 18 - FWMSPrinter - Pintando uma cor de fundo com FillRect
                               Aula 19 - FWMSPrinter - a lógica do cabeçalho, do rodapé e quebra
                               Gerando consulta Sql, utilizando pergunta de e até Produtos.
+                              linhas na lista do resultado
 @see Terminal da Informação
 @see https://tdn.totvs.com/display/public/framework/FWMsPrinter
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -27,7 +28,7 @@
 User Function xFWMSP12()
     Local   aArea   :=FWGetArea()
     Private lJob    := IsBlind()
-    Private  cPerg   :="PERPROD"
+    Private cPerg   :="PERPROD"
 
     //Se for execução automática via JOB, executa sem pergunta
     If lJob
@@ -52,19 +53,19 @@ Static Function fMontaRel()
         Private     cTel        :="(14)997385495 "
         Private     cAdm        :="Atílio Sistemas"
         Private     nLarg       :=90
-        Private     nAlt        :=90
-        Private     nLinAtu     :=000
+        Private     nAlt        :=90     
+        Private     nLinAtu     :=000        
         Private     nTamLin     :=010
         Private     nLinFin     :=820
         Private     nColIni     :=010
         Private     nColFin     :=550
         Private     nPageAtu    :=1
         Private     nColProd    :=nColIni
-        Private     nColDesc    :=nColIni+080
-        Private     nColTipo    :=nColFin-280
-        Private     nColTDes    :=nColFin-240
-        Private     nColUMed    :=nColFin-140
-        Private     nColDUMed   :=nColFin-100
+        Private     nColDesc    :=nColIni+090
+        Private     nColTipo    :=nColFin-270
+        Private     nColTDes    :=nColFin-230
+        Private     nColUMed    :=nColFin-130
+        Private     nColDUMed   :=nColFin-090
         Private     nColMeio    := (nColFin-nColIni)/2
         Private     nEspLin     :=015
         Private     nFimQdr     :=0
@@ -153,20 +154,20 @@ Static Function fMontaRel()
 
     xImpCab()
     //imprimir consulta
-    cQuery := "SELECT  B1.B1_COD as Cod,"
-	cQuery += "	B1.B1_DESC as Descr,    "
-	cQuery += "	B1.B1_TIPO as Tipo,     "
-	cQuery += "	(	SELECT X5.X5_DESCRI "
-	cQuery += "		FROM "+RetSqlName("SX5")+" X5"
-	cQuery += "		WHERE X5.D_E_L_E_T_ ='' AND  X5.X5_TABELA='02' AND X5.X5_CHAVE=B1.B1_TIPO) as TpDesc,"
-	cQuery += "	B1.B1_UM as UMED,       "
-	cQuery += "	AH.AH_DESCPO as UmDesc  "
-    cQuery += " FROM "+RetSqlName("SB1")+" B1  INNER JOIN "+RetSqlName("SAH")+" AH "
-    cQuery += " ON	B1.B1_UM = AH.AH_UNIMED AND B1.D_E_L_E_T_ = AH.D_E_L_E_T_"
-    cQuery += " Where B1.B1_COD BETWEEN '"+cProd1+"' and '"+cProd2+"'"
-    cQuery += " ORDER BY cod"
-    
-    cQuery:= ChangeQuery(cQuery)    
+        cQuery := "SELECT  B1.B1_COD as Cod,"
+        cQuery += "	B1.B1_DESC as Descr,    "
+        cQuery += "	B1.B1_TIPO as Tipo,     "
+        cQuery += "	(	SELECT X5.X5_DESCRI "
+        cQuery += "		FROM "+RetSqlName("SX5")+" X5"
+        cQuery += "		WHERE X5.D_E_L_E_T_ ='' AND  X5.X5_TABELA='02' AND X5.X5_CHAVE=B1.B1_TIPO) as TpDesc,"
+        cQuery += "	B1.B1_UM as UMED,       "
+        cQuery += "	AH.AH_DESCPO as UmDesc  "
+        cQuery += " FROM "+RetSqlName("SB1")+" B1  INNER JOIN "+RetSqlName("SAH")+" AH "
+        cQuery += " ON	B1.B1_UM = AH.AH_UNIMED AND B1.D_E_L_E_T_ = AH.D_E_L_E_T_"
+        cQuery += " Where B1.B1_COD BETWEEN '"+cProd1+"' and '"+cProd2+"'"
+        cQuery += " ORDER BY cod"
+        
+        cQuery:= ChangeQuery(cQuery)    
                           //https://tdn.totvs.com/display/tec/TCGenQry
     DBUseArea(.T.,'TOPCONN',TcGenQry(,,cQuery),'B1',.F.,.T.)
     
@@ -177,15 +178,26 @@ Static Function fMontaRel()
         IncProc("Imprimindo produto - "+ cValToChar(B1->COD))
         xBreackPage()//verifica quebra de página
                         //( < nRow>, < nCol>, < cText>,  [ oFont], [ nWidth], [ nHeigth], [ nClrText], [ nAlignHorz], [ nAlignVert ] )
-        oPrintPvt:SayAlign(nLinAtu, nColProd, B1->cod,     oFontDet, 100 , 10 , RGB(0,0,0), PAD_LEFT,)
+        oPrintPvt:SayAlign(nLinAtu, nColProd, " "+B1->cod,     oFontDet, 100 , 10 , RGB(0,0,0), PAD_LEFT,)
         oPrintPvt:SayAlign(nLinAtu, nColDesc, B1->Descr,   oFontDet, 200 , 10 , RGB(0,0,0), PAD_LEFT,)
         oPrintPvt:SayAlign(nLinAtu, nColTipo, B1->Tipo,    oFontDet, 040 , 10 , RGB(0,0,0), PAD_CENTER,)
         oPrintPvt:SayAlign(nLinAtu, nColTDes, B1->TpDesc,  oFontDet, 120 , 10 , RGB(0,0,0), PAD_LEFT,)
         oPrintPvt:SayAlign(nLinAtu, nColUMed, B1->UMED,    oFontDet, 040 , 10 , RGB(0,0,0), PAD_CENTER,)
         oPrintPvt:SayAlign(nLinAtu, nColDUMed,B1->UmDesc,  oFontDet, 080 , 10 , RGB(0,0,0), PAD_LEFT,)
         nLinAtu+=nEspLin
+        //limha de separação
+        oPrintPvt:Line(nLinAtu-3,nColIni,nLinAtu-3,nColFin,nCorCinza)
+        //linha vertical na lista
+        oPrintPvt:Line(nLinAtu-18,nColIni,   nLinAtu-3,nColIni,   nCorCinza)//produto
+        oPrintPvt:Line(nLinAtu-18,nColDesc-2,nLinAtu-3,nColDesc-2,nCorCinza)//desc
+        oPrintPvt:Line(nLinAtu-18,nColTipo+5,nLinAtu-3,nColTipo+5,  nCorCinza)//TP
+        oPrintPvt:Line(nLinAtu-18,nColTDes-2,nLinAtu-3,nColTDes-2,nCorCinza)//tp desc
+        oPrintPvt:Line(nLinAtu-18,nColUMed+5,nLinAtu-3,nColUMed+5,  nCorCinza)//um
+        oPrintPvt:Line(nLinAtu-18,nColDUMed-2,nLinAtu-3,nColDUMed-2,nCorCinza)//um des
+        oPrintPvt:Line(nLinAtu-18,nColFin,    nLinAtu-3,nColFin,   nCorCinza)//final
         B1->(DbSkip())
     EndDo
+    
     B1->(dbCloseArea())
     RECOVER
         Alert("Ocorreu um erro durante a execução da consulta.")
@@ -272,6 +284,14 @@ Static Function  xImpCab()
     //separatória
     nLinAtu+=020
     oPrintPvt:Line(nLinAtu,nColIni,nLinAtu,nColFin,)
+    //linha vertical complementar, primeira linha maior
+    oPrintPvt:Line(nLinAtu,nColIni,   nLinAtu+18, nColIni,   nCorCinza)//produto
+    oPrintPvt:Line(nLinAtu,nColDesc-2,nLinAtu+18, nColDesc-2,nCorCinza)//desc
+    oPrintPvt:Line(nLinAtu,nColTipo+5,nLinAtu+18, nColTipo+5,nCorCinza)//TP
+    oPrintPvt:Line(nLinAtu,nColTDes-2,nLinAtu+18, nColTDes-2,nCorCinza)//tp desc
+    oPrintPvt:Line(nLinAtu,nColUMed+5,nLinAtu+18, nColUMed+5,nCorCinza)//um
+    oPrintPvt:Line(nLinAtu,nColDUMed-2,nLinAtu+18,nColDUMed-2,nCorCinza)//um des
+    oPrintPvt:Line(nLinAtu,nColFin,   nLinAtu+18,nColFin,nCorCinza)//final
     nLinAtu+=005
 
 return
