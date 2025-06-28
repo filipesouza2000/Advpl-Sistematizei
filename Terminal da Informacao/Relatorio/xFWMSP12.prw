@@ -3,6 +3,7 @@
 #Include "RPTDef.ch"
 #Include "FwPrintSetup.ch"
 
+
 #Define PAD_LEFT    0
 #Define PAD_RIGHT   1
 #Define PAD_CENTER  2
@@ -20,25 +21,41 @@
                               Aula 19 - FWMSPrinter - a lógica do cabeçalho, do rodapé e quebra
                               Gerando consulta Sql, utilizando pergunta de e até Produtos.
                               linhas na lista do resultado
+                              Aula 20 - FWMSPrinter - Gerando a informação zebrada e com parambox
 @see Terminal da Informação
 @see https://tdn.totvs.com/display/public/framework/FWMsPrinter
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 */
 
 User Function xFWMSP12()
-    Local   aArea   :=FWGetArea()
-    Private lJob    := IsBlind()
-    Private cPerg   :="PERPROD"
+    Local   aArea   :=FWGetArea()  
+    Local cProdDe  := Space(TamSX3('B1_COD')[01])
+    Local cProdAt  := Space(TamSX3('B1_COD')[01])
+    Local cTipoDe  := Space(TamSX3('B1_TIPO')[01])
+    Local cTipoAt  := Space(TamSX3('B1_TIPO')[01])
+    Local   nOrden  :=1
+    Private   lJob    := IsBlind()
+    Private   cPerg   :="PERPROD"
+    Private   aPergs  :={}  
 
     //Se for execução automática via JOB, executa sem pergunta
     If lJob
-        Processa({|| fMontaRel()}, "Processando...")
-    else//senão, exibe pergunta  
-        // função que cria perguntas na SX1 se não existir
-            xValidPerg()
+        fMontaRel()
+    else
+        //    xValidPerg()
         //função para exibir pergunta e rececer parâmetros para o relatório
-            pergunte(cPerg)
+        //    pergunte(cPerg)
+        //Parambox
+        aAdd(aPergs,{1,"Produto de:", cProdDe,"",".T.","SB1",".T.",80,.F.})//MV_PAR01
+        aAdd(aPergs,{1,"Produto até:",cProdAt,"",".T.","SB1",".T.",80,.F.})//MV_PAR02
+        aAdd(aPergs,{1,"Tipo de:",    cTipoDe,"",".T.","02",".T.", 40,.F.})//MV_PAR03
+        aAdd(aPergs,{1,"Tipo ate:",   cTipoAt,"",".T.","02",".T.", 40,.F.})//MV_PAR04        
+        aAdd(aPergs,{2,"Ordenar por:",nOrden,  {"1-Cod Prod","2-Desc Prod","3-Tipo","4-Uni Med"},100,".T.",.T.})//MV_PAR05
+        //se a pergunta for confirmada, cria as definições do relatorio
+        if Parambox(aPergs,"Informe os parÂmetros",,,,,,,,,.F.,.F.)
+            MV_PAR05:=Val(cValToChar(MV_PAR05))
             Processa({|| fMontaRel()}, "Processando...")                    
+        Endif            
     EndIf
     
     FwRestArea(aArea)
@@ -84,8 +101,9 @@ Static Function fMontaRel()
         Private     oFontDetI   :=TFont():New(cNomeFont,,-11,,.F.,,,,,.F.,.T.)  
         Private     oFontMin    :=TFont():New(cNomeFont,,-09,,.F.,,,,,.F.,.F.) 
         Private     cTextV      :="Assinatura Premium do Terminal de Informação, veja https://terminaldeinformacao.com/hotmart"
-        Private     cProd1      :=IIF(Alltrim(MV_PAR01)=='' .OR. Alltrim(MV_PAR01)=='0','',Alltrim(MV_PAR01))
-        Private     cProd2      :=IIF(Alltrim(MV_PAR02)=='' .OR. Alltrim(MV_PAR02)=='0','ZZZZZZ',Alltrim(MV_PAR02))
+        //Private     cProd1      :=IIF(Alltrim(MV_PAR01)=='' .OR. Alltrim(MV_PAR01)=='0','',Alltrim(MV_PAR01))
+        //Private     cProd2      :=IIF(Alltrim(MV_PAR02)=='' .OR. Alltrim(MV_PAR02)=='0','ZZZZZZ',Alltrim(MV_PAR02))
+        Private     nReg        :=0
     If lJob
         cCaminho:="/report/"
         cArquivo:="FWMSP_job_"+ dToS(dDataGer) + "_" + StrTran(cHoraGer,':','')+".pdf"
@@ -164,8 +182,21 @@ Static Function fMontaRel()
         cQuery += "	AH.AH_DESCPO as UmDesc  "
         cQuery += " FROM "+RetSqlName("SB1")+" B1  INNER JOIN "+RetSqlName("SAH")+" AH "
         cQuery += " ON	B1.B1_UM = AH.AH_UNIMED AND B1.D_E_L_E_T_ = AH.D_E_L_E_T_"
-        cQuery += " Where B1.B1_COD BETWEEN '"+cProd1+"' and '"+cProd2+"'"
-        cQuery += " ORDER BY cod"
+        cQuery += " Where B1.B1_COD  BETWEEN '"+MV_PAR01+"' and '"+MV_PAR02+"'"
+        cQuery += " AND   B1.B1_TIPO BETWEEN '"+MV_PAR03+"' and '"+MV_PAR04+"'"
+        cQuery += " AND   B1.B1_MSBLQL != '1'"
+        cQuery += " AND   B1.D_E_L_E_T_ =''"
+        cQuery += " ORDER BY  "
+        If MV_PAR05 == 1
+            cQuery+= " B1.B1_COD "
+        elseIf MV_PAR05 == 2
+            cQuery+= " B1.B1_DESC "    
+        elseIf MV_PAR05 == 3
+            cQuery+= " B1.B1_TIPO " 
+        elseIf MV_PAR05 == 4
+            cQuery+= " B1.B1_UM "        
+        EndIf
+        
         
         cQuery:= ChangeQuery(cQuery)    
                           //https://tdn.totvs.com/display/tec/TCGenQry
@@ -173,32 +204,41 @@ Static Function fMontaRel()
     
     // Garante que a área será fechada mesmo com erro
     BEGIN SEQUENCE
-    // Imprime os dados encontrados
-    While B1->(!EOF())
-        IncProc("Imprimindo produto - "+ cValToChar(B1->COD))
-        xBreackPage()//verifica quebra de página
-                        //( < nRow>, < nCol>, < cText>,  [ oFont], [ nWidth], [ nHeigth], [ nClrText], [ nAlignHorz], [ nAlignVert ] )
-        oPrintPvt:SayAlign(nLinAtu, nColProd, " "+B1->cod,     oFontDet, 100 , 10 , RGB(0,0,0), PAD_LEFT,)
-        oPrintPvt:SayAlign(nLinAtu, nColDesc, B1->Descr,   oFontDet, 200 , 10 , RGB(0,0,0), PAD_LEFT,)
-        oPrintPvt:SayAlign(nLinAtu, nColTipo, B1->Tipo,    oFontDet, 040 , 10 , RGB(0,0,0), PAD_CENTER,)
-        oPrintPvt:SayAlign(nLinAtu, nColTDes, B1->TpDesc,  oFontDet, 120 , 10 , RGB(0,0,0), PAD_LEFT,)
-        oPrintPvt:SayAlign(nLinAtu, nColUMed, B1->UMED,    oFontDet, 040 , 10 , RGB(0,0,0), PAD_CENTER,)
-        oPrintPvt:SayAlign(nLinAtu, nColDUMed,B1->UmDesc,  oFontDet, 080 , 10 , RGB(0,0,0), PAD_LEFT,)
-        nLinAtu+=nEspLin
-        //limha de separação
-        oPrintPvt:Line(nLinAtu-3,nColIni,nLinAtu-3,nColFin,nCorCinza)
-        //linha vertical na lista
-        oPrintPvt:Line(nLinAtu-18,nColIni,   nLinAtu-3,nColIni,   nCorCinza)//produto
-        oPrintPvt:Line(nLinAtu-18,nColDesc-2,nLinAtu-3,nColDesc-2,nCorCinza)//desc
-        oPrintPvt:Line(nLinAtu-18,nColTipo+5,nLinAtu-3,nColTipo+5,  nCorCinza)//TP
-        oPrintPvt:Line(nLinAtu-18,nColTDes-2,nLinAtu-3,nColTDes-2,nCorCinza)//tp desc
-        oPrintPvt:Line(nLinAtu-18,nColUMed+5,nLinAtu-3,nColUMed+5,  nCorCinza)//um
-        oPrintPvt:Line(nLinAtu-18,nColDUMed-2,nLinAtu-3,nColDUMed-2,nCorCinza)//um des
-        oPrintPvt:Line(nLinAtu-18,nColFin,    nLinAtu-3,nColFin,   nCorCinza)//final
-        B1->(DbSkip())
-    EndDo
-    
-    B1->(dbCloseArea())
+        B1->(DBGoTop())
+        IF B1->(!EOF())
+        // Imprime os dados encontrados
+        While B1->(!EOF())
+            nReg++
+            IncProc("Imprimindo produto - "+ cValToChar(B1->COD))
+            xBreackPage()//verifica quebra de página
+            If nReg %2==0
+                oPrintPvt:FillRect({nLinAtu-2,nColIni+1,nLinAtu+nEspLin-3 ,nColFin-1},oBrush)
+            EndIf
+                            //( < nRow>, < nCol>, < cText>,  [ oFont], [ nWidth], [ nHeigth], [ nClrText], [ nAlignHorz], [ nAlignVert ] )
+            oPrintPvt:SayAlign(nLinAtu, nColProd, " "+Alltrim(B1->cod),oFontDet, 100 , 10 , RGB(0,0,0), PAD_LEFT,)
+            oPrintPvt:SayAlign(nLinAtu, nColDesc,Alltrim( B1->Descr),  oFontDet, 200 , 10 , RGB(0,0,0), PAD_LEFT,)
+            oPrintPvt:SayAlign(nLinAtu, nColTipo, Alltrim(B1->Tipo),   oFontDet, 040 , 10 , RGB(0,0,0), PAD_CENTER,)
+            oPrintPvt:SayAlign(nLinAtu, nColTDes, Alltrim(B1->TpDesc), oFontDet, 120 , 10 , RGB(0,0,0), PAD_LEFT,)
+            oPrintPvt:SayAlign(nLinAtu, nColUMed, Alltrim(B1->UMED),   oFontDet, 040 , 10 , RGB(0,0,0), PAD_CENTER,)
+            oPrintPvt:SayAlign(nLinAtu, nColDUMed,Alltrim(B1->UmDesc), oFontDet, 080 , 10 , RGB(0,0,0), PAD_LEFT,)
+            nLinAtu+=nEspLin
+            //limha de separação
+            oPrintPvt:Line(nLinAtu-3,nColIni,nLinAtu-3,nColFin,nCorCinza)
+            //linha vertical na lista
+            oPrintPvt:Line(nLinAtu-18,nColIni,   nLinAtu-3,nColIni,   nCorCinza)//produto
+            oPrintPvt:Line(nLinAtu-18,nColDesc-2,nLinAtu-3,nColDesc-2,nCorCinza)//desc
+            oPrintPvt:Line(nLinAtu-18,nColTipo+5,nLinAtu-3,nColTipo+5,  nCorCinza)//TP
+            oPrintPvt:Line(nLinAtu-18,nColTDes-2,nLinAtu-3,nColTDes-2,nCorCinza)//tp desc
+            oPrintPvt:Line(nLinAtu-18,nColUMed+5,nLinAtu-3,nColUMed+5,  nCorCinza)//um
+            oPrintPvt:Line(nLinAtu-18,nColDUMed-2,nLinAtu-3,nColDUMed-2,nCorCinza)//um des
+            oPrintPvt:Line(nLinAtu-18,nColFin,    nLinAtu-3,nColFin,   nCorCinza)//final
+            B1->(DbSkip())
+        EndDo
+        else
+            FwAlertError("Dados não encontrados com os filtros informados","Falha")
+        Endif    
+
+        B1->(dbCloseArea())
     RECOVER
         Alert("Ocorreu um erro durante a execução da consulta.")
     END SEQUENCE
