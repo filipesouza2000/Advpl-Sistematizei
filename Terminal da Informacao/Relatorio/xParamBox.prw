@@ -1,4 +1,3 @@
-[?? Suspicious Content] //Bibliotecas
 #Include "TOTVS.ch"
  
 /*/{Protheus.doc} User Function zExe380
