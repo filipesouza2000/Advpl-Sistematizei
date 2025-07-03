@@ -3,7 +3,7 @@
 #Include "RPTDef.ch"
 #Include "FwPrintSetup.ch"
 
-
+Static oSetupRel    :=NIL
 #Define PAD_LEFT    0
 #Define PAD_RIGHT   1
 #Define PAD_CENTER  2
@@ -22,6 +22,7 @@
                               Gerando consulta Sql, utilizando pergunta de e até Produtos.
                               linhas na lista do resultado
                               Aula 20 - FWMSPrinter - Gerando a informação zebrada e com parambox
+                              Aula 21 - FWMSPrinter - relatório com FWPrintSetup
 @see Terminal da Informação
 @see https://tdn.totvs.com/display/public/framework/FWMsPrinter
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -54,7 +55,11 @@ User Function xFWMSP12()
         //se a pergunta for confirmada, cria as definições do relatorio
         if Parambox(aPergs,"Informe os parÂmetros",,,,,,,,,.F.,.F.)
             MV_PAR05:=Val(cValToChar(MV_PAR05))
-            Processa({|| fMontaRel()}, "Processando...")                    
+            //aciona setup do relatorio
+            xSetupPrint()
+            If ValType( oSetupRel)!="U"
+                Processa({|| fMontaRel()}, "Processando...")                    
+            EndIf            
         Endif            
     EndIf
     
@@ -149,7 +154,7 @@ Static Function fMontaRel()
     */
         oPrintPvt:=FwMsprinter():New(;
             cArquivo,;//cFilePrinter
-            IMP_PDF,; //nDevice
+            IMP_PDF,; //nDevice  
             .F.,;     //lAdjustToLegacy
             '',;      //cPathInServer
             .T.,;     //lDisableSetup
@@ -162,6 +167,8 @@ Static Function fMontaRel()
             .T.)      //lViewPdf
         //FWMSPrinter():New(cNomeRel,IMP_PDF,.F.,'',.T.,,@oPrintPvt,,,,,.T.)
         oPrintPvt:cPathPDF:=cCaminho    
+        oPrintPvt:nDevice:=IMP_PDF
+        oPrintPvt:cPrinter:= oSetupRel:aOptions[PD_VALUETYPE]
         
     EndIf
     //Setando atributos do relatório
@@ -386,4 +393,27 @@ Static Function xValidPerg()
 	Next i 
 	RestArea(aArea) 
 Return(cPerg)
+
+Static Function xSetupPrint()
+    Local aDevice       :={"DISCO","SPOOL","EMAIL","EXCEL","HTML","PDF"}
+    Local oSetup 
+    Local cSession      :=GetPrinterSession()
+    Local cDevice       :=If (Empty(fwGetProfString(cSession,"PRINTTYPE","SPOOL",.T.)),"PDF",fwGetProfString(cSession,"PRINTTYPE","SPOOL",.T.))
+    Local nPrintType    :=aScan(aDevice,{|x| x== cDevice})
+    Local nOrientation  :=1
+    Local nLocal        :=2
+    Local nFlags        :=PD_ISTOTVSPRINTER + PD_DISABLEPREVIEW //+ PD_DISABLEPAPERSIZE + PD_DISABLEMARGIN
+
+    //cria o setup do relatorio
+    oSetup:= FwPrintSetup():New(nFlags,"ETIQUETA")
+    oSetup:SetProperty(PD_DESTINATION, nLocal)
+    oSetup:SetProperty(PD_ORIENTATION, nOrientation)
+    oSetup:SetProperty(PD_PRINTTYPE, nPrintType)
+    oSetupRel:=nil
+
+    //se a tela dor confirmada, atualiza o setup default do relatorio
+    If oSetup:Activate()==PD_OK //.and. oSetup:GetProperty(PD_PRINTTYPE)==IMP_SPOOL
+        oSetupRel:=oSetup
+    EndIf
+return
 
